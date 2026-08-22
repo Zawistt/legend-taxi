@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Legend Taxi</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root{
+    --tun:#0E1621;
+    --qatlam:#17212B;
+    --chegara:#2B3A4A;
+    --matn:#EDF2F7;
+    --xira:#8A9AAB;
+    --sariq:#F2B705;
+    --sariq-tor:#C99400;
+    --yashil:#2FA84F;
+    --qizil:#E0453A;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden}
+  body{
+    background:var(--tun);color:var(--matn);
+    font-family:-apple-system,"SF Pro Text",Roboto,"Segoe UI",sans-serif;
+    display:flex;flex-direction:column;
+  }
+
+  /* Bosqich chizig'i */
+  #bosqichlar{
+    display:flex;gap:6px;padding:10px 14px 8px;
+    background:var(--tun);border-bottom:1px solid var(--chegara);
+  }
+  .bos{
+    flex:1;height:3px;border-radius:2px;background:var(--chegara);
+    transition:background .25s ease;
+  }
+  .bos.faol{background:var(--sariq)}
+
+  /* Xarita */
+  #xarita{flex:1;width:100%;background:#0B121B}
+  .leaflet-control-attribution{
+    background:rgba(14,22,33,.75)!important;color:var(--xira)!important;font-size:9px!important;
+  }
+  .leaflet-control-attribution a{color:var(--xira)!important}
+
+  /* Markazdagi nishon */
+  #nishon{
+    position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-100%);
+    z-index:500;pointer-events:none;
+    transition:transform .18s cubic-bezier(.34,1.4,.64,1);
+  }
+  #nishon.suriladi{transform:translate(-50%,-115%)}
+  #nishon svg{filter:drop-shadow(0 6px 10px rgba(0,0,0,.55))}
+  #soya{
+    position:absolute;left:50%;top:50%;
+    transform:translate(-50%,-50%);
+    width:10px;height:4px;border-radius:50%;
+    background:rgba(0,0,0,.45);z-index:499;pointer-events:none;
+  }
+
+  /* Joylashuvim tugmasi */
+  #menlik{
+    position:absolute;right:14px;bottom:calc(var(--panel-h,190px) + 14px);
+    z-index:600;width:44px;height:44px;border-radius:22px;
+    background:var(--qatlam);border:1px solid var(--chegara);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 14px rgba(0,0,0,.4);cursor:pointer;
+  }
+  #menlik:active{transform:scale(.94)}
+
+  /* Pastki panel */
+  #panel{
+    background:var(--qatlam);border-top:1px solid var(--chegara);
+    padding:14px 16px calc(14px + env(safe-area-inset-bottom));
+    box-shadow:0 -8px 24px rgba(0,0,0,.35);
+  }
+  .sarlavha{
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--xira);margin-bottom:8px;font-weight:600;
+  }
+  .manzil{
+    font-size:17px;line-height:1.35;font-weight:600;min-height:23px;
+    word-break:break-word;
+  }
+  .manzil.kutish{color:var(--xira);font-weight:400}
+
+  /* Yo'l ko'rsatkichi */
+  .yol{display:flex;gap:11px;margin-bottom:14px}
+  .yol-chiziq{
+    width:12px;display:flex;flex-direction:column;align-items:center;padding-top:5px;
+  }
+  .nuqta{width:9px;height:9px;border-radius:50%;flex:none}
+  .nuqta.a{background:var(--yashil)}
+  .nuqta.b{background:var(--qizil)}
+  .chiziq{flex:1;width:2px;background:var(--chegara);margin:3px 0;min-height:16px}
+  .yol-matn{flex:1;min-width:0}
+  .yol-matn .qator{padding-bottom:12px}
+  .yol-matn .qator:last-child{padding-bottom:0}
+  .yorliq{font-size:11px;color:var(--xira);margin-bottom:2px}
+  .qiymat{font-size:15px;font-weight:600;line-height:1.3;word-break:break-word}
+  .qiymat.bosh{color:var(--xira);font-weight:400}
+
+  /* Narx */
+  #narx-blok{display:none;margin-bottom:14px}
+  #narx-kirit{
+    width:100%;background:var(--tun);border:1px solid var(--chegara);
+    border-radius:12px;padding:14px 16px;color:var(--matn);
+    font-size:22px;font-weight:700;font-family:inherit;
+    text-align:center;letter-spacing:.02em;outline:none;
+  }
+  #narx-kirit:focus{border-color:var(--sariq)}
+  #narx-kirit::placeholder{color:var(--xira);font-weight:400;font-size:17px}
+  .tez-narx{display:flex;gap:8px;margin-top:10px}
+  .tez{
+    flex:1;padding:9px 0;border-radius:10px;background:var(--tun);
+    border:1px solid var(--chegara);color:var(--matn);
+    font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;
+  }
+  .tez:active{background:var(--chegara)}
+
+  /* Tugmalar */
+  .tugma{
+    width:100%;padding:16px;border-radius:14px;border:none;
+    font-size:16px;font-weight:700;font-family:inherit;
+    cursor:pointer;letter-spacing:.01em;
+  }
+  .asosiy{background:var(--sariq);color:#1A1207}
+  .asosiy:active{background:var(--sariq-tor)}
+  .asosiy:disabled{background:var(--chegara);color:var(--xira);cursor:default}
+  .ikkilamchi{
+    background:transparent;color:var(--xira);
+    border:1px solid var(--chegara);margin-top:8px;padding:13px;
+    font-size:14px;font-weight:600;
+  }
+
+  /* Xabar */
+  #xabar{
+    position:absolute;left:50%;top:16px;transform:translateX(-50%);
+    z-index:900;background:var(--qizil);color:#fff;
+    padding:10px 18px;border-radius:10px;font-size:14px;font-weight:600;
+    box-shadow:0 6px 18px rgba(0,0,0,.4);
+    opacity:0;pointer-events:none;transition:opacity .2s ease;
+    white-space:nowrap;
+  }
+  #xabar.kor{opacity:1}
+
+
+  /* Navigatsiya rejimi */
+  #nav-panel{display:none;background:var(--qatlam);border-top:1px solid var(--chegara);
+    padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+  #nav-masofa{font-size:28px;font-weight:800;letter-spacing:-.01em}
+  #nav-izoh{font-size:13px;color:var(--xira);margin-top:4px}
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important}
+  }
+</style>
+</head>
+<body>
+
+<div id="bosqichlar">
+  <div class="bos faol" id="b1"></div>
+  <div class="bos" id="b2"></div>
+  <div class="bos" id="b3"></div>
+</div>
+
+<div id="xarita"></div>
+
+<div id="soya"></div>
+<div id="nishon">
+  <svg width="30" height="40" viewBox="0 0 30 40" fill="none">
+    <path d="M15 39C15 39 28 24.5 28 15C28 7.8 22.2 2 15 2C7.8 2 2 7.8 2 15C2 24.5 15 39 15 39Z"
+          fill="#F2B705" stroke="#0E1621" stroke-width="2.5"/>
+    <circle cx="15" cy="15" r="5" fill="#0E1621"/>
+  </svg>
+</div>
+
+<div id="menlik">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EDF2F7" stroke-width="2" stroke-linecap="round">
+    <circle cx="12" cy="12" r="3.2"/>
+    <path d="M12 2v3M12 19v3M22 12h-3M5 12H2"/>
+    <circle cx="12" cy="12" r="8" stroke-opacity=".45"/>
+  </svg>
+</div>
+
+<div id="panel">
+  <div id="tanlash">
+    <div class="sarlavha" id="qadam-nomi">Qayerdan olib ketamiz?</div>
+    <div class="manzil kutish" id="manzil">Xaritani suring — nishon joyni belgilaydi</div>
+    <button class="tugma asosiy" id="tasdiq" style="margin-top:14px">Shu yerdan</button>
+    <button class="tugma ikkilamchi" id="ortga" style="display:none">Orqaga</button>
+  </div>
+
+  <div id="yakun" style="display:none">
+    <div class="yol">
+      <div class="yol-chiziq">
+        <div class="nuqta a"></div>
+        <div class="chiziq"></div>
+        <div class="nuqta b"></div>
+      </div>
+      <div class="yol-matn">
+        <div class="qator">
+          <div class="yorliq">Qayerdan</div>
+          <div class="qiymat" id="ko-a">—</div>
+        </div>
+        <div class="qator">
+          <div class="yorliq">Qayerga</div>
+          <div class="qiymat" id="ko-b">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="narx-blok">
+      <div class="sarlavha">Taklif qilayotgan narxingiz</div>
+      <input id="narx-kirit" type="tel" inputmode="numeric" placeholder="Summani kiriting">
+      <div class="tez-narx">
+        <button class="tez" data-n="10000">10 000</button>
+        <button class="tez" data-n="15000">15 000</button>
+        <button class="tez" data-n="20000">20 000</button>
+        <button class="tez" data-n="30000">30 000</button>
+      </div>
+    </div>
+
+    <button class="tugma asosiy" id="yuborish" style="margin-top:14px">Buyurtma berish</button>
+    <button class="tugma ikkilamchi" id="qaytadan">Manzillarni o'zgartirish</button>
+  </div>
+</div>
+
+
+<div id="nav-panel">
+  <div class="sarlavha">Manzilgacha</div>
+  <div id="nav-masofa">—</div>
+  <div id="nav-izoh">Ko'k nuqta — siz, qizil — manzil</div>
+</div>
+
+<div id="xabar"></div>
+
+<script>
+const tg = window.Telegram ? window.Telegram.WebApp : null;
+if (tg) { tg.ready(); tg.expand(); }
+
+const MARKAZ = [41.2995, 69.2401];   // Toshkent
+let xarita, qadam = 1, A = null, B = null, chiziq = null, mA = null, mB = null;
+let qidiruvTimer = null, oxirgiSorov = 0;
+
+const el = id => document.getElementById(id);
+
+xarita = L.map('xarita', { zoomControl:false, attributionControl:true })
+          .setView(MARKAZ, 14);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  maxZoom: 19,
+  attribution: '&copy; OpenStreetMap, &copy; CARTO'
+}).addTo(xarita);
+
+const belgiA = L.divIcon({className:'', html:'<div style="width:14px;height:14px;border-radius:50%;background:#2FA84F;border:3px solid #0E1621;box-shadow:0 2px 8px rgba(0,0,0,.5)"></div>', iconSize:[14,14], iconAnchor:[7,7]});
+const belgiB = L.divIcon({className:'', html:'<div style="width:14px;height:14px;border-radius:50%;background:#E0453A;border:3px solid #0E1621;box-shadow:0 2px 8px rgba(0,0,0,.5)"></div>', iconSize:[14,14], iconAnchor:[7,7]});
+
+function xabarBer(matn){
+  const x = el('xabar');
+  x.textContent = matn;
+  x.classList.add('kor');
+  setTimeout(()=>x.classList.remove('kor'), 2600);
+}
+
+function panelBalandligi(){
+  document.documentElement.style.setProperty('--panel-h', el('panel').offsetHeight + 'px');
+}
+panelBalandligi();
+window.addEventListener('resize', panelBalandligi);
+
+// --- Manzil nomini olish ---
+async function manzilNomi(lat, lng){
+  try{
+    const j = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=17&accept-language=uz`,
+      {headers:{'Accept':'application/json'}}
+    ).then(r=>r.json());
+    const a = j.address || {};
+    const qism = [a.road, a.house_number, a.neighbourhood || a.suburb, a.city || a.town || a.village]
+                 .filter(Boolean);
+    return qism.length ? qism.join(', ') : (j.display_name || '').split(',').slice(0,3).join(', ');
+  }catch(e){
+    return null;
+  }
+}
+
+let joriyNom = '';
+function nomniYangila(){
+  const c = xarita.getCenter();
+  const m = el('manzil');
+  m.textContent = 'Aniqlanmoqda…';
+  m.classList.add('kutish');
+  clearTimeout(qidiruvTimer);
+  const soro = ++oxirgiSorov;
+  qidiruvTimer = setTimeout(async ()=>{
+    const nom = await manzilNomi(c.lat, c.lng);
+    if (soro !== oxirgiSorov) return;
+    joriyNom = nom || `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+    m.textContent = joriyNom;
+    m.classList.remove('kutish');
+  }, 550);
+}
+
+xarita.on('movestart', ()=> el('nishon').classList.add('suriladi'));
+xarita.on('moveend', ()=>{ el('nishon').classList.remove('suriladi'); nomniYangila(); });
+
+// --- Joylashuvim ---
+el('menlik').addEventListener('click', ()=>{
+  if (!navigator.geolocation){ xabarBer('Qurilma joylashuvni bermayapti'); return; }
+  navigator.geolocation.getCurrentPosition(
+    p => xarita.setView([p.coords.latitude, p.coords.longitude], 16),
+    () => xabarBer('Joylashuvga ruxsat berilmadi'),
+    {enableHighAccuracy:true, timeout:8000}
+  );
+});
+
+// --- Qadamlar ---
+function qadamKorsat(){
+  el('b1').classList.toggle('faol', qadam >= 1);
+  el('b2').classList.toggle('faol', qadam >= 2);
+  el('b3').classList.toggle('faol', qadam >= 3);
+
+  if (qadam === 3){
+    el('tanlash').style.display = 'none';
+    el('yakun').style.display = 'block';
+    el('narx-blok').style.display = 'block';
+    el('ko-a').textContent = A.nom;
+    el('ko-b').textContent = B.nom;
+    el('ko-a').classList.remove('bosh');
+    el('ko-b').classList.remove('bosh');
+    if (chiziq) xarita.removeLayer(chiziq);
+    chiziq = L.polyline([[A.lat,A.lng],[B.lat,B.lng]], {color:'#F2B705', weight:3, opacity:.85, dashArray:'6 8'}).addTo(xarita);
+    xarita.fitBounds(chiziq.getBounds(), {padding:[60,60]});
+  } else {
+    el('tanlash').style.display = 'block';
+    el('yakun').style.display = 'none';
+    el('qadam-nomi').textContent = qadam === 1 ? 'Qayerdan olib ketamiz?' : 'Qayerga borasiz?';
+    el('tasdiq').textContent = qadam === 1 ? 'Shu yerdan' : 'Shu yergacha';
+    el('ortga').style.display = qadam === 2 ? 'block' : 'none';
+  }
+  panelBalandligi();
+}
+
+el('tasdiq').addEventListener('click', ()=>{
+  const c = xarita.getCenter();
+  const nom = joriyNom || `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+  if (qadam === 1){
+    A = {lat:c.lat, lng:c.lng, nom};
+    if (mA) xarita.removeLayer(mA);
+    mA = L.marker([A.lat, A.lng], {icon:belgiA}).addTo(xarita);
+    qadam = 2;
+    qadamKorsat();
+    nomniYangila();
+  } else {
+    B = {lat:c.lat, lng:c.lng, nom};
+    if (mB) xarita.removeLayer(mB);
+    mB = L.marker([B.lat, B.lng], {icon:belgiB}).addTo(xarita);
+    qadam = 3;
+    qadamKorsat();
+  }
+});
+
+el('ortga').addEventListener('click', ()=>{
+  qadam = 1;
+  if (mA){ xarita.removeLayer(mA); mA = null; }
+  A = null;
+  qadamKorsat();
+  nomniYangila();
+});
+
+el('qaytadan').addEventListener('click', ()=>{
+  qadam = 1;
+  A = B = null;
+  [mA, mB, chiziq].forEach(l => { if (l) xarita.removeLayer(l); });
+  mA = mB = chiziq = null;
+  el('narx-kirit').value = '';
+  qadamKorsat();
+  nomniYangila();
+});
+
+document.querySelectorAll('.tez').forEach(b=>{
+  b.addEventListener('click', ()=>{ el('narx-kirit').value = b.dataset.n; });
+});
+
+el('narx-kirit').addEventListener('input', e=>{
+  e.target.value = e.target.value.replace(/\D/g,'').slice(0,7);
+});
+
+el('yuborish').addEventListener('click', ()=>{
+  const narx = parseInt(el('narx-kirit').value || '0', 10);
+  if (!A || !B){ xabarBer('Ikkala manzilni belgilang'); return; }
+  if (!narx || narx < 1000){ xabarBer('Narx kamida 1000 so\'m'); return; }
+  if (narx > 5000000){ xabarBer('Narx juda katta'); return; }
+
+  const malumot = {
+    qayerdan: A.nom, a_lat: +A.lat.toFixed(6), a_lng: +A.lng.toFixed(6),
+    qayerga:  B.nom, b_lat: +B.lat.toFixed(6), b_lng: +B.lng.toFixed(6),
+    narx: narx
+  };
+
+  if (tg && tg.sendData){
+    tg.sendData(JSON.stringify(malumot));
+  } else {
+    xabarBer('Bu sahifa Telegram ichida ochilishi kerak');
+  }
+});
+
+
+// --- Navigatsiya rejimi ---
+const parametr = new URLSearchParams(location.search);
+if (parametr.get('mode') === 'nav'){
+  const mlat = parseFloat(parametr.get('lat'));
+  const mlng = parseFloat(parametr.get('lng'));
+  el('panel').style.display = 'none';
+  el('bosqichlar').style.display = 'none';
+  el('nishon').style.display = 'none';
+  el('soya').style.display = 'none';
+  el('nav-panel').style.display = 'block';
+  panelBalandligi();
+
+  if (!isNaN(mlat) && !isNaN(mlng)){
+    const manzil = L.marker([mlat, mlng], {icon: belgiB}).addTo(xarita);
+    xarita.setView([mlat, mlng], 15);
+    let men = null, yol = null;
+
+    function menYangila(p){
+      const la = p.coords.latitude, ln = p.coords.longitude;
+      if (men) xarita.removeLayer(men);
+      men = L.circleMarker([la, ln], {radius:8, color:'#0E1621', weight:3, fillColor:'#3FA9F5', fillOpacity:1}).addTo(xarita);
+      if (yol) xarita.removeLayer(yol);
+      yol = L.polyline([[la, ln], [mlat, mlng]], {color:'#F2B705', weight:3, opacity:.8, dashArray:'6 8'}).addTo(xarita);
+      const R = 6371, t = Math.PI/180;
+      const dl = (mlat-la)*t, dg = (mlng-ln)*t;
+      const a = Math.sin(dl/2)**2 + Math.cos(la*t)*Math.cos(mlat*t)*Math.sin(dg/2)**2;
+      const km = 2*R*Math.asin(Math.sqrt(a));
+      el('nav-masofa').textContent = km < 1 ? Math.round(km*1000) + ' m' : km.toFixed(1) + ' km';
+    }
+
+    if (navigator.geolocation){
+      navigator.geolocation.watchPosition(menYangila, ()=>{
+        el('nav-izoh').textContent = 'Joylashuvga ruxsat berilmadi';
+      }, {enableHighAccuracy:true, maximumAge:5000});
+    }
+  }
+}
+
+if (parametr.get("mode") !== "nav") nomniYangila();
+</script>
+</body>
+</html>
