@@ -147,6 +147,13 @@
   }
   #xabar.kor{opacity:1}
 
+
+  /* Navigatsiya rejimi */
+  #nav-panel{display:none;background:var(--qatlam);border-top:1px solid var(--chegara);
+    padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+  #nav-masofa{font-size:28px;font-weight:800;letter-spacing:-.01em}
+  #nav-izoh{font-size:13px;color:var(--xira);margin-top:4px}
+
   @media (prefers-reduced-motion:reduce){
     *{transition:none!important;animation:none!important}
   }
@@ -220,6 +227,13 @@
     <button class="tugma asosiy" id="yuborish" style="margin-top:14px">Buyurtma berish</button>
     <button class="tugma ikkilamchi" id="qaytadan">Manzillarni o'zgartirish</button>
   </div>
+</div>
+
+
+<div id="nav-panel">
+  <div class="sarlavha">Manzilgacha</div>
+  <div id="nav-masofa">—</div>
+  <div id="nav-izoh">Ko'k nuqta — siz, qizil — manzil</div>
 </div>
 
 <div id="xabar"></div>
@@ -394,7 +408,46 @@ el('yuborish').addEventListener('click', ()=>{
   }
 });
 
-nomniYangila();
+
+// --- Navigatsiya rejimi ---
+const parametr = new URLSearchParams(location.search);
+if (parametr.get('mode') === 'nav'){
+  const mlat = parseFloat(parametr.get('lat'));
+  const mlng = parseFloat(parametr.get('lng'));
+  el('panel').style.display = 'none';
+  el('bosqichlar').style.display = 'none';
+  el('nishon').style.display = 'none';
+  el('soya').style.display = 'none';
+  el('nav-panel').style.display = 'block';
+  panelBalandligi();
+
+  if (!isNaN(mlat) && !isNaN(mlng)){
+    const manzil = L.marker([mlat, mlng], {icon: belgiB}).addTo(xarita);
+    xarita.setView([mlat, mlng], 15);
+    let men = null, yol = null;
+
+    function menYangila(p){
+      const la = p.coords.latitude, ln = p.coords.longitude;
+      if (men) xarita.removeLayer(men);
+      men = L.circleMarker([la, ln], {radius:8, color:'#0E1621', weight:3, fillColor:'#3FA9F5', fillOpacity:1}).addTo(xarita);
+      if (yol) xarita.removeLayer(yol);
+      yol = L.polyline([[la, ln], [mlat, mlng]], {color:'#F2B705', weight:3, opacity:.8, dashArray:'6 8'}).addTo(xarita);
+      const R = 6371, t = Math.PI/180;
+      const dl = (mlat-la)*t, dg = (mlng-ln)*t;
+      const a = Math.sin(dl/2)**2 + Math.cos(la*t)*Math.cos(mlat*t)*Math.sin(dg/2)**2;
+      const km = 2*R*Math.asin(Math.sqrt(a));
+      el('nav-masofa').textContent = km < 1 ? Math.round(km*1000) + ' m' : km.toFixed(1) + ' km';
+    }
+
+    if (navigator.geolocation){
+      navigator.geolocation.watchPosition(menYangila, ()=>{
+        el('nav-izoh').textContent = 'Joylashuvga ruxsat berilmadi';
+      }, {enableHighAccuracy:true, maximumAge:5000});
+    }
+  }
+}
+
+if (parametr.get("mode") !== "nav") nomniYangila();
 </script>
 </body>
 </html>
