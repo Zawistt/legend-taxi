@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Legend Taxi</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<!-- ===================== XARITA PROVAYDERI =====================
+     YANDEX_KALIT ga Yandex kabinetidan olgan API kalitingizni yozing.
+     Bo'sh qoldirilsa yoki Yandex yuklanmasa — avtomatik Leaflet ishlaydi.
+     Kalitni yandex.ru/maps-api/console dan oling va sozlamalarida
+     domeningizni cheklang (zawistt.github.io va o'z domeningiz).
+============================================================== -->
+<script>
+  window.YANDEX_KALIT = '9f167652-7af1-4e07-9007-184a09cd9623';
+  window.YANDEX_TIL   = 'ru_RU';   // uz_UZ qo'llab-quvvatlansa o'zgartiring
+</script>
+<script>
+(function(){
+  if (!window.YANDEX_KALIT) return;
+  var s = document.createElement('script');
+  s.src = 'https://api-maps.yandex.ru/v3/?apikey=' + encodeURIComponent(window.YANDEX_KALIT)
+        + '&lang=' + window.YANDEX_TIL;
+  s.onerror = function(){ window.YANDEX_XATO = true; };
+  document.head.appendChild(s);
+})();
+</script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  :root{
+    --fon:#0E1621; --panel:#17212B; --panel2:#1F2C38;
+    --matn:#EDF2F7; --xira:#7D8B99; --sariq:#F2B705;
+    --yashil:#2FA84F; --qizil:#E0453A; --chegara:#26333F;
+    --panel-h:220px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;height:100%;overflow:hidden;
+    background:var(--fon);color:var(--matn);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
+
+  #xarita{position:absolute;inset:0;bottom:var(--panel-h);z-index:1;background:var(--fon)}
+  .leaflet-control-attribution{
+    background:rgba(14,22,33,.75)!important;color:var(--xira)!important;font-size:9px!important}
+  .leaflet-control-attribution a{color:var(--xira)!important}
+
+  /* Yandex markerlari markazga tekislanadi (Leaflet iconAnchor o'rniga) */
+  .y-belgi{transform:translate(-50%,-50%);will-change:transform}
+  .ymaps3x0--map-copyrights{opacity:.55;font-size:9px}
+
+  /* markazdagi nishon */
+  #nishon{position:absolute;left:50%;top:calc((100% - var(--panel-h))/2);
+    transform:translate(-50%,-100%);z-index:400;pointer-events:none;transition:transform .18s}
+  #nishon.suriladi{transform:translate(-50%,-110%)}
+  #soya{position:absolute;left:50%;top:calc((100% - var(--panel-h))/2);
+    transform:translate(-50%,-50%);width:10px;height:4px;border-radius:50%;
+    background:rgba(0,0,0,.45);z-index:399;pointer-events:none}
+
+  #menlik{position:absolute;right:14px;bottom:calc(var(--panel-h) + 14px);z-index:401;
+    width:42px;height:42px;border-radius:50%;background:var(--panel);
+    border:1px solid var(--chegara);display:flex;align-items:center;justify-content:center;
+    box-shadow:0 4px 14px rgba(0,0,0,.4)}
+
+  #bosqichlar{position:absolute;top:0;left:0;right:0;z-index:402;display:flex;gap:4px;padding:8px 12px 0}
+  .bos{flex:1;height:3px;border-radius:2px;background:var(--chegara);transition:background .25s}
+  .bos.faol{background:var(--sariq)}
+
+  #panel{position:absolute;left:0;right:0;bottom:0;z-index:500;
+    background:var(--panel);border-top:1px solid var(--chegara);
+    border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom));
+    box-shadow:0 -8px 28px rgba(0,0,0,.45);max-height:78vh;overflow-y:auto}
+
+  .sarlavha{font-size:12px;font-weight:600;letter-spacing:.04em;
+    text-transform:uppercase;color:var(--xira);margin-bottom:8px}
+  .manzil{font-size:17px;font-weight:600;line-height:1.35;min-height:46px;
+    display:flex;align-items:center}
+  .manzil.kutish{color:var(--xira);font-weight:400;font-size:15px}
+
+  .tugma{width:100%;border:0;border-radius:12px;padding:15px;font-size:16px;
+    font-weight:700;font-family:inherit;cursor:pointer}
+  .tugma.asosiy{background:var(--sariq);color:#0E1621}
+  .tugma.asosiy:disabled{background:var(--panel2);color:var(--xira)}
+  .tugma.ikkilamchi{background:transparent;color:var(--xira);font-weight:600;
+    font-size:14px;padding:12px;margin-top:6px}
+
+  /* A → B ko'rinishi */
+  .yol{display:flex;gap:12px;margin-bottom:14px}
+  .yol-chiziq{display:flex;flex-direction:column;align-items:center;padding-top:6px}
+  .nuqta{width:9px;height:9px;border-radius:50%}
+  .nuqta.a{background:var(--yashil)}
+  .nuqta.b{background:var(--qizil)}
+  .chiziq{width:2px;flex:1;min-height:24px;background:var(--chegara);margin:3px 0}
+  .yol-matn{flex:1;min-width:0}
+  .qator{margin-bottom:12px}
+  .qator:last-child{margin-bottom:0}
+  .yorliq{font-size:11px;color:var(--xira);text-transform:uppercase;letter-spacing:.04em}
+  .qiymat{font-size:15px;font-weight:600;line-height:1.3;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+  /* masofa qatori */
+  #masofa-qator{display:flex;justify-content:space-between;align-items:center;
+    padding:10px 12px;background:var(--panel2);border-radius:10px;margin-bottom:12px;font-size:13px}
+  #masofa-qator .k{color:var(--xira)}
+  #masofa-qator .q{font-weight:700}
+
+  /* tarif kartalari */
+  .tariflar{display:flex;gap:10px;margin-bottom:4px}
+  .tarif{flex:1;background:var(--panel2);border:2px solid transparent;
+    border-radius:12px;padding:12px;cursor:pointer;transition:border-color .15s}
+  .tarif.tanlangan{border-color:var(--sariq)}
+  .tarif .nom{font-size:14px;font-weight:700;margin-bottom:2px}
+  .tarif .izoh{font-size:11px;color:var(--xira);margin-bottom:8px}
+  .tarif .narx{font-size:19px;font-weight:800;letter-spacing:-.02em}
+  .tarif .som{font-size:12px;color:var(--xira);font-weight:600}
+  .tarif.yuklanmoqda .narx{color:var(--xira)}
+
+  #ogoh{font-size:11px;color:var(--xira);line-height:1.45;margin:10px 0 2px}
+
+  /* navigatsiya */
+  #nav-panel{position:absolute;left:0;right:0;bottom:0;z-index:500;display:none;
+    background:var(--panel);border-top:1px solid var(--chegara);border-radius:16px 16px 0 0;
+    padding:14px 16px calc(14px + env(safe-area-inset-bottom))}
+  #nav-yuqori{display:flex;align-items:center;gap:14px}
+  #nav-belgi{font-size:38px;line-height:1;color:var(--sariq);width:46px;text-align:center;flex-shrink:0}
+  #nav-orta{flex:1;min-width:0}
+  #nav-masofa{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+  #nav-korsatma{font-size:15px;font-weight:600;color:var(--matn);margin-top:2px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #nav-ovoz{background:var(--panel2);border:1px solid var(--chegara);color:var(--matn);
+    width:44px;height:44px;border-radius:50%;font-size:19px;flex-shrink:0;cursor:pointer}
+  #nav-past{display:flex;justify-content:space-between;margin-top:12px;
+    padding-top:10px;border-top:1px solid var(--chegara);font-size:13px;color:var(--xira)}
+  #nav-qolgan{font-weight:700;color:var(--matn)}
+  #nav-holat{font-size:12px;color:var(--qizil);margin-top:6px;min-height:14px}
+  #nav-ovozmatn{font-size:11px;color:var(--xira);margin-top:2px;min-height:13px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #nav-markaz{display:none;width:100%;margin-top:10px;background:var(--panel2);
+    border:1px solid var(--chegara);color:var(--matn);border-radius:10px;
+    padding:11px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer}
+
+  .mashina{transition:transform .9s linear}
+
+  #h-panel{position:absolute;left:0;right:0;bottom:0;z-index:500;display:none;
+    background:var(--panel);border-top:1px solid var(--chegara);border-radius:16px 16px 0 0;
+    padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+  #h-holat{font-size:15px;font-weight:600;line-height:1.4;margin-bottom:4px}
+  #h-aniqlik{font-size:12px;color:var(--xira);margin-bottom:12px}
+  #h-aniqlik b{color:var(--matn)}
+
+  #xabar{position:absolute;left:50%;top:52px;transform:translate(-50%,-14px);
+    z-index:900;background:var(--panel2);border:1px solid var(--chegara);
+    padding:10px 16px;border-radius:10px;font-size:14px;font-weight:600;
+    opacity:0;pointer-events:none;transition:.22s;white-space:nowrap;max-width:92vw}
+  #xabar.kor{opacity:1;transform:translate(-50%,0)}
+</style>
+</head>
+<body>
+
+<div id="bosqichlar">
+  <div class="bos faol" id="b1"></div>
+  <div class="bos" id="b2"></div>
+  <div class="bos" id="b3"></div>
+</div>
+
+<div id="xarita"></div>
+
+<div id="soya"></div>
+<div id="nishon">
+  <svg width="30" height="40" viewBox="0 0 30 40" fill="none">
+    <path d="M15 39C15 39 28 24.5 28 15C28 7.8 22.2 2 15 2C7.8 2 2 7.8 2 15C2 24.5 15 39 15 39Z"
+          fill="#F2B705" stroke="#0E1621" stroke-width="2.5"/>
+    <circle cx="15" cy="15" r="5" fill="#0E1621"/>
+  </svg>
+</div>
+
+<div id="menlik">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#EDF2F7" stroke-width="2" stroke-linecap="round">
+    <circle cx="12" cy="12" r="3.2"/>
+    <path d="M12 2v3M12 19v3M22 12h-3M5 12H2"/>
+    <circle cx="12" cy="12" r="8" stroke-opacity=".45"/>
+  </svg>
+</div>
+
+<div id="panel">
+  <div id="tanlash">
+    <div class="sarlavha" id="qadam-nomi">Qayerdan olib ketamiz?</div>
+    <div class="manzil kutish" id="manzil">Xaritani suring — nishon joyni belgilaydi</div>
+    <button class="tugma asosiy" id="tasdiq" style="margin-top:14px">Shu yerdan</button>
+    <button class="tugma ikkilamchi" id="ortga" style="display:none">Orqaga</button>
+  </div>
+
+  <div id="yakun" style="display:none">
+    <div class="yol">
+      <div class="yol-chiziq">
+        <div class="nuqta a"></div>
+        <div class="chiziq"></div>
+        <div class="nuqta b"></div>
+      </div>
+      <div class="yol-matn">
+        <div class="qator">
+          <div class="yorliq">Qayerdan</div>
+          <div class="qiymat" id="ko-a">—</div>
+        </div>
+        <div class="qator">
+          <div class="yorliq">Qayerga</div>
+          <div class="qiymat" id="ko-b">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="masofa-qator">
+      <span class="k">Yo'l masofasi</span>
+      <span class="q" id="ko-masofa">hisoblanmoqda…</span>
+    </div>
+
+    <div class="sarlavha">Tarifni tanlang</div>
+    <div class="tariflar">
+      <div class="tarif tanlangan yuklanmoqda" data-kod="start">
+        <div class="nom">Start</div>
+        <div class="izoh">Oddiy mashina</div>
+        <div class="narx" id="narx-start">—</div>
+        <div class="som">so'm</div>
+      </div>
+      <div class="tarif yuklanmoqda" data-kod="komfort">
+        <div class="nom">Komfort</div>
+        <div class="izoh">Yangiroq, kengroq</div>
+        <div class="narx" id="narx-komfort">—</div>
+        <div class="som">so'm</div>
+      </div>
+    </div>
+
+    <div id="ogoh">
+      Narx taxminiy. Yakuniy summa haqiqiy masofa va kutish vaqtiga qarab hisoblanadi.
+    </div>
+
+    <button class="tugma asosiy" id="yuborish" style="margin-top:10px" disabled>Hisoblanmoqda…</button>
+    <button class="tugma ikkilamchi" id="qaytadan">Manzillarni o'zgartirish</button>
+  </div>
+</div>
+
+<div id="h-panel">
+  <div class="sarlavha">Haydovchi rejimi</div>
+  <div id="h-holat">Joylashuv aniqlanmoqda…</div>
+  <div id="h-aniqlik">GPS ishga tushishi uchun bir necha soniya kerak</div>
+  <button class="tugma asosiy" id="h-tugma" disabled>Kuting…</button>
+  <button class="tugma ikkilamchi" id="h-markaz">Meni xaritada markazlashtirish</button>
+</div>
+
+<div id="nav-panel">
+  <div id="nav-yuqori">
+    <div id="nav-belgi">↑</div>
+    <div id="nav-orta">
+      <div id="nav-masofa">—</div>
+      <div id="nav-korsatma">Marshrut hisoblanmoqda…</div>
+    </div>
+    <button id="nav-ovoz" title="Ovoz">🔊</button>
+  </div>
+  <div id="nav-past">
+    <span id="nav-qolgan">—</span>
+    <span id="nav-aniqlik">GPS: —</span>
+  </div>
+  <div id="nav-holat"></div>
+  <div id="nav-ovozmatn"></div>
+  <button id="nav-markaz">Meni markazlashtirish</button>
+</div>
+
+<div id="xabar"></div>
+
+<script>
+const tg = window.Telegram ? window.Telegram.WebApp : null;
+if (tg) { tg.ready(); tg.expand(); }
+
+const MARKAZ = [41.2995, 69.2401];   // Toshkent
+
+// Bot serverga ko'chirilgach shu yerga API manzilini yozing.
+// Bo'sh qolsa — xaritada mashinalar ko'rsatilmaydi, qolgan hammasi ishlayveradi.
+const API = '';   // masalan: 'https://sizning-domeningiz.uz'
+
+// Marshrut serveri. Standart — OSRM ommaviy demo serveri (tijoratda ishlatish
+// tavsiya etilmaydi, cheklanadi). O'z serveringizga OSRM o'rnatgach shu yerga
+// o'z manzilingizni yozing, masalan: 'https://sizning-domeningiz.uz/osrm'
+const OSRM = 'https://router.project-osrm.org';
+
+
+// Tariflar — bot.py dagi qiymatlar bilan bir xil bo'lishi kerak
+const TARIFLAR = {
+  start:   { nom:'Start',   boshlangich:7000, km:1200 },
+  komfort: { nom:'Komfort', boshlangich:9000, km:1400 }
+};
+
+let qadam = 1, A = null, B = null;
+let chiziq = null, mA = null, mB = null;
+let qidiruvTimer = null, oxirgiSorov = 0;
+let yolKm = 0, tanlanganTarif = 'start', marshrutOK = false;
+
+const el = id => document.getElementById(id);
+
+/* ===================== XARITA ADAPTERI =====================
+   Butun kod faqat shu obyekt orqali xarita bilan gaplashadi.
+   Ichida ikkita amalga oshirish bor: Yandex JS API 3.0 va Leaflet.
+   Yandex kaliti yo'q, yuklanmadi yoki xato bergan bo'lsa — Leaflet.
+   Koordinatalar hamma joyda {lat, lng} shaklida uzatiladi;
+   Yandex ichkarida [lng, lat] ga aylantiriladi.
+============================================================ */
+const Xarita = (function(){
+
+  let turi = 'leaflet';     // 'yandex' yoki 'leaflet'
+  let xrt = null;           // asl xarita obyekti
+  let ymaps = null;         // ymaps3 modullari
+  let manba = null;         // Yandex marker manbasi
+  let tinglovchilar = { harakatBoshi: [], harakatOxiri: [], tortish: [] };
+
+  // --- yordamchi: HTML elementdan marker tanasi ---
+  function tana(html){
+    const d = document.createElement('div');
+    d.className = 'y-belgi';
+    d.innerHTML = html;
+    return d;
+  }
+
+  // ================= YANDEX =================
+  async function yandexYarat(elId, markaz, zoom){
+    await ymaps3.ready;
+    ymaps = ymaps3;
+    const { YMap, YMapDefaultSchemeLayer, YMapDefaultFeaturesLayer,
+            YMapListener, YMapFeatureDataSource, YMapLayer } = ymaps3;
+
+    xrt = new YMap(document.getElementById(elId), {
+      location: { center: [markaz[1], markaz[0]], zoom: zoom },
+      behaviors: ['drag', 'pinchZoom', 'dblClick', 'mouseRotate', 'mouseTilt']
+    });
+
+    xrt.addChild(new YMapDefaultSchemeLayer({ theme: 'dark' }));
+    xrt.addChild(new YMapFeatureDataSource({ id: 'legend' }));
+    xrt.addChild(new YMapLayer({ source: 'legend', type: 'features', zIndex: 1500 }));
+    xrt.addChild(new YMapLayer({ source: 'legend', type: 'markers', zIndex: 1800 }));
+    xrt.addChild(new YMapDefaultFeaturesLayer({ zIndex: 1900 }));
+    manba = 'legend';
+
+    let harakatlanmoqda = false;
+    xrt.addChild(new YMapListener({
+      layer: 'any',
+      onActionStart: () => {
+        if (!harakatlanmoqda){
+          harakatlanmoqda = true;
+          tinglovchilar.harakatBoshi.forEach(f => f());
+          tinglovchilar.tortish.forEach(f => f());
+        }
+      },
+      onActionEnd: () => {
+        harakatlanmoqda = false;
+        tinglovchilar.harakatOxiri.forEach(f => f());
+      }
+    }));
+    turi = 'yandex';
+  }
+
+  // ================= LEAFLET =================
+  function leafletYarat(elId, markaz, zoom){
+    xrt = L.map(elId, { zoomControl:false, attributionControl:true }).setView(markaz, zoom);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap, &copy; CARTO'
+    }).addTo(xrt);
+
+    xrt.on('movestart', ()=> tinglovchilar.harakatBoshi.forEach(f => f()));
+    xrt.on('moveend',  ()=> tinglovchilar.harakatOxiri.forEach(f => f()));
+    xrt.on('dragstart',()=> tinglovchilar.tortish.forEach(f => f()));
+    turi = 'leaflet';
+  }
+
+  // ================= UMUMIY INTERFEYS =================
+  return {
+
+    async yarat(elId, markaz, zoom){
+      const yandexBor = window.YANDEX_KALIT && !window.YANDEX_XATO && window.ymaps3;
+      if (yandexBor){
+        try{
+          await yandexYarat(elId, markaz, zoom);
+          return 'yandex';
+        }catch(e){
+          console.warn('Yandex xaritasi ishga tushmadi, Leaflet ishlatiladi:', e);
+          document.getElementById(elId).innerHTML = '';
+        }
+      }
+      leafletYarat(elId, markaz, zoom);
+      return 'leaflet';
+    },
+
+    turi(){ return turi; },
+
+    /* Marker qo'shish.
+       html — marker ichidagi HTML, joy — {lat,lng}
+       Qaytadi: {joyla(joy), burchak(deg), ochir()} */
+    belgi(joy, html, ustki){
+      if (turi === 'yandex'){
+        const t = tana(html);
+        const m = new ymaps.YMapMarker(
+          { coordinates: [joy.lng, joy.lat], source: manba,
+            zIndex: ustki ? 2000 : 1800 },
+          t
+        );
+        xrt.addChild(m);
+        return {
+          _m: m, _t: t, _y: true,
+          joyla(j){
+            t.style.transition = 'transform 1s linear';
+            m.update({ coordinates: [j.lng, j.lat] });
+          },
+          burchak(d){
+            const svg = t.querySelector('svg');
+            if (svg) svg.style.transform = 'rotate(' + d + 'deg)';
+            else t.style.transform = 'translate(-50%,-50%) rotate(' + d + 'deg)';
+          },
+          ochir(){ try{ xrt.removeChild(m); }catch(e){} }
+        };
+      }
+      const ic = L.divIcon({
+        className: '',
+        html: '<div style="width:30px;height:30px;display:flex;align-items:center;justify-content:center">' + html + '</div>',
+        iconSize:[30,30], iconAnchor:[15,15]
+      });
+      const m = L.marker([joy.lat, joy.lng],
+                  { icon: ic, interactive:false,
+                    zIndexOffset: ustki ? 1000 : 0 }).addTo(xrt);
+      return {
+        _m: m, _y: false,
+        joyla(j){
+          m.setLatLng([j.lat, j.lng]);
+          const e = m.getElement();
+          if (e) e.style.transition = 'transform 1s linear';
+        },
+        burchak(d){
+          const e = m.getElement();
+          const svg = e && e.querySelector('svg');
+          if (svg) svg.style.transform = 'rotate(' + d + 'deg)';
+        },
+        ochir(){ xrt.removeLayer(m); }
+      };
+    },
+
+    /* Chiziq. nuqtalar — [{lat,lng}, ...] */
+    chiziq(nuqtalar, uslub){
+      const u = uslub || {};
+      const rang = u.rang || '#F2B705';
+      const qalin = u.qalin || 5;
+      if (turi === 'yandex'){
+        const f = new ymaps.YMapFeature({
+          source: manba,
+          geometry: { type:'LineString', coordinates: nuqtalar.map(p => [p.lng, p.lat]) },
+          style: { stroke: [{ color: rang, width: qalin, opacity: u.shaffof || 0.9,
+                              dash: u.punktir ? [6, 8] : undefined }] }
+        });
+        xrt.addChild(f);
+        return { _f: f, _nuqtalar: nuqtalar, _y: true,
+                 ochir(){ try{ xrt.removeChild(f); }catch(e){} } };
+      }
+      const p = L.polyline(nuqtalar.map(n => [n.lat, n.lng]),
+                  { color: rang, weight: qalin, opacity: u.shaffof || 0.9,
+                    lineJoin:'round', dashArray: u.punktir ? '6 8' : null }).addTo(xrt);
+      return { _f: p, _nuqtalar: nuqtalar, _y: false, ochir(){ xrt.removeLayer(p); } };
+    },
+
+    /* Aniqlik doirasi (GPS xatosi). radius — metrda */
+    doira(joy, radius, rang){
+      if (turi === 'yandex'){
+        // Yandex'da doira ko'pburchak orqali chiziladi
+        const n = [], R = 6371000, qadam = Math.PI/18;
+        for (let a = 0; a < Math.PI*2 + 0.001; a += qadam){
+          const dl = (radius/R) * Math.cos(a);
+          const dg = (radius/(R*Math.cos(joy.lat*Math.PI/180))) * Math.sin(a);
+          n.push([ joy.lng + dg*180/Math.PI, joy.lat + dl*180/Math.PI ]);
+        }
+        const f = new ymaps.YMapFeature({
+          source: manba,
+          geometry: { type:'Polygon', coordinates: [n] },
+          style: { stroke:[{color: rang, width:1}], fill: rang, fillOpacity: .12 }
+        });
+        xrt.addChild(f);
+        return { ochir(){ try{ xrt.removeChild(f); }catch(e){} } };
+      }
+      const c = L.circle([joy.lat, joy.lng],
+                  { radius: radius, color: rang, weight:1,
+                    fillColor: rang, fillOpacity:.12 }).addTo(xrt);
+      return { ochir(){ xrt.removeLayer(c); } };
+    },
+
+    ochir(obj){ if (obj && obj.ochir) obj.ochir(); },
+
+    /* Xaritani ko'chirish */
+    kor(joy, zoom, animatsiyasiz){
+      if (turi === 'yandex'){
+        xrt.setLocation({ center:[joy.lng, joy.lat],
+                          zoom: zoom == null ? xrt.zoom : zoom,
+                          duration: animatsiyasiz ? 0 : 300 });
+        return;
+      }
+      xrt.setView([joy.lat, joy.lng], zoom == null ? xrt.getZoom() : zoom,
+                  { animate: !animatsiyasiz });
+    },
+
+    markaz(){
+      if (turi === 'yandex'){
+        const c = xrt.center;
+        return { lat: c[1], lng: c[0] };
+      }
+      const c = xrt.getCenter();
+      return { lat: c.lat, lng: c.lng };
+    },
+
+    zoom(){ return turi === 'yandex' ? xrt.zoom : xrt.getZoom(); },
+
+    /* Bir necha nuqtani ekranga sig'dirish */
+    sigdir(nuqtalar, chekka){
+      if (!nuqtalar || !nuqtalar.length) return;
+      let minLa= 90, maxLa=-90, minLo= 180, maxLo=-180;
+      nuqtalar.forEach(p => {
+        minLa = Math.min(minLa, p.lat); maxLa = Math.max(maxLa, p.lat);
+        minLo = Math.min(minLo, p.lng); maxLo = Math.max(maxLo, p.lng);
+      });
+      const c = chekka == null ? 50 : chekka;
+      if (turi === 'yandex'){
+        xrt.setLocation({
+          bounds: [[minLo, maxLa], [maxLo, minLa]],
+          duration: 300
+        });
+        return;
+      }
+      xrt.fitBounds([[minLa, minLo], [maxLa, maxLo]], { padding:[c, c] });
+    },
+
+    /* Hodisalar: 'harakatBoshi' | 'harakatOxiri' | 'tortish' */
+    tingla(hodisa, fn){
+      if (tinglovchilar[hodisa]) tinglovchilar[hodisa].push(fn);
+    },
+
+    tozala(){ tinglovchilar = { harakatBoshi: [], harakatOxiri: [], tortish: [] }; }
+  };
+})();
+
+// A va B nuqta belgilari (HTML matn — ikkala provayder uchun ham bir xil)
+const BELGI_A = '<div style="width:14px;height:14px;border-radius:50%;background:#2FA84F;border:3px solid #0E1621;box-shadow:0 2px 8px rgba(0,0,0,.5)"></div>';
+const BELGI_B = '<div style="width:14px;height:14px;border-radius:50%;background:#E0453A;border:3px solid #0E1621;box-shadow:0 2px 8px rgba(0,0,0,.5)"></div>';
+
+function xabarBer(matn){
+  const x = el('xabar');
+  x.textContent = matn;
+  x.classList.add('kor');
+  setTimeout(()=>x.classList.remove('kor'), 2600);
+}
+
+function panelBalandligi(){
+  document.documentElement.style.setProperty('--panel-h', el('panel').offsetHeight + 'px');
+}
+panelBalandligi();
+window.addEventListener('resize', panelBalandligi);
+
+function pulShakli(n){
+  return Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}
+
+// --- Manzil nomini olish ---
+async function manzilNomi(lat, lng){
+  try{
+    const j = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=17&accept-language=uz`,
+      {headers:{'Accept':'application/json'}}
+    ).then(r=>r.json());
+    const a = j.address || {};
+    const qism = [a.road, a.house_number, a.neighbourhood || a.suburb, a.city || a.town || a.village].filter(Boolean);
+    return qism.length ? qism.join(', ') : (j.display_name || '').split(',').slice(0,3).join(', ');
+  }catch(e){
+    return null;
+  }
+}
+
+let joriyNom = '';
+function nomniYangila(){
+  const c = Xarita.markaz();
+  const m = el('manzil');
+  m.textContent = 'Aniqlanmoqda…';
+  m.classList.add('kutish');
+  clearTimeout(qidiruvTimer);
+  const soro = ++oxirgiSorov;
+  qidiruvTimer = setTimeout(async ()=>{
+    const nom = await manzilNomi(c.lat, c.lng);
+    if (soro !== oxirgiSorov) return;
+    joriyNom = nom || `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+    m.textContent = joriyNom;
+    m.classList.remove('kutish');
+  }, 550);
+}
+
+Xarita.tingla('harakatBoshi', ()=> el('nishon').classList.add('suriladi'));
+Xarita.tingla('harakatOxiri', ()=>{ el('nishon').classList.remove('suriladi'); nomniYangila(); });
+
+el('menlik').addEventListener('click', ()=>{
+  if (!navigator.geolocation){ xabarBer('Qurilma joylashuvni bermayapti'); return; }
+  navigator.geolocation.getCurrentPosition(
+    p => Xarita.kor({lat:p.coords.latitude, lng:p.coords.longitude}, 16),
+    () => xabarBer('Joylashuvga ruxsat berilmadi'),
+    {enableHighAccuracy:true, timeout:8000}
+  );
+}); 
+
+// --- To'g'ri chiziq masofasi (zaxira usul) ---
+function tugriMasofa(lat1, lng1, lat2, lng2){
+  const R = 6371, t = Math.PI/180;
+  const dl = (lat2-lat1)*t, dg = (lng2-lng1)*t;
+  const a = Math.sin(dl/2)**2 + Math.cos(lat1*t)*Math.cos(lat2*t)*Math.sin(dg/2)**2;
+  return 2*R*Math.asin(Math.sqrt(a));
+}
+
+// --- Haqiqiy yo'l marshruti (OSRM) ---
+async function marshrutOl(lat1, lng1, lat2, lng2){
+  const url = `${OSRM}/route/v1/driving/${lng1},${lat1};${lng2},${lat2}`
+            + `?overview=full&geometries=geojson`;
+  const javob = await fetch(url).then(r=>r.json());
+  if (!javob.routes || !javob.routes.length) throw new Error('marshrut yo\'q');
+  const y = javob.routes[0];
+  return {
+    km: y.distance / 1000,
+    daqiqa: y.duration / 60,
+    nuqtalar: y.geometry.coordinates.map(c => ({lat: c[1], lng: c[0]}))
+  };
+}
+
+function narxHisobla(kod, km){
+  const t = TARIFLAR[kod];
+  const n = t.boshlangich + Math.round(km * t.km);
+  return Math.round(n / 500) * 500;
+}
+
+function narxlarniYangila(){
+  for (const kod of ['start','komfort']){
+    el('narx-' + kod).textContent = pulShakli(narxHisobla(kod, yolKm));
+  }
+  document.querySelectorAll('.tarif').forEach(k => k.classList.remove('yuklanmoqda'));
+  const n = narxHisobla(tanlanganTarif, yolKm);
+  el('yuborish').textContent = pulShakli(n) + " so'm — buyurtma berish";
+  el('yuborish').disabled = false;
+  panelBalandligi();
+}
+
+async function yolniChiz(){
+  marshrutOK = false;
+  el('ko-masofa').textContent = 'hisoblanmoqda…';
+  el('yuborish').disabled = true;
+  el('yuborish').textContent = 'Hisoblanmoqda…';
+  if (chiziq) { Xarita.ochir(chiziq); chiziq = null; }
+
+  let egri = [{lat:A.lat, lng:A.lng}, {lat:B.lat, lng:B.lng}];
+  try{
+    const y = await marshrutOl(A.lat, A.lng, B.lat, B.lng);
+    yolKm = y.km;
+    marshrutOK = true;
+    egri = y.nuqtalar;
+    chiziq = Xarita.chiziq(egri, {rang:'#F2B705', qalin:5});
+    el('ko-masofa').textContent = y.km.toFixed(1) + ' km · ' + Math.round(y.daqiqa) + ' daqiqa';
+  }catch(e){
+    // Marshrut xizmati javob bermasa — to'g'ri chiziq bo'yicha taxmin
+    yolKm = tugriMasofa(A.lat, A.lng, B.lat, B.lng) * 1.35;
+    chiziq = Xarita.chiziq(egri, {rang:'#F2B705', qalin:3, shaffof:.8, punktir:true});
+    el('ko-masofa').textContent = '≈ ' + yolKm.toFixed(1) + ' km (taxminiy)';
+  }
+  Xarita.sigdir(egri, 50);
+  narxlarniYangila();
+}
+
+function qadamKorsat(){
+  el('b1').classList.toggle('faol', qadam >= 1);
+  el('b2').classList.toggle('faol', qadam >= 2);
+  el('b3').classList.toggle('faol', qadam >= 3);
+
+  if (qadam === 3){
+    el('tanlash').style.display = 'none';
+    el('yakun').style.display = 'block';
+    el('ko-a').textContent = A.nom;
+    el('ko-b').textContent = B.nom;
+    mashinaKuzatuviniToxtat();
+    yolniChiz();
+  } else {
+    el('tanlash').style.display = 'block';
+    el('yakun').style.display = 'none';
+    el('qadam-nomi').textContent = qadam === 1 ? 'Qayerdan olib ketamiz?' : 'Qayerga borasiz?';
+    el('tasdiq').textContent = qadam === 1 ? 'Shu yerdan' : 'Shu yergacha';
+    el('ortga').style.display = qadam === 2 ? 'block' : 'none';
+  }
+  panelBalandligi();
+}
+
+el('tasdiq').addEventListener('click', ()=>{
+  const c = Xarita.markaz();
+  const nom = joriyNom || `${c.lat.toFixed(5)}, ${c.lng.toFixed(5)}`;
+  if (qadam === 1){
+    A = {lat:c.lat, lng:c.lng, nom};
+    Xarita.ochir(mA);
+    mA = Xarita.belgi(A, BELGI_A);
+    qadam = 2;
+    qadamKorsat();
+    nomniYangila();
+  } else {
+    B = {lat:c.lat, lng:c.lng, nom};
+    if (tugriMasofa(A.lat, A.lng, B.lat, B.lng) < 0.2){
+      xabarBer('Manzillar juda yaqin');
+      return;
+    }
+    Xarita.ochir(mB);
+    mB = Xarita.belgi(B, BELGI_B);
+    qadam = 3;
+    qadamKorsat();
+  }
+});
+
+el('ortga').addEventListener('click', ()=>{
+  qadam = 1;
+  Xarita.ochir(mA); mA = null;
+  A = null;
+  qadamKorsat();
+  nomniYangila();
+});
+
+el('qaytadan').addEventListener('click', ()=>{
+  qadam = 1;
+  A = B = null;
+  yolKm = 0;
+  marshrutOK = false;
+  [mA, mB, chiziq].forEach(l => Xarita.ochir(l));
+  mA = mB = chiziq = null;
+  qadamKorsat();
+  nomniYangila();
+  mashinaKuzatuviniBoshla();
+});
+
+document.querySelectorAll('.tarif').forEach(k=>{
+  k.addEventListener('click', ()=>{
+    document.querySelectorAll('.tarif').forEach(x=>x.classList.remove('tanlangan'));
+    k.classList.add('tanlangan');
+    tanlanganTarif = k.dataset.kod;
+    if (yolKm > 0){
+      el('yuborish').textContent = pulShakli(narxHisobla(tanlanganTarif, yolKm)) + " so'm — buyurtma berish";
+    }
+  });
+});
+
+el('yuborish').addEventListener('click', ()=>{
+  if (!A || !B){ xabarBer('Ikkala manzilni belgilang'); return; }
+  if (!yolKm){ xabarBer('Masofa hali hisoblanmadi'); return; }
+
+  const malumot = {
+    qayerdan: A.nom, a_lat: +A.lat.toFixed(6), a_lng: +A.lng.toFixed(6),
+    qayerga:  B.nom, b_lat: +B.lat.toFixed(6), b_lng: +B.lng.toFixed(6),
+    tarif: tanlanganTarif,
+    km: +yolKm.toFixed(2)
+  };
+
+  if (tg && tg.sendData){
+    tg.sendData(JSON.stringify(malumot));
+  } else {
+    xabarBer('Bu sahifa Telegram ichida ochilishi kerak');
+  }
+});
+
+// ================= MASHINA BELGILARI =================
+function mashinaBelgi(rang, burchak){
+  const svg = `<svg class="mashina" width="30" height="30" viewBox="0 0 24 24"
+      style="transform:rotate(${burchak||0}deg)">
+    <path d="M5 11l1.5-4.2A2 2 0 0 1 8.4 5.5h7.2a2 2 0 0 1 1.9 1.3L19 11v6a1 1 0 0 1-1 1h-1.5a1 1 0 0 1-1-1v-1h-7v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1z"
+      fill="${rang}" stroke="#0E1621" stroke-width="1.2" stroke-linejoin="round"/>
+    <circle cx="8" cy="14" r="1.1" fill="#0E1621"/>
+    <circle cx="16" cy="14" r="1.1" fill="#0E1621"/>
+  </svg>`;
+  return svg;
+}
+const RANG = { start:'#F2B705', komfort:'#12181F' };
+
+// ================= MIJOZ: YAQIN MASHINALAR =================
+let mashinalar = [], mashinaTimer = null;
+
+function burchakHisobla(a, b){
+  const y = Math.sin((b[1]-a[1])*Math.PI/180) * Math.cos(b[0]*Math.PI/180);
+  const x = Math.cos(a[0]*Math.PI/180)*Math.sin(b[0]*Math.PI/180)
+          - Math.sin(a[0]*Math.PI/180)*Math.cos(b[0]*Math.PI/180)*Math.cos((b[1]-a[1])*Math.PI/180);
+  return (Math.atan2(y, x) * 180/Math.PI + 360) % 360;
+}
+
+let mashinaSorovda = false;
+async function mashinalarniYangila(){
+  if (!API || mashinaSorovda) return;
+  mashinaSorovda = true;
+  try { await mashinalarniOl(); } finally { mashinaSorovda = false; }
+}
+
+async function mashinalarniOl(){
+  const c = Xarita.markaz();
+  let royxat;
+  try{
+    const j = await fetch(`${API}/yaqin?lat=${c.lat.toFixed(5)}&lng=${c.lng.toFixed(5)}`,
+                          {cache:'no-store'}).then(r=>r.json());
+    royxat = j.mashinalar || [];
+  }catch(e){ return; }   // server javob bermasa — xarita mashinasiz ishlayveradi
+
+  // borlarini siljitamiz, ortiqchasini olib tashlaymiz
+  royxat.forEach((m, i) => {
+    const joy = {lat: m.lat, lng: m.lng};
+    if (mashinalar[i]){
+      const eski = mashinalar[i]._joy;
+      const siljish = tugriMasofa(eski.lat, eski.lng, joy.lat, joy.lng) * 1000;
+      mashinalar[i].joyla(joy);
+      mashinalar[i]._joy = joy;
+      if (siljish > 5){
+        mashinalar[i]._burchak = burchakHisobla([eski.lat, eski.lng], [joy.lat, joy.lng]);
+        mashinalar[i].burchak(mashinalar[i]._burchak);
+      }
+    } else {
+      mashinalar[i] = Xarita.belgi(joy, mashinaBelgi(RANG[m.tarif] || RANG.start, 0));
+      mashinalar[i]._joy = joy;
+    }
+  });
+  for (let i = royxat.length; i < mashinalar.length; i++) Xarita.ochir(mashinalar[i]);
+  mashinalar.length = royxat.length;
+}
+
+function mashinaKuzatuviniBoshla(){
+  if (!API || mashinaTimer) return;
+  mashinalarniYangila();
+  mashinaTimer = setInterval(mashinalarniYangila, 10000);
+}
+function mashinaKuzatuviniToxtat(){
+  clearInterval(mashinaTimer); mashinaTimer = null;
+  mashinalar.forEach(m => Xarita.ochir(m));
+  mashinalar = [];
+}
+
+// ================= HAYDOVCHI REJIMI =================
+function haydovchiRejimi(onlineMi){
+  el('panel').style.display = 'none';
+  el('bosqichlar').style.display = 'none';
+  el('nishon').style.display = 'none';
+  el('soya').style.display = 'none';
+  el('h-panel').style.display = 'block';
+  document.documentElement.style.setProperty('--panel-h', el('h-panel').offsetHeight + 'px');
+
+  let men = null, doira = null, joy = null, oxirgiJoy = null, kuzat = true;
+  Xarita.tingla('tortish', ()=>{ kuzat = false; el('h-markaz').textContent = 'Kuzatuvni yoqish'; });
+
+  const tugma = el('h-tugma');
+  tugma.textContent = onlineMi ? 'Joylashuvni saqlash' : 'Online bo\'lish';
+
+  function chiz(p){
+    const la = p.coords.latitude, ln = p.coords.longitude;
+    const aniqlik = Math.round(p.coords.accuracy || 0);
+    joy = {lat:la, lng:ln, aniqlik};
+
+    if (oxirgiJoy && tugriMasofa(oxirgiJoy.lat, oxirgiJoy.lng, la, ln)*1000 < 2 && men){
+      el('h-aniqlik').innerHTML = 'Aniqlik: <b>' + aniqlik + ' m</b>';
+      return;
+    }
+    const burchak = oxirgiJoy ? burchakHisobla([oxirgiJoy.lat, oxirgiJoy.lng], [la, ln]) : 0;
+    oxirgiJoy = {lat:la, lng:ln};
+
+    if (men){
+      men.joyla({lat:la, lng:ln});
+      men.burchak(burchak);
+    } else {
+      men = Xarita.belgi({lat:la, lng:ln}, mashinaBelgi('#3FA9F5', 0), true);
+      Xarita.kor({lat:la, lng:ln}, 16);
+    }
+    if (kuzat) Xarita.kor({lat:la, lng:ln}, null, true);
+    Xarita.ochir(doira);
+    doira = Xarita.doira({lat:la, lng:ln}, aniqlik, '#3FA9F5');
+
+    el('h-holat').textContent = onlineMi ? 'Siz ONLINE holatdasiz' : 'Joylashuv topildi';
+    el('h-aniqlik').innerHTML = 'Aniqlik: <b>' + aniqlik + ' m</b>' +
+      (aniqlik > 100 ? ' — ochiq joyga chiqsangiz aniqroq bo\'ladi' : '');
+    tugma.disabled = false;
+  }
+
+  function xato(e){
+    el('h-holat').textContent = 'Joylashuv olinmadi';
+    el('h-aniqlik').textContent = e && e.code === 1
+      ? 'Telegram\'ga joylashuvga ruxsat berilmagan. Telefon sozlamalari → Telegram → Joylashuv → Ruxsat bering.'
+      : 'GPS signali yo\'q. Ochiq joyga chiqib, qaytadan urinib ko\'ring.';
+    tugma.disabled = true;
+  }
+
+  if (navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(chiz, xato, {enableHighAccuracy:true, timeout:15000});
+    navigator.geolocation.watchPosition(chiz, xato, {enableHighAccuracy:true, maximumAge:3000});
+  } else {
+    xato(null);
+  }
+
+  el('h-markaz').addEventListener('click', ()=>{
+    kuzat = true;
+    el('h-markaz').textContent = 'Meni xaritada markazlashtirish';
+    if (joy) Xarita.kor(joy, 16);
+    else xabarBer('Joylashuv hali topilmadi');
+  });
+
+  tugma.addEventListener('click', ()=>{
+    if (!joy){ xabarBer('Joylashuv hali topilmadi'); return; }
+    if (joy.aniqlik > 500){ xabarBer('GPS aniqligi past — biroz kuting'); return; }
+    const malumot = { tur:'joylashuv', online:true,
+                      lat:+joy.lat.toFixed(6), lng:+joy.lng.toFixed(6) };
+    if (tg && tg.sendData) tg.sendData(JSON.stringify(malumot));
+    else xabarBer('Bu sahifa Telegram ichida ochilishi kerak');
+  });
+}
+
+// ================= NAVIGATSIYA DVIGATELI =================
+
+// --- Ovoz ---
+const Ovoz = {
+  yoqiq: true, tanlangan: null, tayyor: false,
+  ovozniTop(){
+    if (!window.speechSynthesis) return null;
+    const hammasi = speechSynthesis.getVoices();
+    if (!hammasi.length) return null;
+    const tanla = kod => hammasi.find(v => (v.lang||'').toLowerCase().startsWith(kod));
+    // uz bo'lmasa turkcha eng yaqin talaffuz beradi, keyin rus, keyin har qanday
+    return tanla('uz') || tanla('tr') || tanla('ru') || hammasi[0];
+  },
+  boshla(){
+    if (!window.speechSynthesis) return;
+    this.tanlangan = this.ovozniTop();
+    speechSynthesis.onvoiceschanged = () => { this.tanlangan = this.ovozniTop(); };
+    try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); this.tayyor = true; }
+    catch(e){}
+  },
+  ayt(matn, shoshilinch){
+    el('nav-ovozmatn').textContent = matn;
+    if (!this.yoqiq || !window.speechSynthesis) return;
+    try{
+      if (shoshilinch) speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(matn);
+      if (this.tanlangan) { u.voice = this.tanlangan; u.lang = this.tanlangan.lang; }
+      u.rate = 1.0; u.pitch = 1.0; u.volume = 1.0;
+      speechSynthesis.speak(u);
+    }catch(e){}
+  }
+};
+
+// --- Manyovr matni va belgisi ---
+function manyovr(m, nom){
+  const t = (m && m.type) || 'continue';
+  const y = (m && m.modifier) || '';
+  const chiqish = m && m.exit;
+  const joy = nom ? ' — ' + nom : '';
+  const M = {
+    'left':        ['↰', 'chapga buriling'],
+    'right':       ['↱', "o'ngga buriling"],
+    'sharp left':  ['↰', 'keskin chapga buriling'],
+    'sharp right': ['↱', "keskin o'ngga buriling"],
+    'slight left': ['↖', 'biroz chapga oling'],
+    'slight right':['↗', "biroz o'ngga oling"],
+    'straight':    ['↑', "to'g'ri harakatlaning"],
+    'uturn':       ['↺', 'orqaga qayrilib oling']
+  };
+  if (t === 'arrive')  return ['🏁', 'Manzilga yetib keldingiz', 'Manzilga yetib keldingiz'];
+  if (t === 'depart')  return ['▲', "Yo'lni boshlang", "Yo'lni boshlang"];
+  if (t === 'merge')   return ['⤵', "Yo'lga qo'shiling" + joy, "Yo'lga qo'shiling"];
+  if (t === 'roundabout' || t === 'rotary'){
+    const n = chiqish ? chiqish + '-chiqishdan chiqing' : 'aylanadan chiqing';
+    return ['◎', 'Aylana yo\'l: ' + n, 'Aylana yo\'lga kiring va ' + n];
+  }
+  if (t === 'fork')    return [(y.includes('left') ? '↖' : '↗'),
+                               (y.includes('left') ? 'Chapdagi' : "O'ngdagi") + " yo'nalishni tanlang",
+                               (y.includes('left') ? 'Chapdagi' : "O'ngdagi") + " yo'nalishni tanlang"];
+  const k = M[y] || M[t] || M['straight'];
+  return [k[0], k[1].charAt(0).toUpperCase() + k[1].slice(1) + joy, k[1]];
+}
+
+function masofaMatn(m){
+  if (m >= 1000) return (m/1000).toFixed(1).replace('.0','') + ' km';
+  if (m >= 100)  return Math.round(m/50)*50 + ' m';
+  return Math.max(0, Math.round(m/10)*10) + ' m';
+}
+function masofaOvoz(m){
+  if (m >= 1000) return (m/1000) >= 2 ? Math.round(m/1000) + ' kilometrdan keyin'
+                                      : Math.round(m/100)/10 + ' kilometrdan keyin';
+  return Math.round(m/50)*50 + ' metrdan keyin';
+}
+
+// --- Nuqtadan chiziqqacha masofa (marshrutdan chiqishni aniqlash uchun) ---
+function chiziqqaMasofa(n, nuqtalar){
+  let eng = Infinity;
+  for (let i = 0; i < nuqtalar.length - 1; i++){
+    // nuqtalar {lat,lng} obyektlari — kesmagaMasofa massiv kutadi
+    const a = [nuqtalar[i].lat,   nuqtalar[i].lng];
+    const b = [nuqtalar[i+1].lat, nuqtalar[i+1].lng];
+    const d = kesmagaMasofa(n, a, b);
+    if (d < eng) eng = d;
+  }
+  return eng;
+}
+function kesmagaMasofa(p, a, b){
+  const R = 6371000, t = Math.PI/180;
+  const x0 = p[1]*t*Math.cos(p[0]*t)*R, y0 = p[0]*t*R;
+  const x1 = a[1]*t*Math.cos(a[0]*t)*R, y1 = a[0]*t*R;
+  const x2 = b[1]*t*Math.cos(b[0]*t)*R, y2 = b[0]*t*R;
+  const dx = x2-x1, dy = y2-y1;
+  const uz = dx*dx + dy*dy;
+  let u = uz ? ((x0-x1)*dx + (y0-y1)*dy) / uz : 0;
+  u = Math.max(0, Math.min(1, u));
+  const cx = x1 + u*dx, cy = y1 + u*dy;
+  return Math.hypot(x0-cx, y0-cy);
+}
+
+// --- Marshrutni bosqichlari bilan olish ---
+async function marshrutBosqichli(lat1, lng1, lat2, lng2, signal){
+  const url = `${OSRM}/route/v1/driving/${lng1},${lat1};${lng2},${lat2}`
+            + `?overview=full&geometries=geojson&steps=true`;
+  const j = await fetch(url, {signal}).then(r=>r.json());
+  if (!j.routes || !j.routes.length) throw new Error('marshrut yo\'q');
+  const y = j.routes[0];
+  const bosqichlar = [];
+  (y.legs || []).forEach(leg => (leg.steps || []).forEach(st => {
+    bosqichlar.push({
+      joy: [st.maneuver.location[1], st.maneuver.location[0]],
+      masofa: st.distance,
+      nom: st.name || '',
+      man: st.maneuver
+    });
+  }));
+  return { km: y.distance/1000, daqiqa: y.duration/60,
+           nuqtalar: y.geometry.coordinates.map(c=>({lat:c[1], lng:c[0]})), bosqichlar };
+}
+
+// --- Asosiy navigatsiya ---
+function navigatsiya(mlat, mlng){
+  el('panel').style.display = 'none';
+  el('bosqichlar').style.display = 'none';
+  el('nishon').style.display = 'none';
+  el('soya').style.display = 'none';
+  el('nav-panel').style.display = 'block';
+  panelBalandligiNav();
+
+  Xarita.belgi({lat:mlat, lng:mlng}, BELGI_B);
+  Xarita.kor({lat:mlat, lng:mlng}, 15);
+
+  let men = null, yol = null, marshrut = null;
+  let joriyBosqich = 0, aytilgan = {}, chetlash = 0;
+  let hisoblanmoqda = false, oxirgiGPS = 0, oxirgiJoy = null, kuzat = true;
+  let abort = null;
+
+  Xarita.tingla('tortish', ()=>{ kuzat = false; el('nav-markaz').style.display = 'block'; });
+  el('nav-markaz').addEventListener('click', ()=>{
+    kuzat = true; el('nav-markaz').style.display = 'none';
+    if (oxirgiJoy) Xarita.kor(oxirgiJoy, 17);
+  });
+  el('nav-ovoz').addEventListener('click', ()=>{
+    Ovoz.yoqiq = !Ovoz.yoqiq;
+    el('nav-ovoz').textContent = Ovoz.yoqiq ? '🔊' : '🔇';
+    if (Ovoz.yoqiq) Ovoz.ayt('Ovoz yoqildi');
+    else if (window.speechSynthesis) speechSynthesis.cancel();
+  });
+
+  function menChiz(la, ln, burchak){
+    if (!men){
+      men = Xarita.belgi({lat:la, lng:ln}, mashinaBelgi('#3FA9F5', burchak), true);
+    } else {
+      men.joyla({lat:la, lng:ln});
+      men.burchak(burchak);
+    }
+  }
+
+  async function qaytaHisobla(la, ln, sabab){
+    if (hisoblanmoqda) return;
+    hisoblanmoqda = true;
+    if (abort) abort.abort();
+    abort = new AbortController();
+    const vaqt = setTimeout(()=>abort.abort(), 12000);
+    try{
+      if (sabab === 'chetlash') Ovoz.ayt('Marshrutdan chiqdingiz. Yangi yo\'l hisoblanmoqda', true);
+      const y = await marshrutBosqichli(la, ln, mlat, mlng, abort.signal);
+      marshrut = y; joriyBosqich = 0; aytilgan = {}; chetlash = 0;
+      Xarita.ochir(yol);
+      yol = Xarita.chiziq(y.nuqtalar, {rang:'#F2B705', qalin:6});
+      if (sabab === 'chetlash') Ovoz.ayt('Marshrut qayta hisoblandi');
+      el('nav-holat').textContent = '';
+    }catch(e){
+      el('nav-holat').textContent = 'Marshrut olinmadi — internetni tekshiring';
+    }finally{
+      clearTimeout(vaqt); hisoblanmoqda = false;
+    }
+  }
+
+  function bosqichniYangila(la, ln){
+    if (!marshrut || !marshrut.bosqichlar.length) return;
+    const B = marshrut.bosqichlar;
+    // o'tib ketilgan bosqichlarni tashlaymiz
+    while (joriyBosqich < B.length - 1 &&
+           tugriMasofa(la, ln, B[joriyBosqich].joy[0], B[joriyBosqich].joy[1])*1000 < 25){
+      joriyBosqich++;
+      aytilgan = {};
+    }
+    const b = B[joriyBosqich];
+    const d = tugriMasofa(la, ln, b.joy[0], b.joy[1]) * 1000;
+    const [belgi, matn, ovozMatn] = manyovr(b.man, b.nom);
+
+    el('nav-belgi').textContent = belgi;
+    el('nav-masofa').textContent = masofaMatn(d);
+    el('nav-korsatma').textContent = matn;
+
+    // qolgan umumiy masofa va vaqt
+    let qolgan = d;
+    for (let i = joriyBosqich + 1; i < B.length; i++) qolgan += B[i].masofa;
+    el('nav-qolgan').textContent = masofaMatn(qolgan) + ' · ~' +
+      Math.max(1, Math.round(qolgan / 1000 / 30 * 60)) + ' daqiqa';
+
+    // ovozli ogohlantirish — har chegara bir marta
+    const chegaralar = [1000, 500, 300, 100, 50];
+    for (const c of chegaralar){
+      if (d <= c && d > c*0.5 && !aytilgan[c]){
+        aytilgan[c] = true;
+        Ovoz.ayt(masofaOvoz(d) + ' ' + ovozMatn);
+        break;
+      }
+    }
+    if (d <= 30 && !aytilgan.hozir){
+      aytilgan.hozir = true;
+      Ovoz.ayt(ovozMatn, true);
+    }
+    if (b.man.type === 'arrive' && d < 40 && !aytilgan.yetdi){
+      aytilgan.yetdi = true;
+      Ovoz.ayt('Manzilga yetib keldingiz', true);
+    }
+  }
+
+  function yangilash(p){
+    const la = p.coords.latitude, ln = p.coords.longitude;
+    const aniqlik = Math.round(p.coords.accuracy || 0);
+    oxirgiGPS = Date.now();
+
+    let burchak = (p.coords.heading != null && !isNaN(p.coords.heading)) ? p.coords.heading : null;
+    if (burchak === null && oxirgiJoy) burchak = burchakHisobla([oxirgiJoy.lat, oxirgiJoy.lng], [la, ln]);
+    if (burchak === null) burchak = 0;
+
+    const siljish = oxirgiJoy ? tugriMasofa(oxirgiJoy.lat, oxirgiJoy.lng, la, ln)*1000 : 999;
+    if (siljish < 2 && men) { el('nav-aniqlik').textContent = 'GPS: ' + aniqlik + ' m'; return; }
+    oxirgiJoy = {lat:la, lng:ln};
+
+    menChiz(la, ln, burchak);
+    if (kuzat) Xarita.kor({lat:la, lng:ln}, Xarita.zoom() < 16 ? 17 : null, true);
+    el('nav-aniqlik').textContent = 'GPS: ' + aniqlik + ' m' + (aniqlik > 50 ? ' (past aniqlik)' : '');
+
+    if (!marshrut){ qaytaHisobla(la, ln, 'boshlangich'); return; }
+
+    // marshrutdan chiqib ketishni aniqlash
+    const chetga = chiziqqaMasofa([la, ln], marshrut.nuqtalar);
+    if (chetga > 60){
+      chetlash++;
+      if (chetlash >= 3) qaytaHisobla(la, ln, 'chetlash');
+    } else {
+      chetlash = 0;
+    }
+    bosqichniYangila(la, ln);
+  }
+
+  function xato(e){
+    el('nav-holat').textContent = (e && e.code === 1)
+      ? 'Joylashuvga ruxsat berilmagan'
+      : 'GPS signali yo\'q — ochiq joyga chiqing';
+  }
+
+  if (navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(yangilash, xato, {enableHighAccuracy:true, timeout:15000});
+    navigator.geolocation.watchPosition(yangilash, xato, {enableHighAccuracy:true, maximumAge:2000});
+  } else xato(null);
+
+  // GPS va internet holatini kuzatish
+  setInterval(()=>{
+    if (oxirgiGPS && Date.now() - oxirgiGPS > 15000)
+      el('nav-holat').textContent = 'GPS yangilanmayapti…';
+    else if (!navigator.onLine)
+      el('nav-holat').textContent = 'Internet yo\'q — marshrut yangilanmaydi';
+    else if (el('nav-holat').textContent.startsWith('GPS yangilanmayapti'))
+      el('nav-holat').textContent = '';
+  }, 5000);
+
+  document.body.addEventListener('click', function bir(){
+    Ovoz.boshla();
+    document.body.removeEventListener('click', bir);
+  }, {once:true});
+}
+
+function panelBalandligiNav(){
+  document.documentElement.style.setProperty('--panel-h', el('nav-panel').offsetHeight + 'px');
+}
+
+const parametr = new URLSearchParams(location.search);
+const rejim = parametr.get('mode');
+
+/* Xarita avval yaratiladi (Yandex yoki Leaflet), keyin rejim ishga tushadi.
+   Yandex skripti sekin kelsa — 3 soniya kutamiz, kelmasa Leaflet bilan davom etamiz. */
+(async function boshla(){
+  if (window.YANDEX_KALIT && !window.YANDEX_XATO && !window.ymaps3){
+    await new Promise(res => {
+      const boshlandi = Date.now();
+      const t = setInterval(() => {
+        if (window.ymaps3 || window.YANDEX_XATO || Date.now() - boshlandi > 3000){
+          clearInterval(t); res();
+        }
+      }, 50);
+    });
+  }
+
+  const ishlatilgan = await Xarita.yarat('xarita', MARKAZ, 14);
+  console.log('Xarita provayderi:', ishlatilgan);
+
+  if (rejim === 'nav'){
+    const mlat = parseFloat(parametr.get('lat'));
+    const mlng = parseFloat(parametr.get('lng'));
+    if (!isNaN(mlat) && !isNaN(mlng)) navigatsiya(mlat, mlng);
+  } else if (rejim === 'haydovchi'){
+    haydovchiRejimi(parametr.get('online') === '1');
+  } else {
+    nomniYangila();
+    mashinaKuzatuviniBoshla();
+  }
+})();
+</script>
+</body>
+</html>
