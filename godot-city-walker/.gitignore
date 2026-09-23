@@ -1,0 +1,15 @@
+# Godot 4 generated/import cache
+.godot/
+*.translation
+
+# Imported assets (auto-generated on project open)
+*.import
+
+# Textures Godot auto-extracts from embedded glTF materials
+assets/*.jpg
+assets/*.jpeg
+assets/*.png
+
+# OS / editor
+.DS_Store
+*.tmp
