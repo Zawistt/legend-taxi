@@ -1,0 +1,12 @@
+config_version=5
+
+[application]
+
+config/name="Legend Taxi City"
+run/main_scene="res://scenes/Main.tscn"
+config/features=PackedStringArray("4.3", "Forward Plus")
+
+[rendering]
+
+renderer/rendering_method="mobile"
+renderer/rendering_method.mobile="mobile"
