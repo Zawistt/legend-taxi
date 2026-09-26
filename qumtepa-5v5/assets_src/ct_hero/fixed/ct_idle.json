@@ -1,0 +1,34 @@
+{
+ "name": "idle",
+ "frames": 105,
+ "fps": 30,
+ "scale": 1.058708734032146,
+ "facing_fixed_deg": 0.24720341751871552,
+ "floor_shift_cm": 6.123815476894379,
+ "weapon": "m416",
+ "weapon_yaw_pitch_deg": [
+  28,
+  -10
+ ],
+ "WeaponSocket": {
+  "position_m": [
+   -0.0454,
+   0.0848,
+   -0.0094
+  ],
+  "rotation_deg_xyz": [
+   -19.29,
+   64.54,
+   -180.0
+  ],
+  "rotation_quat_wxyz": [
+   0.08946,
+   0.52639,
+   0.14166,
+   -0.83357
+  ]
+ },
+ "removed_actions": [
+  "01a0deaf-6eab-70ac-8598-4645041e6f5c.001_target_character"
+ ]
+}

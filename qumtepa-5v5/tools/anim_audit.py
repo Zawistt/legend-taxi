@@ -14,10 +14,16 @@ P = "mixamorig:"
 LIMITS = {"float_cm": 1.0, "slide_cm": 1.0, "spine_deg": 5.0, "shoulder_deg": 3.0, "hands_cm": (35.0, 45.0)}
 
 
+FPS = int(sys.argv[sys.argv.index("--fps") + 1]) if "--fps" in sys.argv else 24
+
+
 def load(path):
-    bpy.ops.wm.read_factory_settings(use_empty=True)
-    bpy.context.scene.render.fps = 24
-    bpy.ops.import_scene.gltf(filepath=path)
+    if path.endswith(".blend"):
+        bpy.ops.wm.open_mainfile(filepath=path)
+    else:
+        bpy.ops.wm.read_factory_settings(use_empty=True)
+        bpy.context.scene.render.fps = FPS
+        bpy.ops.import_scene.gltf(filepath=path)
     arm = [o for o in bpy.data.objects if o.type == "ARMATURE"][0]
     body = [o for o in bpy.data.objects if o.type == "MESH" and o.find_armature() == arm][0]
     return arm, body
@@ -92,9 +98,16 @@ def audit_action(arm, body, act, top, torso_faces):
             rec["toe" + k].append(float(toe_[:, 2].min()))
             low = fv[fv[:, 2] < fv[:, 2].min() + 0.01]
             rec["foot" + k + "_xy"].append(low[:, :2].mean(0).tolist())
-        fwd = fwd_toes[0] + fwd_toes[1]
+        # tana yo'nalishi: son va yelka chiziqlaridan (oyoq uchlari tashqariga ochiq bo'lishi mumkin)
+        lr = np.zeros(3)
+        for a_, b_ in (("LeftUpLeg", "RightUpLeg"),):          # son (chanoq) yo'nalishi — tana burilishidan qat'i nazar
+            dd = bone_head(arm, a_) - bone_head(arm, b_)
+            dd[2] = 0
+            lr += dd / max(1e-6, np.linalg.norm(dd))
+        fwd = np.array([lr[1], -lr[0], 0.0])
         fwd /= max(1e-6, np.linalg.norm(fwd))
         rec["fwd"].append(fwd.tolist())
+        rec.setdefault("ankle_mid", []).append(((bone_head(arm, "LeftFoot") + bone_head(arm, "RightFoot")) / 2)[:2].tolist())
         hips = bone_head(arm, "Hips")
         rec["hips"].append(hips.tolist())
         neck = bone_head(arm, "Neck")
@@ -172,7 +185,7 @@ def audit_action(arm, body, act, top, torso_faces):
     R["root_xy_max_cm"] = round(float(np.linalg.norm(H[:, :2] - H[0, :2], axis=1).max() * 100), 2)
     R["root_z_range_cm"] = round(float((H[:, 2].max() - H[:, 2].min()) * 100), 2)
     R["origin"] = [round(x, 3) for x in arm.matrix_world.translation]
-    ff = np.array([rec["footL_xy"][0], rec["footR_xy"][0]]).mean(0)
+    ff = np.array(rec["ankle_mid"][0])
     R["feet_center_xy_cm"] = [round(ff[0] * 100, 1), round(ff[1] * 100, 1)]
     fw = np.array(rec["fwd"][0])
     R["facing_deg_from_minusY"] = round(math.degrees(math.atan2(fw[0], -fw[1])), 1)
@@ -243,7 +256,7 @@ def render(arm, body, act, out, tag):
 
 
 def main():
-    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    args = [a for i, a in enumerate(sys.argv[1:]) if not a.startswith("--") and sys.argv[i] != "--fps"]
     path, out = args[0], args[1]
     os.makedirs(out, exist_ok=True)
     arm, body = load(path)

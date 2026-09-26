@@ -1,0 +1,185 @@
+{
+ "file": "idle_qurol_bilan.blend",
+ "bones": [
+  "Hips",
+  "Spine",
+  "Spine1",
+  "Spine2",
+  "Neck",
+  "Head",
+  "HeadTop_End",
+  "headfront",
+  "LeftShoulder",
+  "LeftArm",
+  "LeftForeArm",
+  "LeftHand",
+  "LeftHandMiddle4",
+  "LeftHandFingers",
+  "RightShoulder",
+  "RightArm",
+  "RightForeArm",
+  "RightHand",
+  "RightHandMiddle4",
+  "RightHandFingers",
+  "LeftUpLeg",
+  "LeftLeg",
+  "LeftFoot",
+  "LeftToeBase",
+  "LeftToe_End",
+  "RightUpLeg",
+  "RightLeg",
+  "RightFoot",
+  "RightToeBase",
+  "RightToe_End"
+ ],
+ "actions": {
+  "idle": [
+   1.0,
+   105.0
+  ]
+ },
+ "animations": {
+  "idle": {
+   "frames": 105,
+   "frame_range": [
+    1,
+    105
+   ],
+   "fps": 30,
+   "duration_s": 3.466666666666667,
+   "height_m": [
+    1.779,
+    1.782
+   ],
+   "floor_zmin_cm": -0.08,
+   "footL_cm": [
+    -0.06,
+    0.0
+   ],
+   "heelL_cm": [
+    -0.06,
+    0.06
+   ],
+   "toeL_cm": [
+    -0.01,
+    0.01
+   ],
+   "slideL_cm": 0.47,
+   "floatL_frames": 0,
+   "sinkL_frames": 0,
+   "footR_cm": [
+    -0.08,
+    -0.06
+   ],
+   "heelR_cm": [
+    0.03,
+    0.03
+   ],
+   "toeR_cm": [
+    -0.08,
+    -0.06
+   ],
+   "slideR_cm": 0.14,
+   "floatR_frames": 0,
+   "sinkR_frames": 0,
+   "root_xy_cm": 0.09,
+   "root_xy_max_cm": 1.01,
+   "root_z_range_cm": 0.19,
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "feet_center_xy_cm": [
+    -5.0,
+    3.9
+   ],
+   "facing_deg_from_minusY": 1.9,
+   "loop_max_deg": [
+    0.86,
+    "LeftHand"
+   ],
+   "loop_hips_cm": 0.11,
+   "jitter_top": [
+    [
+     0,
+     0.12,
+     "RightUpLeg"
+    ],
+    [
+     0,
+     0.09,
+     "LeftHand"
+    ],
+    [
+     0,
+     0.09,
+     "LeftForeArm"
+    ],
+    [
+     0,
+     0.08,
+     "RightFoot"
+    ],
+    [
+     0,
+     0.06,
+     "Spine2"
+    ]
+   ],
+   "jitter_total_spikes": 0,
+   "spine_deg": [
+    3.3,
+    3.4
+   ],
+   "lumbar_deg": [
+    4.9,
+    5.0
+   ],
+   "shoulder_deg": [
+    0.0,
+    0.0
+   ],
+   "kneeL_deg": [
+    27.0,
+    28.8
+   ],
+   "kneeL_reverse_frames": 0,
+   "kneeR_deg": [
+    31.6,
+    33.1
+   ],
+   "kneeR_reverse_frames": 0,
+   "hands_cm": [
+    39.5,
+    39.5
+   ],
+   "hands_line_vs_forward_deg": [
+    31.9,
+    32.4
+   ],
+   "hands_height_diff_cm": [
+    3.2,
+    3.3
+   ],
+   "hand_inside_body_frames": {
+    "R": 0,
+    "L": 0
+   },
+   "renders": [
+    "report/keyin_render/idle_qurol_bilan_00_old.png",
+    "report/keyin_render/idle_qurol_bilan_00_yon.png",
+    "report/keyin_render/idle_qurol_bilan_00_tepa.png",
+    "report/keyin_render/idle_qurol_bilan_25_old.png",
+    "report/keyin_render/idle_qurol_bilan_25_yon.png",
+    "report/keyin_render/idle_qurol_bilan_25_tepa.png",
+    "report/keyin_render/idle_qurol_bilan_50_old.png",
+    "report/keyin_render/idle_qurol_bilan_50_yon.png",
+    "report/keyin_render/idle_qurol_bilan_50_tepa.png",
+    "report/keyin_render/idle_qurol_bilan_75_old.png",
+    "report/keyin_render/idle_qurol_bilan_75_yon.png",
+    "report/keyin_render/idle_qurol_bilan_75_tepa.png"
+   ]
+  }
+ }
+}
