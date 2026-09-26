@@ -148,7 +148,7 @@ PROPS = [
     ("stack", -36.5, -27.0, S2(1.1), 0.0),                 # Long corner
     ("palm", -47.5, -8.0, 8.0),
     ("barrel", -45.0, -2.0),                               # Long pastki qismi
-    ("crate", -31.0, -7.0, 1.1, 0.2),                      # Long pit ichi
+    ("crate", -29.8, -6.0, 1.1, 0.2),                      # Long pit ichi
     ("urn", -44.0, -9.5), ("crate", -43.8, 1.8, 1.0, 0.1), # Long pit (yashirinish)
     # --- Top mid (katta ochiq maydon)
     ("stack", -10.0, -25.0, S2(), 0.0),                    # Top mid chap
@@ -237,18 +237,19 @@ TARGETS = {
 
 # ------------------------------------------------------------------ smoke rejasi
 # (nom, jamoa, nishon (x, z), otish joyi (x, z), to'sishi kerak bo'lgan ko'rish chiziqlari [(dan, gacha)])
+# Otish joylari 3-bosqichda Godot fizikasi bilan topilgan (tests/run_grenades.gd, docs/smokes_stage3.json).
 SMOKE_R = 2.6
 SMOKES = [
-    ("A CT",          "T",  (-18.5, 15.0), (-34.0, -20.0), [((-13.0, 16.0), A_PLANT), ((-13.0, 17.0), (-38.0, 14.0))]),
-    ("A ramp",        "T",  (-28.0, 30.0), (-22.0, -10.0), [((-30.5, 37.0), (-24.8, 21.0)), ((-27.0, 33.0), (-30.0, 20.8))]),
-    ("A platforma",   "T",  (-44.0, 20.0), (-44.0, -5.0), [((-47.5, 22.0), (-34.0, 6.0)), ((-47.5, 25.0), (-30.0, 8.0))]),
-    ("B doors",       "T",  (18.5, 15.0), (12.0, -4.0),    [((13.0, 15.0), B_PLANT), ((13.0, 15.0), (30.0, 9.0))]),
-    ("B ramp",        "T",  (28.0, 30.0), (22.0, -10.0), [((30.5, 37.0), (24.8, 21.0)), ((27.0, 33.0), (30.0, 20.8))]),
-    ("B platforma",   "T",  (44.0, 20.0), (44.0, -5.0),  [((47.5, 22.0), (34.0, 6.0)), ((47.5, 25.0), (30.0, 8.0))]),
-    ("Mid doors",     "T",  (0.0, 7.5), (0.0, -32.0),     [((-1.0, -20.0), (1.0, 9.0)), ((1.0, -24.0), (-1.0, 10.0))]),
-    ("Long chiqishi", "CT", (-44.0, 5.5), (-28.0, 38.0),  [((-44.0, 20.0), (-44.0, -12.0)), ((-47.0, 20.0), (-41.0, -10.0))]),
-    ("Tunnel chiqishi", "CT", (44.0, 5.5), (28.0, 38.0),  [((44.0, 20.0), (44.0, -12.0)), ((47.0, 20.0), (41.0, -10.0))]),
-    ("Top mid",       "CT", (0.0, -21.0), (0.0, 8.0),     [((0.0, 7.0), (0.0, -25.0))]),
+    ("A CT",          "T",  (-18.5, 15.0), (-31.5, -9.0), [((-13.0, 16.0), A_PLANT), ((-13.0, 17.0), (-38.0, 14.0))]),
+    ("A ramp",        "T",  (-28.0, 30.0), (-21.0, -1.0), [((-30.5, 37.0), (-24.8, 21.0)), ((-27.0, 33.0), (-30.0, 20.8))]),
+    ("A platforma",   "T",  (-44.0, 20.0), (-31.0, -8.0), [((-47.5, 22.0), (-34.0, 6.0)), ((-47.5, 25.0), (-30.0, 8.0))]),
+    ("B doors",       "T",  (18.5, 15.0), (19.8, -1.0),    [((13.0, 15.0), B_PLANT), ((13.0, 15.0), (30.0, 9.0))]),
+    ("B ramp",        "T",  (28.0, 30.0), (21.0, -1.0), [((30.5, 37.0), (24.8, 21.0)), ((27.0, 33.0), (30.0, 20.8))]),
+    ("B platforma",   "T",  (44.0, 20.0), (42.0, -8.0),  [((47.5, 22.0), (34.0, 6.0)), ((47.5, 25.0), (30.0, 8.0))]),
+    ("Mid doors",     "T",  (0.0, 7.5), (-4.0, -26.5),     [((-1.0, -20.0), (1.0, 9.0)), ((1.0, -24.0), (-1.0, 10.0))]),
+    ("Long chiqishi", "CT", (-44.0, 5.5), (-29.0, 37.5),  [((-44.0, 20.0), (-44.0, -12.0)), ((-47.0, 20.0), (-41.0, -10.0))]),
+    ("Tunnel chiqishi", "CT", (44.0, 5.5), (30.0, 34.5),  [((44.0, 20.0), (44.0, -12.0)), ((47.0, 20.0), (41.0, -10.0))]),
+    ("Top mid",       "CT", (0.0, -21.0), (6.0, 11.0),     [((0.0, 7.0), (0.0, -25.0))]),
 ]
 
 # ------------------------------------------------------------------ botlar uchun strategik nuqtalar (nom, tur, jamoa, x, z)
@@ -287,4 +288,65 @@ AI_POINTS = [
     ("CT mid sharq", "rotate", "CT", 9.0, 30.0),
     ("CT spawn", "rotate", "CT", 0.0, 42.0),
     ("T spawn", "rotate", "T", 0.0, -47.0),
+]
+
+# ================================================================== 3-bosqich: bot o'yinlari uchun taktikalar
+# Yo'llar (metr). Oxirgi nuqta — "kutish joyi": guruh shu yerda hujum vaqtini kutadi.
+T_ROUTES = {
+    "LONG":    [(-20.0, -42.0), (-31.0, -38.0), (-32.0, -22.0), (-40.0, -17.0), (-44.0, -8.0)],
+    "SHORT":   [(-7.0, -37.0), (-12.0, -26.0), (-18.0, -21.0), (-22.0, -14.0), (-22.0, -3.0)],
+    "TUNNELS": [(20.0, -42.0), (31.0, -38.0), (32.0, -22.0), (40.0, -17.0), (44.0, -8.0)],
+    "WINDOW":  [(7.0, -37.0), (12.0, -26.0), (18.0, -21.0), (22.0, -14.0), (22.0, -3.0)],
+    "MID":     [(-7.0, -37.0), (-9.0, -31.0), (0.0, -21.0), (0.0, -12.0), (0.0, -5.0)],
+    "MIDWIN":  [(7.0, -37.0), (9.0, -31.0), (0.0, -21.0), (3.0, -7.0), (12.0, -6.0), (21.0, -5.0)],
+}
+# Hujum boshlanganda kutish joyidan site'gacha: (kirish nuqtalari)
+T_ENTRY = {
+    "LONG": [(-44.0, 6.0)], "SHORT": [(-23.5, 6.5)], "TUNNELS": [(44.0, 6.0)], "WINDOW": [(23.5, 6.5)],
+    "MID_A": [(0.0, 7.0), (-8.0, 9.0), (-15.0, 15.0)], "MID_B": [(0.0, 7.0), (8.0, 7.0), (15.0, 15.0)],
+    "MIDWIN": [(23.5, 6.5)],
+}
+# Bomba o'rnatilgandan keyin T lar turadigan joylar: (joy, qaraydigan nuqta)
+T_POSTPLANT = {
+    "A": [((-44.0, 8.0), (-28.0, 32.0)), ((-30.0, 9.0), (-14.0, 15.0)), ((-36.0, 24.5), (-28.0, 32.0)),
+          ((-47.5, 22.5), (-28.0, 30.0)), ((-25.0, 11.0), (-14.0, 15.0))],
+    "B": [((44.0, 8.0), (28.0, 32.0)), ((30.0, 9.0), (14.0, 15.0)), ((36.0, 24.5), (28.0, 32.0)),
+          ((47.5, 22.5), (28.0, 30.0)), ((25.0, 11.0), (14.0, 15.0))],
+}
+# T taktikalari: nom, site, guruhlar [(yo'l, kirish, odam soni, bomba shu guruhdami)], smoke'lar, hujum vaqti (s, oraliq)
+T_STRATS = [
+    ("A split (Long + Short)", "A", [("LONG", "LONG", 2, True), ("SHORT", "SHORT", 2, False), ("MID", "MID_A", 1, False)],
+     ["A CT", "A ramp", "A platforma"], (28.0, 40.0)),
+    ("A rush (Long)", "A", [("LONG", "LONG", 4, True), ("SHORT", "SHORT", 1, False)], ["A platforma"], (17.0, 19.0)),
+    ("B split (Tunnels + Window)", "B", [("TUNNELS", "TUNNELS", 2, True), ("WINDOW", "WINDOW", 2, False), ("MID", "MID_B", 1, False)],
+     ["B doors", "B ramp", "B platforma"], (28.0, 40.0)),
+    ("B rush (Tunnels)", "B", [("TUNNELS", "TUNNELS", 4, True), ("WINDOW", "WINDOW", 1, False)], ["B platforma"], (17.0, 19.0)),
+    ("Mid → B (Mid-window)", "B", [("MIDWIN", "MIDWIN", 2, True), ("TUNNELS", "TUNNELS", 2, False), ("MID", "MID_B", 1, False)],
+     ["Mid doors", "B doors", "B ramp"], (26.0, 36.0)),
+    ("Mid → A (Mid doors, A CT)", "A", [("MID", "MID_A", 3, True), ("SHORT", "SHORT", 2, False)],
+     ["Mid doors", "A ramp", "A platforma"], (24.0, 34.0)),
+    ("Mid → B (Mid doors, B doors)", "B", [("MID", "MID_B", 3, True), ("WINDOW", "WINDOW", 2, False)],
+     ["Mid doors", "B ramp", "B platforma"], (24.0, 34.0)),
+    ("Default → A (kech)", "A", [("LONG", "LONG", 1, True), ("SHORT", "SHORT", 1, False), ("MID", "MID_A", 1, False),
+                               ("TUNNELS", "LONG", 1, False), ("WINDOW", "SHORT", 1, False)], ["A CT", "A ramp"], (50.0, 65.0)),
+    ("Default → B (kech)", "B", [("TUNNELS", "TUNNELS", 1, True), ("WINDOW", "WINDOW", 1, False), ("MID", "MID_B", 1, False),
+                               ("LONG", "TUNNELS", 1, False), ("SHORT", "WINDOW", 1, False)], ["B doors", "B ramp"], (50.0, 65.0)),
+]
+# CT turish joylari: nom -> (joy, qaraydigan nuqta, qaysi site/hudud)
+CT_SPOTS = {
+    "A platforma": ((-47.5, 22.5), (-44.0, 3.0), "A"),
+    "A CT tomoni": ((-19.5, 25.0), (-22.0, 6.0), "A"),
+    "A default": ((-31.5, 22.0), (-40.0, 4.0), "A"),
+    "Mid doors": ((-4.0, 7.5), (0.0, 4.0), "M"),      # eshikka qiyshiq burchakda: mid dan to'g'ri ko'rinmaydi
+    "CT mid": ((6.0, 7.5), (0.0, 4.0), "M"),
+    "B platforma": ((47.5, 22.5), (44.0, 3.0), "B"),
+    "B CT tomoni": ((19.5, 25.0), (22.0, 6.0), "B"),
+    "B default": ((31.5, 22.0), (40.0, 4.0), "B"),
+}
+CT_SETUPS = [
+    ("2-1-2", ["A platforma", "A CT tomoni", "Mid doors", "B platforma", "B CT tomoni"]),
+    ("3-1-1 (A kuchli)", ["A platforma", "A CT tomoni", "A default", "Mid doors", "B platforma"]),
+    ("1-1-3 (B kuchli)", ["A platforma", "Mid doors", "B platforma", "B CT tomoni", "B default"]),
+    ("2-2-1 (mid kuchli)", ["A platforma", "A CT tomoni", "Mid doors", "CT mid", "B platforma"]),
+    ("1-2-2 (mid kuchli)", ["A platforma", "Mid doors", "CT mid", "B platforma", "B CT tomoni"]),
 ]

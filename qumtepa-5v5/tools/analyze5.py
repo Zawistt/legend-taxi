@@ -378,7 +378,7 @@ for name, team, tgt, throw, lines in L.SMOKES:
            "throw_dist_m": round(dist, 1), "open_sky": ctype(tgt) in OPEN_SKY, "lines_blocked": ok_lines,
            "throw_from_s": round(float(t_throw), 1)}
     smoke_rep.append(rep)
-    check(rep["open_sky"] and dist <= 45 and np.isfinite(t_throw) and all(ok_lines),
+    check(rep["open_sky"] and dist <= 36 and np.isfinite(t_throw) and all(ok_lines),
           f"Smoke \"{name}\" ({team}): {callout(throw)} dan {dist:.0f} m, {sum(ok_lines)}/{len(ok_lines)} chiziqni to'sadi")
 
 # ------------------------------------------------------------------ natija
@@ -393,6 +393,18 @@ print("\nEng uzun ko'rish chiziqlari (callout bo'yicha):")
 for co, (d, to) in sorted(long_by_callout.items(), key=lambda kv: -kv[1][0])[:10]:
     print(f"  {co:22s} {d:5.1f} m  -> {to}")
 
+# har bir katak kimning hududi: 1 — T, -1 — CT, 0 — talashuvli, 9 — bino
+side_grid = []
+for r in range(L.G):
+    row = []
+    for c in range(L.G):
+        if L.grid[r][c] == "#":
+            row.append(9); continue
+        x_, z_ = L.m(c, r)
+        i_, j_ = px(x_, z_)
+        row.append(int(side(tT[j_, i_], tC[j_, i_])) if np.isfinite(tT[j_, i_]) else 0)
+    side_grid.append(row)
+
 os.makedirs(DOCS, exist_ok=True)
 json.dump({
     "size_m": SIZE, "speed": SPEED, "round": L.ROUND, "targets": TG,
@@ -404,6 +416,7 @@ json.dump({
     "longest_sightline": {"m": round(longest[0], 1), "from": callout(longest[1]), "to": callout(longest[2]), "p": list(longest[1]), "q": list(longest[2])},
     "longest_by_callout": {k: [round(v[0], 1), v[1]] for k, v in long_by_callout.items()},
     "callout_names": CNAMES, "callout_grid": cgrid,
+    "side_grid": side_grid,
     "checks": [{"ok": o, "msg": m_} for o, m_ in checks],
 }, open(os.path.join(DOCS, "analysis_stage1.json"), "w"), ensure_ascii=False, indent=1)
 

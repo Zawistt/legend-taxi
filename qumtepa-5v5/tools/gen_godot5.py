@@ -101,8 +101,11 @@ for fn in ("player.gd", "game_mode.gd", "hud.gd", "bomb.gd", "input_setup.gd"):
 for fn in os.listdir(f"{V2}/audio"):
     shutil.copy(f"{V2}/audio/{fn}", f"{OUT}/audio/{fn}")
 shutil.copy(f"{V2}/scenes/bomb.tscn", f"{OUT}/scenes/bomb.tscn")
-shutil.copy(f"{SRC}/tests/run_tests.gd", f"{OUT}/tests/run_tests.gd")
-shutil.copy(f"{SRC}/tools/screenshots.gd", f"{OUT}/tools/screenshots.gd")
+for sub in ("scripts", "tests"):
+    for fn in os.listdir(f"{SRC}/{sub}"):
+        shutil.copy(f"{SRC}/{sub}/{fn}", f"{OUT}/{sub}/{fn}")
+for fn in os.listdir(f"{SRC}/tools"):
+    shutil.copy(f"{SRC}/tools/{fn}", f"{OUT}/tools/{fn}")
 
 # ------------------------------------------------------------------ map_data.gd
 R = L.ROUND
@@ -318,8 +321,102 @@ const MID_DOORS_WALL := [Vector3(-3.5, 1.6, -16), Vector3(-3.5, 1.6, 9)]
 ## yopiq yo'lak (T spawn tomi 5.0 m)
 const COVERED_POINT := Vector3(0, 0, -46)
 const COVERED_H := {L.COVER["T"]}
+## hudud to'ri (2 m kataklar): 1 — T hududi, -1 — CT hududi, 0 — talashuvli, 9 — bino
+const SIDE_GRID := {json.dumps(an["side_grid"])}
+## smoke rejasi: [nom, jamoa, nishon, otish joyi]
+const SMOKES := [
+{chr(10).join(f'	[{json.dumps(n, ensure_ascii=False)}, "{t}", {V3(tg)}, {V3(th)}],' for n, t, tg, th, _l in L.SMOKES)}
+]
 '''
 open(f"{OUT}/tests/test_data.gd", "w").write(td)
+
+# ------------------------------------------------------------------ scripts/strategies.gd — bot o'yinlari uchun
+lineups = {}
+lp = os.path.join(HERE, "..", "docs", "smokes_stage3.json")
+if os.path.exists(lp):
+    lineups = {r["name"]: r["lineup"] for r in json.load(open(lp))}
+REGION = {"A site": "A", "A platforma": "A", "A default": "A", "A short chiqishi": "A", "A long chiqishi": "A", "A ramp": "A",
+          "A CT": "A", "Long": "A", "Long pit": "A", "Catwalk": "A",
+          "B site": "B", "B platforma": "B", "B default": "B", "B window chiqishi": "B", "B tunnel chiqishi": "B", "B ramp": "B",
+          "B doors": "B", "Lower tunnels": "B", "Tunnel cho'ntagi": "B", "B window": "B",
+          "Mid doors": "M", "CT mid": "M", "Mid": "M", "Mid-window": "M"}
+unknown = set(REGION) - set(an["callout_names"])
+assert not unknown, unknown
+
+
+def gdarr(pts):
+    return "[" + ", ".join(V3(p) for p in pts) + "]"
+
+
+def gdstr(x):
+    return json.dumps(x, ensure_ascii=False)
+
+
+st = f'''extends RefCounted
+## AVTOMATIK YARATILGAN (tools/gen_godot5.py, layout5.py dagi 3-bosqich taktikalaridan). Qo'lda o'zgartirmang.
+
+const PLANT := {{"A": {V3(L.A_PLANT)}, "B": {V3(L.B_PLANT)}}}
+const SMOKE_R := {L.SMOKE_R}
+const SMOKE_TIME := 15.0
+## callout -> hudud (CT lar qaysi site'da T ko'rganini bilishi uchun)
+const REGION := {gdstr(REGION)}
+const T_ROUTES := {{
+{chr(10).join(f"	{gdstr(k)}: {gdarr(v)}," for k, v in L.T_ROUTES.items())}
+}}
+const T_ENTRY := {{
+{chr(10).join(f"	{gdstr(k)}: {gdarr(v)}," for k, v in L.T_ENTRY.items())}
+}}
+const T_POSTPLANT := {{
+{chr(10).join(f"	{gdstr(k)}: [" + ", ".join(f"[{V3(p)}, {V3(l)}]" for p, l in v) + "]," for k, v in L.T_POSTPLANT.items())}
+}}
+## [nom, site, [[yo'l, kirish, odam, bomba], ...], [smoke'lar], [hujum vaqti dan, gacha]]
+const T_STRATS := [
+{chr(10).join(f"	[{gdstr(n)}, {gdstr(site)}, [" + ", ".join(f"[{gdstr(g[0])}, {gdstr(g[1])}, {g[2]}, {str(g[3]).lower()}]" for g in groups) + f"], {gdstr(sm)}, [{tw[0]}, {tw[1]}]]," for n, site, groups, sm, tw in L.T_STRATS)}
+]
+## nom -> [joy, qaraydigan nuqta, hudud]
+const CT_SPOTS := {{
+{chr(10).join(f"	{gdstr(k)}: [{V3(p)}, {V3(l)}, {gdstr(r)}]," for k, (p, l, r) in L.CT_SPOTS.items())}
+}}
+const CT_SETUPS := [
+{chr(10).join(f"	[{gdstr(n)}, {gdstr(v)}]," for n, v in L.CT_SETUPS)}
+]
+## aylanib kelgan CT lar turadigan joylar
+const ROTATE_SPOT := {{
+{chr(10).join(f"	{gdstr(site)}: [" + ", ".join(f"[{V3(p)}, {V3(l)}]" for k, (p, l, r) in L.CT_SPOTS.items() if r == site) + "]," for site in ("A", "B"))}
+}}
+## smoke: nom -> [jamoa, nishon, uchish vaqti (s, fizika bilan topilgan lineup'dan)]
+const SMOKES := {{
+{chr(10).join(f"	{gdstr(n)}: [{gdstr(tm)}, {V3(tg)}, {lineups.get(n, {}).get('flight_s', 2.0)}]," for n, tm, tg, _th, _l in L.SMOKES)}
+}}
+'''
+open(f"{OUT}/scripts/strategies.gd", "w").write(st)
+
+# ------------------------------------------------------------------ bots.tscn — 5v5 bot o'yini (kuzatish va balans sinovi)
+s = Scene()
+glb = s.add_ext("PackedScene", "res://map/qumtepa5v5_greybox.glb", "1_map")
+col = s.add_ext("PackedScene", "res://map/collision.tscn", "2_col")
+mscr = s.add_ext("Script", "res://scripts/bot_match.gd", "3_bm")
+cscr = s.add_ext("Script", "res://scripts/spectator.gd", "4_sp")
+nm = s.add_ext("NavigationMesh", "res://map/navmesh.res", "6_nav") if NAVMESH else s.add_sub("NavigationMesh", "navmesh")
+s.add_sub("ProceduralSkyMaterial", "sky_mat", sky_top_color="Color(0.27, 0.49, 0.78, 1)", sky_horizon_color="Color(0.86, 0.8, 0.68, 1)",
+          ground_bottom_color="Color(0.45, 0.36, 0.25, 1)", ground_horizon_color="Color(0.86, 0.8, 0.68, 1)")
+s.add_sub("Sky", "sky", sky_material='SubResource("sky_mat")')
+s.add_sub("Environment", "env", background_mode="2", sky='SubResource("sky")', ambient_light_source="2",
+          ambient_light_color="Color(0.8, 0.74, 0.64, 1)", ambient_light_energy="0.6", tonemap_mode="3", tonemap_exposure="0.95")
+s.node("Bots", "Node3D")
+s.node("WorldEnvironment", "WorldEnvironment", ".", environment='SubResource("env")')
+s.node("Sun", "DirectionalLight3D", ".", transform=f"Transform3D({basis}, 0, 40, 0)", light_color="Color(1, 0.9, 0.74, 1)",
+       light_energy="1.15", shadow_enabled="true", directional_shadow_max_distance="140.0")
+s.node("Map", parent=".", instance=glb)
+s.node("Navigation", "NavigationRegion3D", ".", navigation_mesh=nm)
+s.node("Collision", parent="Navigation", instance=col)
+s.node("Spawns", "Node3D", ".")
+for team, pts in L.SPAWNS.items():
+    for i, (x0, z0) in enumerate(pts):
+        s.node(f"{team}{i + 1}", "Marker3D", "Spawns", groups=[f"spawn_{team}"], transform=T(x0, 0.05, z0, yaw_pi=(team == "T")))
+s.node("BotMatch", "Node3D", ".", script=mscr)
+s.node("Spectator", "Camera3D", ".", script=cscr, current="true")
+s.save(f"{OUT}/bots.tscn")
 
 # ------------------------------------------------------------------ project.godot, bake_nav.gd
 open(f"{OUT}/project.godot", "w").write('''; Engine configuration file.
@@ -345,6 +442,7 @@ window/size/viewport_height=900
 3d_physics/layer_5="hitboxes"
 3d_physics/layer_6="grenades"
 3d_physics/layer_7="triggers"
+3d_physics/layer_8="smoke"
 
 [rendering]
 

@@ -1,0 +1,1513 @@
+{
+ "rounds": [
+  {
+   "ct_alive": 0,
+   "duration": 33.5,
+   "exec_t": 18.3,
+   "kills": [
+    {
+     "dist": 41.1,
+     "from": "Long",
+     "killer": "T",
+     "t": 12.5,
+     "victim": "CT",
+     "where": "A platforma"
+    },
+    {
+     "dist": 15.1,
+     "from": "A site",
+     "killer": "CT",
+     "t": 17.6,
+     "victim": "T",
+     "where": "Catwalk"
+    },
+    {
+     "dist": 18.7,
+     "from": "Long",
+     "killer": "T",
+     "t": 20.9,
+     "victim": "CT",
+     "where": "A default"
+    },
+    {
+     "dist": 38.2,
+     "from": "CT mid",
+     "killer": "CT",
+     "t": 24.4,
+     "victim": "T",
+     "where": "A site"
+    },
+    {
+     "dist": 40.6,
+     "from": "CT mid",
+     "killer": "CT",
+     "t": 25.4,
+     "victim": "T",
+     "where": "A site"
+    },
+    {
+     "dist": 40.7,
+     "from": "A site",
+     "killer": "T",
+     "t": 25.6,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 26.2,
+     "from": "A site",
+     "killer": "CT",
+     "t": 25.9,
+     "victim": "T",
+     "where": "A site"
+    },
+    {
+     "dist": 22.3,
+     "from": "A site",
+     "killer": "T",
+     "t": 29,
+     "victim": "CT",
+     "where": "A site"
+    },
+    {
+     "dist": 16.6,
+     "from": "A site",
+     "killer": "T",
+     "t": 33.5,
+     "victim": "CT",
+     "where": "A site"
+    }
+   ],
+   "plant_site": "A",
+   "plant_t": 32.1,
+   "planted": true,
+   "reason": "CT lar yo'q qilindi",
+   "round": 2,
+   "setup": "2-1-2",
+   "site": "A",
+   "strategy": "A rush (Long)",
+   "t_alive": 1,
+   "winner": "T"
+  },
+  {
+   "ct_alive": 0,
+   "duration": 55.9,
+   "exec_t": 32.4,
+   "kills": [
+    {
+     "dist": 27.8,
+     "from": "Mid",
+     "killer": "T",
+     "t": 9.2,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 41.2,
+     "from": "Lower tunnels",
+     "killer": "T",
+     "t": 13.2,
+     "victim": "CT",
+     "where": "B platforma"
+    },
+    {
+     "dist": 56.9,
+     "from": "A platforma",
+     "killer": "CT",
+     "t": 37.8,
+     "victim": "T",
+     "where": "CT mid"
+    },
+    {
+     "dist": 15.2,
+     "from": "B site",
+     "killer": "CT",
+     "t": 38.7,
+     "victim": "T",
+     "where": "B default"
+    },
+    {
+     "dist": 22.2,
+     "from": "B site",
+     "killer": "CT",
+     "t": 39.1,
+     "victim": "T",
+     "where": "B site"
+    },
+    {
+     "dist": 26.2,
+     "from": "B tunnel chiqishi",
+     "killer": "T",
+     "t": 43,
+     "victim": "CT",
+     "where": "B site"
+    },
+    {
+     "dist": 32.2,
+     "from": "B site",
+     "killer": "T",
+     "t": 51.8,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 29.7,
+     "from": "CT mid",
+     "killer": "CT",
+     "t": 52.5,
+     "victim": "T",
+     "where": "B site"
+    },
+    {
+     "dist": 35.2,
+     "from": "B tunnel chiqishi",
+     "killer": "T",
+     "t": 55.9,
+     "victim": "CT",
+     "where": "CT mid"
+    }
+   ],
+   "plant_site": "B",
+   "plant_t": 40.2,
+   "planted": true,
+   "reason": "CT lar yo'q qilindi",
+   "round": 3,
+   "setup": "2-1-2",
+   "site": "B",
+   "strategy": "B split (Tunnels + Window)",
+   "t_alive": 1,
+   "winner": "T"
+  },
+  {
+   "ct_alive": 2,
+   "duration": 41.2,
+   "exec_t": 18.8,
+   "kills": [
+    {
+     "dist": 41.2,
+     "from": "B platforma",
+     "killer": "CT",
+     "t": 12.8,
+     "victim": "T",
+     "where": "Lower tunnels"
+    },
+    {
+     "dist": 41.2,
+     "from": "Lower tunnels",
+     "killer": "T",
+     "t": 12.9,
+     "victim": "CT",
+     "where": "B platforma"
+    },
+    {
+     "dist": 19.5,
+     "from": "B window",
+     "killer": "T",
+     "t": 17.6,
+     "victim": "CT",
+     "where": "B site"
+    },
+    {
+     "dist": 23.9,
+     "from": "B window chiqishi",
+     "killer": "T",
+     "t": 24.7,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 22.6,
+     "from": "B site",
+     "killer": "CT",
+     "t": 25.1,
+     "victim": "T",
+     "where": "B site"
+    },
+    {
+     "dist": 21.9,
+     "from": "B ramp",
+     "killer": "CT",
+     "t": 28.9,
+     "victim": "T",
+     "where": "B site"
+    },
+    {
+     "dist": 26.3,
+     "from": "B site",
+     "killer": "CT",
+     "t": 29.5,
+     "victim": "T",
+     "where": "B tunnel chiqishi"
+    },
+    {
+     "dist": 16.4,
+     "from": "B site",
+     "killer": "CT",
+     "t": 32.9,
+     "victim": "T",
+     "where": "B window chiqishi"
+    }
+   ],
+   "plant_site": "B",
+   "plant_t": 26.7,
+   "planted": true,
+   "reason": "bomba zararsizlantirildi",
+   "round": 4,
+   "setup": "2-1-2",
+   "site": "B",
+   "strategy": "B rush (Tunnels)",
+   "t_alive": 0,
+   "winner": "CT"
+  },
+  {
+   "ct_alive": 0,
+   "duration": 57.8,
+   "exec_t": 32.7,
+   "kills": [
+    {
+     "dist": 32.6,
+     "from": "Top mid",
+     "killer": "T",
+     "t": 9.1,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 41.2,
+     "from": "B platforma",
+     "killer": "CT",
+     "t": 12.1,
+     "victim": "T",
+     "where": "Lower tunnels"
+    },
+    {
+     "dist": 41.2,
+     "from": "B platforma",
+     "killer": "CT",
+     "t": 13.2,
+     "victim": "T",
+     "where": "Lower tunnels"
+    },
+    {
+     "dist": 31.2,
+     "from": "B window",
+     "killer": "T",
+     "t": 35.3,
+     "victim": "CT",
+     "where": "B platforma"
+    },
+    {
+     "dist": 26.3,
+     "from": "B site",
+     "killer": "CT",
+     "t": 46.6,
+     "victim": "T",
+     "where": "B tunnel chiqishi"
+    },
+    {
+     "dist": 13.3,
+     "from": "B site",
+     "killer": "T",
+     "t": 49.4,
+     "victim": "CT",
+     "where": "B default"
+    },
+    {
+     "dist": 26.4,
+     "from": "B site",
+     "killer": "T",
+     "t": 55.2,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 23.8,
+     "from": "CT mid",
+     "killer": "CT",
+     "t": 56,
+     "victim": "T",
+     "where": "B site"
+    },
+    {
+     "dist": 29.1,
+     "from": "B site",
+     "killer": "T",
+     "t": 57.8,
+     "victim": "CT",
+     "where": "CT mid"
+    }
+   ],
+   "plant_site": "B",
+   "plant_t": 43.8,
+   "planted": true,
+   "reason": "CT lar yo'q qilindi",
+   "round": 5,
+   "setup": "2-1-2",
+   "site": "B",
+   "strategy": "Mid → B (Mid-window)",
+   "t_alive": 1,
+   "winner": "T"
+  },
+  {
+   "ct_alive": 0,
+   "duration": 63.9,
+   "exec_t": 29.9,
+   "kills": [
+    {
+     "dist": 25.4,
+     "from": "Mid",
+     "killer": "T",
+     "t": 9,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 30.7,
+     "from": "Catwalk",
+     "killer": "T",
+     "t": 32.3,
+     "victim": "CT",
+     "where": "A platforma"
+    },
+    {
+     "dist": 22.5,
+     "from": "A site",
+     "killer": "CT",
+     "t": 39.2,
+     "victim": "T",
+     "where": "A site"
+    },
+    {
+     "dist": 15.1,
+     "from": "A default",
+     "killer": "T",
+     "t": 42.1,
+     "victim": "CT",
+     "where": "A site"
+    },
+    {
+     "dist": 23.4,
+     "from": "A short chiqishi",
+     "killer": "T",
+     "t": 57.3,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 22.3,
+     "from": "A ramp",
+     "killer": "CT",
+     "t": 58.5,
+     "victim": "T",
+     "where": "A site"
+    },
+    {
+     "dist": 22.1,
+     "from": "A long chiqishi",
+     "killer": "T",
+     "t": 63.9,
+     "victim": "CT",
+     "where": "A site"
+    }
+   ],
+   "plant_site": "A",
+   "plant_t": 44.9,
+   "planted": true,
+   "reason": "CT lar yo'q qilindi",
+   "round": 6,
+   "setup": "2-1-2",
+   "site": "A",
+   "strategy": "Mid → A (Mid doors, A CT)",
+   "t_alive": 3,
+   "winner": "T"
+  },
+  {
+   "ct_alive": 4,
+   "duration": 58.8,
+   "exec_t": 32.4,
+   "kills": [
+    {
+     "dist": 25.8,
+     "from": "Mid",
+     "killer": "T",
+     "t": 8.9,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 22,
+     "from": "B site",
+     "killer": "CT",
+     "t": 39.3,
+     "victim": "T",
+     "where": "B site"
+    },
+    {
+     "dist": 15.2,
+     "from": "B site",
+     "killer": "CT",
+     "t": 44,
+     "victim": "T",
+     "where": "B default"
+    },
+    {
+     "dist": 10.9,
+     "from": "B platforma",
+     "killer": "CT",
+     "t": 49.1,
+     "victim": "T",
+     "where": "B tunnel chiqishi"
+    },
+    {
+     "dist": 20,
+     "from": "B platforma",
+     "killer": "CT",
+     "t": 49.8,
+     "victim": "T",
+     "where": "B site"
+    },
+    {
+     "dist": 23.3,
+     "from": "B platforma",
+     "killer": "CT",
+     "t": 50.7,
+     "victim": "T",
+     "where": "B window chiqishi"
+    }
+   ],
+   "plant_site": "B",
+   "plant_t": 47.6,
+   "planted": true,
+   "reason": "bomba zararsizlantirildi",
+   "round": 7,
+   "setup": "2-1-2",
+   "site": "B",
+   "strategy": "Mid → B (Mid doors, B doors)",
+   "t_alive": 0,
+   "winner": "CT"
+  },
+  {
+   "ct_alive": 3,
+   "duration": 75.7,
+   "exec_t": 57.7,
+   "kills": [
+    {
+     "dist": 25.4,
+     "from": "Mid",
+     "killer": "T",
+     "t": 9.2,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 41.1,
+     "from": "A platforma",
+     "killer": "CT",
+     "t": 12.5,
+     "victim": "T",
+     "where": "Long"
+    },
+    {
+     "dist": 41.2,
+     "from": "B platforma",
+     "killer": "CT",
+     "t": 12.8,
+     "victim": "T",
+     "where": "Lower tunnels"
+    },
+    {
+     "dist": 29.2,
+     "from": "A platforma",
+     "killer": "CT",
+     "t": 14.9,
+     "victim": "T",
+     "where": "Catwalk"
+    },
+    {
+     "dist": 39.9,
+     "from": "A platforma",
+     "killer": "CT",
+     "t": 29.1,
+     "victim": "T",
+     "where": "Long"
+    },
+    {
+     "dist": 39.6,
+     "from": "Long",
+     "killer": "T",
+     "t": 48.5,
+     "victim": "CT",
+     "where": "A platforma"
+    },
+    {
+     "dist": 10.1,
+     "from": "A CT",
+     "killer": "CT",
+     "t": 74.6,
+     "victim": "T",
+     "where": "A site"
+    }
+   ],
+   "plant_site": "A",
+   "plant_t": 59.4,
+   "planted": true,
+   "reason": "bomba zararsizlantirildi",
+   "round": 8,
+   "setup": "2-1-2",
+   "site": "A",
+   "strategy": "Default → A (kech)",
+   "t_alive": 0,
+   "winner": "CT"
+  },
+  {
+   "ct_alive": 0,
+   "duration": 51.1,
+   "exec_t": 52.6,
+   "kills": [
+    {
+     "dist": 25.4,
+     "from": "Mid",
+     "killer": "T",
+     "t": 9.2,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 41.1,
+     "from": "Long",
+     "killer": "T",
+     "t": 13.5,
+     "victim": "CT",
+     "where": "A platforma"
+    },
+    {
+     "dist": 41.2,
+     "from": "B platforma",
+     "killer": "CT",
+     "t": 13.5,
+     "victim": "T",
+     "where": "Lower tunnels"
+    },
+    {
+     "dist": 40.2,
+     "from": "Lower tunnels",
+     "killer": "T",
+     "t": 26,
+     "victim": "CT",
+     "where": "B platforma"
+    },
+    {
+     "dist": 13.1,
+     "from": "B site",
+     "killer": "T",
+     "t": 40.6,
+     "victim": "CT",
+     "where": "B default"
+    },
+    {
+     "dist": 12.2,
+     "from": "CT spawn",
+     "killer": "CT",
+     "t": 44.6,
+     "victim": "T",
+     "where": "CT mid"
+    },
+    {
+     "dist": 8.1,
+     "from": "CT mid",
+     "killer": "CT",
+     "t": 47.4,
+     "victim": "T",
+     "where": "A CT"
+    },
+    {
+     "dist": 32.7,
+     "from": "B site",
+     "killer": "T",
+     "t": 51.1,
+     "victim": "CT",
+     "where": "CT mid"
+    }
+   ],
+   "plant_site": "B",
+   "plant_t": 36.7,
+   "planted": true,
+   "reason": "CT lar yo'q qilindi",
+   "round": 9,
+   "setup": "2-1-2",
+   "site": "B",
+   "strategy": "Default → B (kech)",
+   "t_alive": 2,
+   "winner": "T"
+  },
+  {
+   "ct_alive": 0,
+   "duration": 49.2,
+   "exec_t": 38.2,
+   "kills": [
+    {
+     "dist": 28.7,
+     "from": "CT mid",
+     "killer": "CT",
+     "t": 9.3,
+     "victim": "T",
+     "where": "Top mid"
+    },
+    {
+     "dist": 27,
+     "from": "Catwalk",
+     "killer": "T",
+     "t": 11.7,
+     "victim": "CT",
+     "where": "A default"
+    },
+    {
+     "dist": 41.1,
+     "from": "Long",
+     "killer": "T",
+     "t": 12.9,
+     "victim": "CT",
+     "where": "A platforma"
+    },
+    {
+     "dist": 15.1,
+     "from": "Catwalk",
+     "killer": "T",
+     "t": 16.6,
+     "victim": "CT",
+     "where": "A site"
+    },
+    {
+     "dist": 15.1,
+     "from": "A site",
+     "killer": "CT",
+     "t": 44.4,
+     "victim": "T",
+     "where": "A default"
+    },
+    {
+     "dist": 22.1,
+     "from": "A site",
+     "killer": "CT",
+     "t": 45.2,
+     "victim": "T",
+     "where": "A site"
+    },
+    {
+     "dist": 13.3,
+     "from": "A site",
+     "killer": "T",
+     "t": 48.8,
+     "victim": "CT",
+     "where": "A default"
+    },
+    {
+     "dist": 13.3,
+     "from": "A site",
+     "killer": "T",
+     "t": 49.2,
+     "victim": "CT",
+     "where": "A default"
+    }
+   ],
+   "plant_site": "A",
+   "plant_t": 46.3,
+   "planted": true,
+   "reason": "CT lar yo'q qilindi",
+   "round": 10,
+   "setup": "3-1-1 (A kuchli)",
+   "site": "A",
+   "strategy": "A split (Long + Short)",
+   "t_alive": 2,
+   "winner": "T"
+  },
+  {
+   "ct_alive": 3,
+   "duration": 21.1,
+   "exec_t": 18.9,
+   "kills": [
+    {
+     "dist": 27,
+     "from": "A default",
+     "killer": "CT",
+     "t": 12.3,
+     "victim": "T",
+     "where": "Catwalk"
+    },
+    {
+     "dist": 41.1,
+     "from": "A platforma",
+     "killer": "CT",
+     "t": 12.5,
+     "victim": "T",
+     "where": "Long"
+    },
+    {
+     "dist": 41.1,
+     "from": "Long",
+     "killer": "T",
+     "t": 12.7,
+     "victim": "CT",
+     "where": "A platforma"
+    },
+    {
+     "dist": 24.6,
+     "from": "A default",
+     "killer": "CT",
+     "t": 17.8,
+     "victim": "T",
+     "where": "Long"
+    },
+    {
+     "dist": 25.3,
+     "from": "A default",
+     "killer": "CT",
+     "t": 20,
+     "victim": "T",
+     "where": "Long"
+    },
+    {
+     "dist": 29.5,
+     "from": "Long",
+     "killer": "T",
+     "t": 20.6,
+     "victim": "CT",
+     "where": "A default"
+    },
+    {
+     "dist": 22.8,
+     "from": "A default",
+     "killer": "CT",
+     "t": 21.1,
+     "victim": "T",
+     "where": "Long"
+    }
+   ],
+   "plant_site": "",
+   "plant_t": -1,
+   "planted": false,
+   "reason": "T lar yo'q qilindi",
+   "round": 11,
+   "setup": "3-1-1 (A kuchli)",
+   "site": "A",
+   "strategy": "A rush (Long)",
+   "t_alive": 0,
+   "winner": "CT"
+  },
+  {
+   "ct_alive": 2,
+   "duration": 71.2,
+   "exec_t": 35.4,
+   "kills": [
+    {
+     "dist": 28.6,
+     "from": "Mid",
+     "killer": "T",
+     "t": 8.8,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 41.2,
+     "from": "B platforma",
+     "killer": "CT",
+     "t": 13.3,
+     "victim": "T",
+     "where": "Lower tunnels"
+    },
+    {
+     "dist": 41.2,
+     "from": "Lower tunnels",
+     "killer": "T",
+     "t": 14.1,
+     "victim": "CT",
+     "where": "B platforma"
+    },
+    {
+     "dist": 56.6,
+     "from": "A platforma",
+     "killer": "CT",
+     "t": 40,
+     "victim": "T",
+     "where": "CT mid"
+    },
+    {
+     "dist": 35.2,
+     "from": "CT mid",
+     "killer": "CT",
+     "t": 55.2,
+     "victim": "T",
+     "where": "B tunnel chiqishi"
+    },
+    {
+     "dist": 30.7,
+     "from": "B platforma",
+     "killer": "T",
+     "t": 58.8,
+     "victim": "CT",
+     "where": "B site"
+    },
+    {
+     "dist": 30.6,
+     "from": "B site",
+     "killer": "CT",
+     "t": 58.8,
+     "victim": "T",
+     "where": "B platforma"
+    },
+    {
+     "dist": 12.5,
+     "from": "B default",
+     "killer": "CT",
+     "t": 62.7,
+     "victim": "T",
+     "where": "B site"
+    }
+   ],
+   "plant_site": "B",
+   "plant_t": 43.3,
+   "planted": true,
+   "reason": "bomba zararsizlantirildi",
+   "round": 12,
+   "setup": "3-1-1 (A kuchli)",
+   "site": "B",
+   "strategy": "B split (Tunnels + Window)",
+   "t_alive": 0,
+   "winner": "CT"
+  },
+  {
+   "ct_alive": 0,
+   "duration": 27.2,
+   "exec_t": 18.9,
+   "kills": [
+    {
+     "dist": 41.2,
+     "from": "Lower tunnels",
+     "killer": "T",
+     "t": 13.1,
+     "victim": "CT",
+     "where": "B platforma"
+    },
+    {
+     "dist": 19.4,
+     "from": "B window",
+     "killer": "T",
+     "t": 17.6,
+     "victim": "CT",
+     "where": "B site"
+    },
+    {
+     "dist": 44,
+     "from": "CT mid",
+     "killer": "CT",
+     "t": 22.6,
+     "victim": "T",
+     "where": "B tunnel chiqishi"
+    },
+    {
+     "dist": 44,
+     "from": "B tunnel chiqishi",
+     "killer": "T",
+     "t": 23.8,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 44.2,
+     "from": "CT mid",
+     "killer": "CT",
+     "t": 24.6,
+     "victim": "T",
+     "where": "B tunnel chiqishi"
+    },
+    {
+     "dist": 24,
+     "from": "B window chiqishi",
+     "killer": "T",
+     "t": 26.2,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 32.2,
+     "from": "B platforma",
+     "killer": "T",
+     "t": 27.2,
+     "victim": "CT",
+     "where": "B ramp"
+    }
+   ],
+   "plant_site": "",
+   "plant_t": -1,
+   "planted": false,
+   "reason": "CT lar yo'q qilindi",
+   "round": 13,
+   "setup": "3-1-1 (A kuchli)",
+   "site": "B",
+   "strategy": "B rush (Tunnels)",
+   "t_alive": 3,
+   "winner": "T"
+  },
+  {
+   "ct_alive": 1,
+   "duration": 65.1,
+   "exec_t": 27.9,
+   "kills": [
+    {
+     "dist": 28.7,
+     "from": "Top mid",
+     "killer": "T",
+     "t": 9,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 41.2,
+     "from": "B platforma",
+     "killer": "CT",
+     "t": 12.1,
+     "victim": "T",
+     "where": "Lower tunnels"
+    },
+    {
+     "dist": 41.2,
+     "from": "B platforma",
+     "killer": "CT",
+     "t": 13.1,
+     "victim": "T",
+     "where": "Lower tunnels"
+    },
+    {
+     "dist": 31.2,
+     "from": "B window",
+     "killer": "T",
+     "t": 30.2,
+     "victim": "CT",
+     "where": "B platforma"
+    },
+    {
+     "dist": 23.7,
+     "from": "CT mid",
+     "killer": "CT",
+     "t": 48.4,
+     "victim": "T",
+     "where": "B site"
+    },
+    {
+     "dist": 29.2,
+     "from": "CT mid",
+     "killer": "CT",
+     "t": 48.8,
+     "victim": "T",
+     "where": "B site"
+    },
+    {
+     "dist": 35.1,
+     "from": "B tunnel chiqishi",
+     "killer": "T",
+     "t": 52.1,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 35.2,
+     "from": "B tunnel chiqishi",
+     "killer": "T",
+     "t": 52.6,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 35.2,
+     "from": "CT mid",
+     "killer": "CT",
+     "t": 52.9,
+     "victim": "T",
+     "where": "B tunnel chiqishi"
+    }
+   ],
+   "plant_site": "B",
+   "plant_t": 38.7,
+   "planted": true,
+   "reason": "bomba zararsizlantirildi",
+   "round": 14,
+   "setup": "3-1-1 (A kuchli)",
+   "site": "B",
+   "strategy": "Mid → B (Mid-window)",
+   "t_alive": 0,
+   "winner": "CT"
+  },
+  {
+   "ct_alive": 0,
+   "duration": 58.1,
+   "exec_t": 30.5,
+   "kills": [
+    {
+     "dist": 26.2,
+     "from": "Mid",
+     "killer": "T",
+     "t": 8.7,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 27,
+     "from": "Catwalk",
+     "killer": "T",
+     "t": 12.9,
+     "victim": "CT",
+     "where": "A default"
+    },
+    {
+     "dist": 30.7,
+     "from": "Catwalk",
+     "killer": "T",
+     "t": 32.4,
+     "victim": "CT",
+     "where": "A platforma"
+    },
+    {
+     "dist": 22.6,
+     "from": "A site",
+     "killer": "CT",
+     "t": 38.8,
+     "victim": "T",
+     "where": "A site"
+    },
+    {
+     "dist": 15.1,
+     "from": "A site",
+     "killer": "CT",
+     "t": 42.3,
+     "victim": "T",
+     "where": "A default"
+    },
+    {
+     "dist": 13,
+     "from": "A site",
+     "killer": "T",
+     "t": 48.1,
+     "victim": "CT",
+     "where": "A default"
+    },
+    {
+     "dist": 28.5,
+     "from": "A site",
+     "killer": "T",
+     "t": 58.1,
+     "victim": "CT",
+     "where": "CT mid"
+    }
+   ],
+   "plant_site": "A",
+   "plant_t": 45.4,
+   "planted": true,
+   "reason": "CT lar yo'q qilindi",
+   "round": 15,
+   "setup": "3-1-1 (A kuchli)",
+   "site": "A",
+   "strategy": "Mid → A (Mid doors, A CT)",
+   "t_alive": 3,
+   "winner": "T"
+  },
+  {
+   "ct_alive": 0,
+   "duration": 59.1,
+   "exec_t": 30.6,
+   "kills": [
+    {
+     "dist": 26.3,
+     "from": "Mid",
+     "killer": "T",
+     "t": 8.8,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 6.8,
+     "from": "B site",
+     "killer": "T",
+     "t": 38,
+     "victim": "CT",
+     "where": "B platforma"
+    },
+    {
+     "dist": 24,
+     "from": "B window chiqishi",
+     "killer": "T",
+     "t": 55.4,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 31.8,
+     "from": "CT mid",
+     "killer": "CT",
+     "t": 57.3,
+     "victim": "T",
+     "where": "B site"
+    },
+    {
+     "dist": 23.9,
+     "from": "B window chiqishi",
+     "killer": "T",
+     "t": 58.6,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 26.4,
+     "from": "B window chiqishi",
+     "killer": "T",
+     "t": 59.1,
+     "victim": "CT",
+     "where": "CT mid"
+    }
+   ],
+   "plant_site": "B",
+   "plant_t": 45.7,
+   "planted": true,
+   "reason": "CT lar yo'q qilindi",
+   "round": 16,
+   "setup": "3-1-1 (A kuchli)",
+   "site": "B",
+   "strategy": "Mid → B (Mid doors, B doors)",
+   "t_alive": 4,
+   "winner": "T"
+  },
+  {
+   "ct_alive": 0,
+   "duration": 40.3,
+   "exec_t": 50.8,
+   "kills": [
+    {
+     "dist": 26.3,
+     "from": "Mid",
+     "killer": "T",
+     "t": 9.6,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 41.1,
+     "from": "A platforma",
+     "killer": "CT",
+     "t": 12.7,
+     "victim": "T",
+     "where": "Long"
+    },
+    {
+     "dist": 41.2,
+     "from": "Lower tunnels",
+     "killer": "T",
+     "t": 13,
+     "victim": "CT",
+     "where": "B platforma"
+    },
+    {
+     "dist": 26.9,
+     "from": "Catwalk",
+     "killer": "T",
+     "t": 14,
+     "victim": "CT",
+     "where": "A default"
+    },
+    {
+     "dist": 29.3,
+     "from": "Catwalk",
+     "killer": "T",
+     "t": 17.2,
+     "victim": "CT",
+     "where": "A platforma"
+    },
+    {
+     "dist": 13.1,
+     "from": "A site",
+     "killer": "T",
+     "t": 40.3,
+     "victim": "CT",
+     "where": "A default"
+    }
+   ],
+   "plant_site": "A",
+   "plant_t": 36.7,
+   "planted": true,
+   "reason": "CT lar yo'q qilindi",
+   "round": 17,
+   "setup": "3-1-1 (A kuchli)",
+   "site": "A",
+   "strategy": "Default → A (kech)",
+   "t_alive": 4,
+   "winner": "T"
+  },
+  {
+   "ct_alive": 2,
+   "duration": 97.2,
+   "exec_t": 51.8,
+   "kills": [
+    {
+     "dist": 26.3,
+     "from": "Mid",
+     "killer": "T",
+     "t": 9.1,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 27,
+     "from": "A default",
+     "killer": "CT",
+     "t": 12.8,
+     "victim": "T",
+     "where": "Catwalk"
+    },
+    {
+     "dist": 41.1,
+     "from": "Long",
+     "killer": "T",
+     "t": 13.6,
+     "victim": "CT",
+     "where": "A platforma"
+    },
+    {
+     "dist": 41.2,
+     "from": "B platforma",
+     "killer": "CT",
+     "t": 13.8,
+     "victim": "T",
+     "where": "Lower tunnels"
+    },
+    {
+     "dist": 40.3,
+     "from": "B platforma",
+     "killer": "CT",
+     "t": 26.4,
+     "victim": "T",
+     "where": "Lower tunnels"
+    },
+    {
+     "dist": 40,
+     "from": "B platforma",
+     "killer": "CT",
+     "t": 39,
+     "victim": "T",
+     "where": "Lower tunnels"
+    },
+    {
+     "dist": 39.8,
+     "from": "Lower tunnels",
+     "killer": "T",
+     "t": 62.5,
+     "victim": "CT",
+     "where": "B platforma"
+    },
+    {
+     "dist": 31.9,
+     "from": "B doors",
+     "killer": "CT",
+     "t": 85.1,
+     "victim": "T",
+     "where": "B platforma"
+    }
+   ],
+   "plant_site": "B",
+   "plant_t": 73.1,
+   "planted": true,
+   "reason": "bomba zararsizlantirildi",
+   "round": 18,
+   "setup": "3-1-1 (A kuchli)",
+   "site": "B",
+   "strategy": "Default → B (kech)",
+   "t_alive": 0,
+   "winner": "CT"
+  },
+  {
+   "ct_alive": 0,
+   "duration": 50.7,
+   "exec_t": 29.5,
+   "kills": [
+    {
+     "dist": 28.5,
+     "from": "Mid",
+     "killer": "T",
+     "t": 9.1,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 41.1,
+     "from": "Long",
+     "killer": "T",
+     "t": 12.7,
+     "victim": "CT",
+     "where": "A platforma"
+    },
+    {
+     "dist": 22.2,
+     "from": "A site",
+     "killer": "T",
+     "t": 48.8,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 23.1,
+     "from": "A site",
+     "killer": "T",
+     "t": 49.4,
+     "victim": "CT",
+     "where": "CT mid"
+    },
+    {
+     "dist": 22.4,
+     "from": "A site",
+     "killer": "T",
+     "t": 50.7,
+     "victim": "CT",
+     "where": "A ramp"
+    }
+   ],
+   "plant_site": "A",
+   "plant_t": 37.6,
+   "planted": true,
+   "reason": "CT lar yo'q qilindi",
+   "round": 19,
+   "setup": "1-1-3 (B kuchli)",
+   "site": "A",
+   "strategy": "A split (Long + Short)",
+   "t_alive": 5,
+   "winner": "T"
+  }
+ ],
+ "seed": 1,
+ "summary": {
+  "avg_first_kill_s": 9.9,
+  "by_setup": {
+   "1-1-3 (B kuchli)": {
+    "plants": 1,
+    "rounds": 1,
+    "t_win_pct": 100,
+    "t_wins": 1
+   },
+   "2-1-2": {
+    "plants": 8,
+    "rounds": 8,
+    "t_win_pct": 62.5,
+    "t_wins": 5
+   },
+   "3-1-1 (A kuchli)": {
+    "plants": 7,
+    "rounds": 9,
+    "t_win_pct": 55.6,
+    "t_wins": 5
+   }
+  },
+  "by_site": {
+   "A": {
+    "plants": 7,
+    "rounds": 8,
+    "t_win_pct": 75,
+    "t_wins": 6
+   },
+   "B": {
+    "plants": 9,
+    "rounds": 10,
+    "t_win_pct": 50,
+    "t_wins": 5
+   }
+  },
+  "by_strategy": {
+   "A rush (Long)": {
+    "plants": 1,
+    "rounds": 2,
+    "t_win_pct": 50,
+    "t_wins": 1
+   },
+   "A split (Long + Short)": {
+    "plants": 2,
+    "rounds": 2,
+    "t_win_pct": 100,
+    "t_wins": 2
+   },
+   "B rush (Tunnels)": {
+    "plants": 1,
+    "rounds": 2,
+    "t_win_pct": 50,
+    "t_wins": 1
+   },
+   "B split (Tunnels + Window)": {
+    "plants": 2,
+    "rounds": 2,
+    "t_win_pct": 50,
+    "t_wins": 1
+   },
+   "Default → A (kech)": {
+    "plants": 2,
+    "rounds": 2,
+    "t_win_pct": 50,
+    "t_wins": 1
+   },
+   "Default → B (kech)": {
+    "plants": 2,
+    "rounds": 2,
+    "t_win_pct": 50,
+    "t_wins": 1
+   },
+   "Mid → A (Mid doors, A CT)": {
+    "plants": 2,
+    "rounds": 2,
+    "t_win_pct": 100,
+    "t_wins": 2
+   },
+   "Mid → B (Mid doors, B doors)": {
+    "plants": 2,
+    "rounds": 2,
+    "t_win_pct": 50,
+    "t_wins": 1
+   },
+   "Mid → B (Mid-window)": {
+    "plants": 2,
+    "rounds": 2,
+    "t_win_pct": 50,
+    "t_wins": 1
+   }
+  },
+  "first_kills": {
+   "A default → Catwalk (CT o'ldirdi)": 1,
+   "B platforma → Lower tunnels (CT o'ldirdi)": 1,
+   "CT mid → Top mid (CT o'ldirdi)": 1,
+   "Long → A platforma (T o'ldirdi)": 1,
+   "Lower tunnels → B platforma (T o'ldirdi)": 1,
+   "Mid → CT mid (T o'ldirdi)": 11,
+   "Top mid → CT mid (T o'ldirdi)": 2
+  },
+  "kills_by_callout": {
+   "A CT": 1,
+   "A default": 11,
+   "A platforma": 10,
+   "A ramp": 1,
+   "A site": 13,
+   "B default": 4,
+   "B platforma": 12,
+   "B ramp": 1,
+   "B site": 15,
+   "B tunnel chiqishi": 7,
+   "B window chiqishi": 2,
+   "CT mid": 34,
+   "Catwalk": 4,
+   "Long": 7,
+   "Lower tunnels": 11,
+   "Top mid": 1
+  },
+  "plant_pct": 88.9,
+  "reasons": {
+   "CT lar yo'q qilindi": 11,
+   "T lar yo'q qilindi": 1,
+   "bomba zararsizlantirildi": 6
+  },
+  "retake_pct": 37.5,
+  "rounds": 18,
+  "t_win_pct": 61.1,
+  "t_wins": 11
+ }
+}

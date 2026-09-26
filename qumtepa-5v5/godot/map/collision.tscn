@@ -2503,11 +2503,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.45, 0.55, -43)
 shape = SubResource("b286")
 
 [node name="S287" type="CollisionShape3D" parent="World_wood"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31, 0.55, -7)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0.55, 26.5)
 shape = SubResource("b287")
 
 [node name="S288" type="CollisionShape3D" parent="World_wood"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 0.55, 26.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.8, 0.55, -6)
 shape = SubResource("b288")
 
 [node name="S289" type="CollisionShape3D" parent="World_wood"]
