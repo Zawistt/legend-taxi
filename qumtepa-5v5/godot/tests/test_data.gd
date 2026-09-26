@@ -13,7 +13,7 @@ const SHORTEST_2D := {"T→A": 17.99, "T→B": 18.02, "CT→A": 12.27, "CT→B":
 const ROUTES := [
 	["T → A (Long)", "T", [Vector3(0, 0, -47), Vector3(-30, 0, -38), Vector3(-32, 0, -20), Vector3(-40, 0, -10), Vector3(-40, 0, 13)], 20.5],
 	["T → A (Short)", "T", [Vector3(0, 0, -47), Vector3(-10, 0, -30), Vector3(-22, 0, -8), Vector3(-40, 0, 13)], 18.0],
-	["T → B (Tunnels)", "T", [Vector3(0, 0, -47), Vector3(31, 0, -38), Vector3(32, 0, -20), Vector3(40, 0, -10), Vector3(40, 0, 13)], 20.3],
+	["T → B (Tunnels)", "T", [Vector3(0, 0, -47), Vector3(31, 0, -38), Vector3(32, 0, -20), Vector3(40, 0, -10), Vector3(40, 0, 13)], 20.4],
 	["T → B (Window)", "T", [Vector3(0, 0, -47), Vector3(20, 0, -20), Vector3(22, 0, 0), Vector3(40, 0, 13)], 18.1],
 	["T → Mid doors", "T", [Vector3(0, 0, -47), Vector3(0, 0, -14), Vector3(0, 0, 4)], 12.8],
 	["CT → A (Ramp)", "CT", [Vector3(0, 0, 42), Vector3(-28, 0, 38), Vector3(-40, 0, 13)], 13.3],

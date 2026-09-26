@@ -174,7 +174,7 @@ PROPS = [
     ("crate", 22.0, 9.5, 1.1, 0.2),                        # Window chiqishi
     ("wall", 17.0, 5.5, 21.5, 7.5, 3.0),                   # Window chiqishi devori
     ("platform", 46.0, 18.0, 49.0, 27.0, 1.3, "-x"),        # B platforma
-    ("stack", 40.0, 11.0, S2(), 0.0),                      # B o'rtasi
+    ("stack", 39.4, 10.5, W2(), 0.0),                      # B o'rtasi (past: 3-bosqichda baland ustun T ga xavfsiz joy bergani uchun)
     ("barrel", 19.5, 21.0), ("urn", 19.5, 9.0),            # B doors yonlari
     ("sandbags", 27.0, 26.0, 30.0, 26.0),                  # Ramp tepasi
     ("barrel", 37.5, 27.5), ("crate", 44.0, 8.0, 1.1, 0.0), ("crate", 25.5, 21.5, 1.1, 0.3),

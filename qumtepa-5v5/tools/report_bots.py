@@ -46,9 +46,11 @@ for rd in data["rounds"]:
 for s, p in (("A", L.A_PLANT), ("B", L.B_PLANT)):
     x, y = P(*p)
     dr.text((x - 9, y - 16), s, fill=(170, 30, 30), font=FB(28))
-dr.text((PAD, 12), "O'limlar: • T  • CT   (kulrang chiziq — raunddagi birinchi o'lim: otuvchi → o'lgan)", fill=(60, 50, 40), font=F(13))
-dr.ellipse([PAD + 88, 17, PAD + 96, 25], fill=TC)
-dr.ellipse([PAD + 118, 17, PAD + 126, 25], fill=CC)
+x0 = PAD
+for txt, col in (("O'limlar:", None), ("T", TC), ("CT", CC), ("  kulrang chiziq — raunddagi birinchi o'lim (otuvchi → o'lgan)", None)):
+    if col:
+        dr.ellipse([x0, 17, x0 + 9, 26], fill=col); x0 += 13
+    dr.text((x0, 12), txt, fill=(60, 50, 40), font=F(13)); x0 += dr.textlength(txt, font=F(13)) + 10
 
 X, y = W + 10, PAD
 dr.text((X, y), "Qumtepa 5v5 — 5v5 bot o'yinlari", fill=(40, 30, 20), font=FB(22)); y += 32

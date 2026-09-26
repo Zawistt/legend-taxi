@@ -12,15 +12,15 @@ Godot 4.3, bomba rejimi (T hujum qiladi, CT himoya qiladi).
 | 0 | Konsepsiya: yo'llar sxemasi, vaqt maqsadlari | ✅ |
 | 1 | 2D blokaut: yakuniy reja, panalar, ko'rish chiziqlari, smoke rejasi, callout'lar | ✅ ([hisobot](docs/STAGE1.md)) |
 | 2 | Godot greybox: qutilardan 3D, collision, NavMesh, spawn, zonalar, raund, testlar | ✅ ([hisobot](docs/STAGE2.md)) |
-| 3 | Balans sinovi: 5v5 botlar, hujum/qaytarib olish stsenariylari, tuzatishlar | ⏳ |
-| 4 | Arxitektura: binolar, arkalar, derazalar, tomlar, hudud uslublari | — |
+| 3 | Balans sinovi: smoke lineup'lari, 5v5 botlar (1080 raund), tuzatishlar | ✅ ([hisobot](docs/STAGE3.md)) |
+| 4 | Arxitektura: binolar, arkalar, derazalar, tomlar, hudud uslublari | ⏳ |
 | 5 | Props va teksturalar, sirt turlari | — |
 | 6 | Yorug'lik, osmon, atmosfera, tovush zonalari | — |
 | 7 | Optimallashtirish (occlusion, LOD, MultiMesh), minimap, yakuniy testlar | — |
 
 ## O'ynash
 
-Godot 4.3 → Import → `qumtepa-5v5/godot/project.godot` → F5. Boshqaruv va sinov ro'yxati: [STAGE2.md](docs/STAGE2.md).
+Godot 4.3 → Import → `qumtepa-5v5/godot/project.godot` → F5 (o'zingiz o'ynaysiz). `bots.tscn` → F6 — 5v5 bot o'yinini kuzatish. Boshqaruv: [STAGE2.md](docs/STAGE2.md), [STAGE3.md](docs/STAGE3.md).
 
 ## Tuzilma
 

@@ -46,8 +46,8 @@
   },
   "T → B (Tunnels)": {
    "team": "T",
-   "dist": 91.5,
-   "time": 20.3
+   "dist": 92.0,
+   "time": 20.4
   },
   "T → B (Window)": {
    "team": "T",
@@ -7348,7 +7348,7 @@
   },
   {
    "ok": true,
-   "msg": "T → B (Tunnels): 20.3 s (maqsad 16.0–20.5 s)"
+   "msg": "T → B (Tunnels): 20.4 s (maqsad 16.0–20.5 s)"
   },
   {
    "ok": true,
