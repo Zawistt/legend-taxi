@@ -1,0 +1,289 @@
+{
+ "file": "ct_idle_v2.glb",
+ "bones": [
+  "Hips",
+  "Spine",
+  "Spine1",
+  "Spine2",
+  "Neck",
+  "Head",
+  "HeadTop_End",
+  "headfront",
+  "LeftShoulder",
+  "LeftArm",
+  "LeftForeArm",
+  "LeftHand",
+  "LeftHandMiddle4",
+  "RightShoulder",
+  "RightArm",
+  "RightForeArm",
+  "RightHand",
+  "RightHandMiddle4",
+  "LeftUpLeg",
+  "LeftLeg",
+  "LeftFoot",
+  "LeftToeBase",
+  "LeftToe_End",
+  "RightUpLeg",
+  "RightLeg",
+  "RightFoot",
+  "RightToeBase",
+  "RightToe_End"
+ ],
+ "actions": {
+  "01a0deaf-6eab-70ac-8598-4645041e6f5c.001_target_character": [
+   0.0,
+   2.0
+  ],
+  "01a0deaf-6eab-70ac-8598-4645041e6f5c_target_character": [
+   1.0,
+   85.0
+  ]
+ },
+ "animations": {
+  "01a0deaf-6eab-70ac-8598-4645041e6f5c.001_target_character": {
+   "frames": 3,
+   "frame_range": [
+    0,
+    2
+   ],
+   "fps": 24,
+   "duration_s": 0.08333333333333333,
+   "height_m": [
+    1.7,
+    1.7
+   ],
+   "floor_zmin_cm": -0.0,
+   "footL_cm": [
+    -0.0,
+    -0.0
+   ],
+   "heelL_cm": [
+    0.37,
+    0.37
+   ],
+   "toeL_cm": [
+    0.21,
+    0.21
+   ],
+   "slideL_cm": 0.0,
+   "floatL_frames": 0,
+   "sinkL_frames": 0,
+   "footR_cm": [
+    0.56,
+    0.56
+   ],
+   "heelR_cm": [
+    0.56,
+    0.56
+   ],
+   "toeR_cm": [
+    0.86,
+    0.86
+   ],
+   "slideR_cm": 0.0,
+   "floatR_frames": 0,
+   "sinkR_frames": 0,
+   "root_xy_cm": 0.0,
+   "root_xy_max_cm": 0.0,
+   "root_z_range_cm": 0.0,
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "feet_center_xy_cm": [
+    -0.1,
+    -0.6
+   ],
+   "facing_deg_from_minusY": 6.1,
+   "loop_max_deg": [
+    0.11,
+    "RightToeBase"
+   ],
+   "loop_hips_cm": 0.0,
+   "jitter_top": [],
+   "jitter_total_spikes": 0,
+   "spine_deg": [
+    -1.7,
+    -1.7
+   ],
+   "lumbar_deg": [
+    -1.7,
+    -1.7
+   ],
+   "shoulder_deg": [
+    1.5,
+    1.5
+   ],
+   "kneeL_deg": [
+    26.9,
+    26.9
+   ],
+   "kneeL_reverse_frames": 0,
+   "kneeR_deg": [
+    41.5,
+    41.5
+   ],
+   "kneeR_reverse_frames": 0,
+   "hands_cm": [
+    83.2,
+    83.2
+   ],
+   "hands_line_vs_forward_deg": [
+    82.7,
+    82.7
+   ],
+   "hands_height_diff_cm": [
+    -0.8,
+    -0.8
+   ],
+   "hand_inside_body_frames": {
+    "R": 0,
+    "L": 0
+   }
+  },
+  "01a0deaf-6eab-70ac-8598-4645041e6f5c_target_character": {
+   "frames": 85,
+   "frame_range": [
+    1,
+    85
+   ],
+   "fps": 24,
+   "duration_s": 3.5,
+   "height_m": [
+    1.696,
+    1.7
+   ],
+   "floor_zmin_cm": -6.14,
+   "footL_cm": [
+    -5.65,
+    -5.53
+   ],
+   "heelL_cm": [
+    -5.65,
+    -5.53
+   ],
+   "toeL_cm": [
+    0.04,
+    0.16
+   ],
+   "slideL_cm": 1.34,
+   "floatL_frames": 0,
+   "sinkL_frames": 85,
+   "footR_cm": [
+    -6.14,
+    -5.89
+   ],
+   "heelR_cm": [
+    -5.25,
+    -5.05
+   ],
+   "toeR_cm": [
+    -6.14,
+    -5.89
+   ],
+   "slideR_cm": 1.77,
+   "floatR_frames": 0,
+   "sinkR_frames": 85,
+   "root_xy_cm": 1.61,
+   "root_xy_max_cm": 1.61,
+   "root_z_range_cm": 0.19,
+   "origin": [
+    0.0,
+    0.0,
+    0.0
+   ],
+   "feet_center_xy_cm": [
+    -8.3,
+    -2.2
+   ],
+   "facing_deg_from_minusY": 14.9,
+   "loop_max_deg": [
+    1.45,
+    "Head"
+   ],
+   "loop_hips_cm": 1.61,
+   "jitter_top": [
+    [
+     0,
+     0.11,
+     "RightForeArm"
+    ],
+    [
+     0,
+     0.11,
+     "LeftArm"
+    ],
+    [
+     0,
+     0.1,
+     "Head"
+    ],
+    [
+     0,
+     0.09,
+     "RightHand"
+    ],
+    [
+     0,
+     0.07,
+     "RightShoulder"
+    ]
+   ],
+   "jitter_total_spikes": 0,
+   "spine_deg": [
+    10.1,
+    10.4
+   ],
+   "lumbar_deg": [
+    7.8,
+    8.0
+   ],
+   "shoulder_deg": [
+    3.7,
+    4.2
+   ],
+   "kneeL_deg": [
+    23.4,
+    24.2
+   ],
+   "kneeL_reverse_frames": 0,
+   "kneeR_deg": [
+    25.6,
+    26.6
+   ],
+   "kneeR_reverse_frames": 0,
+   "hands_cm": [
+    31.0,
+    31.6
+   ],
+   "hands_line_vs_forward_deg": [
+    31.9,
+    32.8
+   ],
+   "hands_height_diff_cm": [
+    12.6,
+    13.3
+   ],
+   "hand_inside_body_frames": {
+    "R": 0,
+    "L": 0
+   },
+   "renders": [
+    "report/oldin/ct_idle_v2_00_old.png",
+    "report/oldin/ct_idle_v2_00_yon.png",
+    "report/oldin/ct_idle_v2_00_tepa.png",
+    "report/oldin/ct_idle_v2_25_old.png",
+    "report/oldin/ct_idle_v2_25_yon.png",
+    "report/oldin/ct_idle_v2_25_tepa.png",
+    "report/oldin/ct_idle_v2_50_old.png",
+    "report/oldin/ct_idle_v2_50_yon.png",
+    "report/oldin/ct_idle_v2_50_tepa.png",
+    "report/oldin/ct_idle_v2_75_old.png",
+    "report/oldin/ct_idle_v2_75_yon.png",
+    "report/oldin/ct_idle_v2_75_tepa.png"
+   ]
+  }
+ }
+}
