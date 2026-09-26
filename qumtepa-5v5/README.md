@@ -19,8 +19,8 @@ Godot 4.3, bomba rejimi (T hujum qiladi, CT himoya qiladi).
 | 3 | Balans sinovi: smoke lineup'lari, 5v5 botlar (1080 raund), tuzatishlar | ✅ ([hisobot](docs/STAGE3.md)) |
 | 4 | Arxitektura: 5 hudud uslubi (qal'a, bozor, madrasa, karvonsaroy, masjid), mo'ljal binolari | ✅ ([hisobot](docs/STAGE4.md)) |
 | 5 | Milliy buyumlar va teksturalar: girih, majolika, ganch, ayvon, vassa, atlas, so'zana, tandir, so'ri, paxta, chinor, Kalta Minor | ✅ ([hisobot](docs/STAGE5.md)) |
-| 6 | Yorug'lik, osmon, atmosfera, tovush zonalari | ⏳ |
-| 7 | Optimallashtirish (occlusion, LOD, MultiMesh), minimap, yakuniy testlar | — |
+| 6 | Yorug'lik (adolatli quyosh, qorong'i burchaksiz), shom rejimi, 6 xil fon tovushi, aks-sado | ✅ ([hisobot](docs/STAGE6.md)) |
+| 7 | Optimallashtirish (occlusion, LOD, MultiMesh), minimap, yakuniy testlar | ⏳ |
 
 ## O'ynash
 
@@ -36,7 +36,9 @@ qumtepa-5v5/
 │   ├── analyze5.py     # 2D tahlil va 59 ta tekshiruv, chizmalar
 │   ├── build5.py       # 3D model: STYLE=greybox yoki STYLE=arch (to'qnashuv ikkalasida bir xil)
 │   ├── arch5.py        # 4-bosqich: hudud uslublari, facade bezaklari, mo'ljal binolari
-│   ├── textures5.py    # protsedural teksturalar (v2 + koshin, g'isht, soyabon, gilam, gumbaz ...)
+│   ├── textures5.py    # protsedural teksturalar (v2 + koshin, girih, majolika, ganch, atlas, so'zana ...)
+│   ├── audio5.py       # 6-bosqich: hududlarning fon tovushlari
+│   ├── check_shots.py  # 6-bosqich: skrinshotlardan ko'rinish (yorqinlik) tekshiruvi
 │   ├── gen_godot5.py   # Godot loyihasini yaratadi (sahna, collision, map_data, test ma'lumotlari)
 │   ├── make_all.sh     # hammasi ketma-ket + NavMesh + 79 ta Godot testi
 │   └── godot_src/      # Godot testlari va skrinshot skripti (manba)
@@ -51,7 +53,8 @@ O'yin skriptlari (o'yinchi, raund, HUD, bomba) va tovushlar `qumtepa-v2/` dan ol
 ```
 pip install numpy scipy pillow trimesh
 cd qumtepa-5v5/tools
-GODOT=/yo'l/godot4 ./make_all.sh     # natija: "Tekshiruvlar: 59 / 59" va "NATIJA: 79 / 79"
+GODOT=/yo'l/godot4 ./make_all.sh     # 2D 59/59, Godot 88/88, smoke 10/10
+SHOTS=1 BOTS=360 GODOT=... ./make_all.sh   # + skrinshotlar va ko'rinish tekshiruvi, + 5v5 bot o'yinlari
 ```
 
 Xaritani o'zgartirish: faqat `layout5.py` ni tahrirlang va `make_all.sh` ni ishga tushiring.

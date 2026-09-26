@@ -6,6 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 GODOT="${GODOT:-godot}"
 python3 analyze5.py
+python3 audio5.py
 STYLE=greybox python3 build5.py
 STYLE=arch python3 build5.py
 rm -f ../godot/map/navmesh.res
@@ -18,6 +19,11 @@ python3 gen_godot5.py
 (cd ../godot && "$GODOT" --headless --fixed-fps 60 -s res://tests/run_tests.gd 2>&1 | grep -v "^$" | grep -v "mesh_get_surface_count\|Parameter \"m\"\|ObjectDB\|resources still in use\|at: " )
 # smoke lineup'lari (granata fizikasi)
 (cd ../godot && "$GODOT" --headless -s res://tests/run_grenades.gd 2>&1 | grep "NATIJA\|XATO")
+# skrinshotlar va ko'rinish tekshiruvi (ekran kerak: xvfb-run bo'lsa ishlatiladi). SHOTS=1 ./make_all.sh
+if [ -n "${SHOTS:-}" ]; then
+  (cd ../godot && xvfb-run -a -s "-screen 0 1600x900x24" "$GODOT" --rendering-method gl_compatibility --rendering-driver opengl3 -s res://tools/screenshots.gd 2>&1 | grep -c saqlandi)
+  python3 check_shots.py | tail -1
+fi
 # 5v5 bot o'yinlari (uzoq: ~1.3 s / raund). BOTS=360 ./make_all.sh
 if [ -n "${BOTS:-}" ]; then
   (cd ../godot && "$GODOT" --headless --fixed-fps 60 -s res://tests/run_bots.gd -- "$BOTS" 1 2>&1 | grep -v "mesh_get_surface\|Parameter \"m\"\|^$\|at: ")

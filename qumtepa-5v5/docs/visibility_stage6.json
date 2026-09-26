@@ -1,0 +1,87 @@
+{
+ "02_t_spawn_top_mid": {
+  "lum": 0.371,
+  "dark_frac": 0.002,
+  "ok": true
+ },
+ "03_long_a_site": {
+  "lum": 0.594,
+  "dark_frac": 0.0,
+  "ok": true
+ },
+ "04_tunnels_b_site": {
+  "lum": 0.383,
+  "dark_frac": 0.0,
+  "ok": true
+ },
+ "05_mid_doors": {
+  "lum": 0.49,
+  "dark_frac": 0.0,
+  "ok": true
+ },
+ "06_ct_mid": {
+  "lum": 0.426,
+  "dark_frac": 0.074,
+  "ok": true
+ },
+ "07_a_site_ramp": {
+  "lum": 0.522,
+  "dark_frac": 0.01,
+  "ok": true
+ },
+ "08_catwalk": {
+  "lum": 0.477,
+  "dark_frac": 0.0,
+  "ok": true
+ },
+ "09_b_site_karvonsaroy": {
+  "lum": 0.625,
+  "dark_frac": 0.0,
+  "ok": true
+ },
+ "10_top_mid_bozor": {
+  "lum": 0.625,
+  "dark_frac": 0.0,
+  "ok": true
+ },
+ "11_ct_spawn": {
+  "lum": 0.55,
+  "dark_frac": 0.001,
+  "ok": true
+ },
+ "12_a_site_minora": {
+  "lum": 0.564,
+  "dark_frac": 0.004,
+  "ok": true
+ },
+ "13_t_spawn_qala": {
+  "lum": 0.386,
+  "dark_frac": 0.0,
+  "ok": true
+ },
+ "14_tandir_bozor": {
+  "lum": 0.703,
+  "dark_frac": 0.009,
+  "ok": true
+ },
+ "15_sori_b_platforma": {
+  "lum": 0.762,
+  "dark_frac": 0.0,
+  "ok": true
+ },
+ "16_kalta_minor": {
+  "lum": 0.563,
+  "dark_frac": 0.0,
+  "ok": true
+ },
+ "17_shom_a_site": {
+  "lum": 0.452,
+  "dark_frac": 0.02,
+  "ok": true
+ },
+ "18_shom_top_mid": {
+  "lum": 0.437,
+  "dark_frac": 0.0,
+  "ok": true
+ }
+}

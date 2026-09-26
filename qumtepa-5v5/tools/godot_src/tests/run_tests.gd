@@ -315,6 +315,47 @@ func _run() -> void:
 	await frames(3)
 	ok(gm.phase == GM.Phase.ROUND_END and gm.last_reason.contains("tushib"), "tushib ketish aniqlanadi, o'yinchi spawn'ga qaytadi")
 
+	print("\n15) Yorug'lik, atmosfera va tovush (6-bosqich)")
+	var sun: DirectionalLight3D = main.get_node("Sun")
+	var ld := -sun.global_transform.basis.z          # yorug'lik yo'nalishi
+	var elev := rad_to_deg(asin(-ld.y))
+	ok(elev >= 40.0 and elev <= 65.0, "quyosh balandligi %.0f° (40–65°: soyalar aniq, ko'zni qamashtirmaydi)" % elev)
+	var ns := absf(ld.z) / Vector2(ld.x, ld.z).length()
+	ok(ns <= 0.2, "quyosh sharq-g'arb o'qida (shimol-janub ulushi %.2f ≤ 0.2): T ham, CT ham quyoshga qarab o'ynamaydi" % ns)
+	var env: Environment = (main.get_node("WorldEnvironment") as WorldEnvironment).environment
+	ok(env.ssao_enabled and env.ssil_enabled and env.glow_enabled, "SSAO, SSIL va glow yoqilgan")
+	ok(env.fog_density <= 0.003 and env.volumetric_fog_density <= 0.006, "tuman yengil (uzoq ko'rish chiziqlari xiralashmaydi)")
+	ok(AudioServer.get_bus_index("Reverb") >= 0 and AudioServer.get_bus_index("Ambient") >= 0, "Reverb va Ambient tovush shinalari bor")
+	var amb := get_nodes_in_group("ambient")
+	var amb_ok := 0
+	var districts := {}
+	for p in amb:
+		var st: AudioStreamWAV = p.stream
+		if p.volume_db <= -18.0 and p.bus == &"Ambient" and st and st.loop_mode != AudioStreamWAV.LOOP_DISABLED:
+			amb_ok += 1
+		districts[str(p.get_meta("district"))] = true
+	ok(amb.size() >= 6 and amb_ok == amb.size(), "fon tovushlari: %d ta manba, hammasi halqada va ≤ −18 dB (qadam tovushini bosmaydi)" % amb.size())
+	ok(districts.size() == 6, "6 xil fon: %s" % ", ".join(districts.keys()))
+	var q := PhysicsPointQueryParameters3D.new()
+	q.collide_with_areas = true
+	q.collide_with_bodies = false
+	q.collision_mask = 64
+	var rv_ok := 0
+	var lit_ok := 0
+	var lamps := get_nodes_in_group("lamps")
+	for cpos in D.COVERED_CELLS:
+		q.position = cpos
+		for h in pl.get_world_3d().direct_space_state.intersect_point(q, 8):
+			if h.collider is Area3D and h.collider.reverb_bus_enabled:
+				rv_ok += 1
+				break
+		for l in lamps:
+			if Vector2(l.global_position.x - cpos.x, l.global_position.z - cpos.z).length() <= 6.0:
+				lit_ok += 1
+				break
+	ok(rv_ok == D.COVERED_CELLS.size(), "hamma yopiq kataklarda aks-sado bor (%d/%d)" % [rv_ok, D.COVERED_CELLS.size()])
+	ok(lit_ok == D.COVERED_CELLS.size(), "hamma yopiq kataklar chiroqdan ≤ 6 m (%d/%d): qorong'i burchak yo'q" % [lit_ok, D.COVERED_CELLS.size()])
+
 	print("\nVAQTLAR (2D tahlil -> 3D fizika):")
 	for row in timing_rows:
 		print("  %-28s %5.1f s -> %5.1f s" % [row[0], row[1], row[2]])

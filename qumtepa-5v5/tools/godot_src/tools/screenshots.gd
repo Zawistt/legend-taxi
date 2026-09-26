@@ -19,6 +19,8 @@ const VIEWS := [
 	["14_tandir_bozor", Vector3(11.5, 1.6, -25.0), Vector3(13.5, 0.6, -22.5), 70.0],
 	["15_sori_b_platforma", Vector3(41.0, 2.2, 21.0), Vector3(47.5, 1.0, 23.0), 75.0],
 	["16_kalta_minor", Vector3(38.0, 1.7, 22.0), Vector3(52.0, 12.0, 31.0), 75.0],
+	["17_shom_a_site", Vector3(-24, 1.7, 26), Vector3(-50, 12.0, 31), 80.0, true],
+	["18_shom_top_mid", Vector3(14, 1.7, -34), Vector3(-12, 2.5, -20), 80.0, true],
 ]
 
 
@@ -38,6 +40,9 @@ func _run() -> void:
 	root.size = Vector2i(1600, 900)
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://../docs/shots"))
 	for v in VIEWS:
+		var atm = main.get_node_or_null("Atmosphere")
+		if atm:
+			atm.set_dusk(v.size() > 4 and v[4])
 		var env: Environment = main.get_node("WorldEnvironment").environment
 		env.fog_enabled = v[3] > 0.0
 		if v[3] < 0.0:
@@ -48,7 +53,7 @@ func _run() -> void:
 			cam.fov = v[3]
 		cam.global_position = v[1]
 		cam.look_at(v[2], Vector3.UP)
-		for i in 12:
+		for i in 20:
 			await process_frame
 		var img := root.get_texture().get_image()
 		img.save_png(ProjectSettings.globalize_path("res://../docs/shots/%s.png" % v[0]))

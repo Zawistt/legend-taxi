@@ -23,6 +23,10 @@ window/size/viewport_height=900
 3d_physics/layer_7="triggers"
 3d_physics/layer_8="smoke"
 
+[audio]
+
+buses/default_bus_layout="res://default_bus_layout.tres"
+
 [rendering]
 
 anti_aliasing/quality/msaa_3d=2

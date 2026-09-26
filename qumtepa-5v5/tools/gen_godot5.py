@@ -174,9 +174,54 @@ s.save(f"{OUT}/map/collision.tscn")
 ART = os.path.exists(f"{OUT}/map/qumtepa5v5.glb")
 
 
-_x = np.array([-30, 45, -18], float); _z = _x / np.linalg.norm(_x)
-_xa = np.cross([0, 1, 0], _z); _xa /= np.linalg.norm(_xa); _ya = np.cross(_z, _xa)
-basis = ", ".join(f"{v:.5f}" for v in (*_xa, *_ya, *_z))   # quyosh yo'nalishi
+# ------------------------------------------------------------------ 6-bosqich: yorug'lik, tovush, atmosfera ma'lumotlari
+COVERED = [(r, c) for r in range(L.G) for c in range(L.G) if L.grid[r][c] in L.COVER]
+FILL_LIGHTS = []
+_lamps = [tuple(p) for p in meta["lamps"]]
+for r, c in COVERED:
+    x_, z_ = L.m(c, r)
+    if all(math.hypot(x_ - p[0], z_ - p[2]) > 5.0 for p in _lamps + FILL_LIGHTS):
+        FILL_LIGHTS.append((x_, 3.0, z_))
+# qopqoqli kataklarni to'rtburchaklarga birlashtirish (aks-sado zonalari)
+REVERB_RECTS = []
+_done = set()
+for r, c in COVERED:
+    if (r, c) in _done:
+        continue
+    t_ = L.grid[r][c]
+    w_ = 1
+    while (r, c + w_) not in _done and c + w_ < L.G and L.grid[r][c + w_] == t_:
+        w_ += 1
+    h_ = 1
+    while r + h_ < L.G and all(L.grid[r + h_][c + k] == t_ and (r + h_, c + k) not in _done for k in range(w_)):
+        h_ += 1
+    for rr in range(r, r + h_):
+        for cc in range(c, c + w_):
+            _done.add((rr, cc))
+    REVERB_RECTS.append((L.ORIGIN + c * L.CELL, L.ORIGIN + r * L.CELL, L.ORIGIN + (c + w_) * L.CELL, L.ORIGIN + (r + h_) * L.CELL, L.COVER[t_]))
+# fon tovushi manbalari: har hududning ochiq kataklari markazida; yopiq yo'laklarda "tunnel"
+AMB_FILES = ["bozor", "masjid", "madrasa", "karvon", "qala", "tunnel"]
+AMB_SOURCES = []
+for d_ in ("bozor", "masjid", "madrasa", "karvon", "qala"):
+    cells = [(r, c) for r in range(L.G) for c in range(L.G) if L.grid[r][c] in ".AB" and L.DISTRICT[r][c] == d_]
+    if not cells:
+        cells = [(r, c) for r in range(L.G) for c in range(L.G) if L.grid[r][c] != "#" and L.DISTRICT[r][c] == d_]
+    mx = sum(L.m(c, r)[0] for r, c in cells) / len(cells)
+    mz = sum(L.m(c, r)[1] for r, c in cells) / len(cells)
+    best = min(cells, key=lambda rc: (L.m(rc[1], rc[0])[0] - mx) ** 2 + (L.m(rc[1], rc[0])[1] - mz) ** 2)
+    bx, bz = L.m(best[1], best[0])
+    AMB_SOURCES.append((d_, (bx, 5.0, bz), -20.0))
+for zname in ("Lower tunnels", "Upper tunnels", "Mid", "Catwalk"):
+    x0_, z0_, x1_, z1_ = L.zone_rect_m(zname)
+    AMB_SOURCES.append(("tunnel", ((x0_ + x1_) / 2, 2.5, (z0_ + z1_) / 2), -22.0))
+# havodagi chang: katta ochiq maydonlar ustida
+DUST = []
+for zname, n in (("A site", 260), ("B site", 260), ("Top mid", 200), ("CT mid", 120), ("Long", 90), ("Outside long", 80)):
+    x0_, z0_, x1_, z1_ = L.zone_rect_m(zname)
+    DUST.append((((x0_ + x1_) / 2, 2.2, (z0_ + z1_) / 2), (x1_ - x0_, 3.6, z1_ - z0_), n))
+
+# Quyosh: g'arbda, 50° balandlikda, sharq-g'arb o'qidan 4° og'gan. Euler YXZ: avval pastga (−50°), keyin sharqqa buriladi.
+SUN_ROT = "Vector3(-50, -86, 0)"
 
 
 def main_scene(glb_path, out_name):
@@ -197,8 +242,12 @@ def main_scene(glb_path, out_name):
             ground_bottom_color="Color(0.45, 0.36, 0.25, 1)", ground_horizon_color="Color(0.86, 0.8, 0.68, 1)")
   s.add_sub("Sky", "sky", sky_material='SubResource("sky_mat")')
   s.add_sub("Environment", "env", background_mode="2", sky='SubResource("sky")', ambient_light_source="2", ambient_light_color="Color(0.8, 0.74, 0.64, 1)", ambient_light_energy="0.6",
-            tonemap_mode="3", tonemap_exposure="0.95", ssao_enabled="true", ssao_radius="1.2", ssao_intensity="1.6",
-            fog_enabled="true", fog_light_color="Color(0.84, 0.76, 0.62, 1)", fog_density="0.0025", fog_sky_affect="0.2")
+            tonemap_mode="3", tonemap_exposure="0.92", ssao_enabled="true", ssao_radius="1.4", ssao_intensity="1.8",
+            ssil_enabled="true", ssil_intensity="0.8", glow_enabled="true", glow_intensity="0.5", glow_bloom="0.05",
+            fog_enabled="true", fog_light_color="Color(0.86, 0.78, 0.64, 1)", fog_density="0.0015", fog_sky_affect="0.25",
+            volumetric_fog_enabled="true", volumetric_fog_density="0.004", volumetric_fog_albedo="Color(0.95, 0.88, 0.75, 1)",
+            volumetric_fog_anisotropy="0.5", volumetric_fog_length="80.0",
+            adjustment_enabled="true", adjustment_saturation="1.06", adjustment_contrast="1.04")
   s.add_sub("CapsuleShape3D", "capsule", radius="0.35", height="1.8")
   s.add_sub("PlaneMesh", "ground", size="Vector2(600, 600)")
   s.add_sub("StandardMaterial3D", "ground_mat", albedo_color="Color(0.62, 0.5, 0.35, 1)", roughness="1.0")
@@ -211,11 +260,8 @@ def main_scene(glb_path, out_name):
 
   s.node("Main", "Node3D")
   s.node("WorldEnvironment", "WorldEnvironment", ".", environment='SubResource("env")')
-  x = np.array([-30, 45, -18], float); z_ = x / np.linalg.norm(x)
-  xa = np.cross([0, 1, 0], z_); xa /= np.linalg.norm(xa); ya = np.cross(z_, xa)
-  basis = ", ".join(f"{v:.5f}" for v in (*xa, *ya, *z_))
-  s.node("Sun", "DirectionalLight3D", ".", transform=f"Transform3D({basis}, 0, 40, 0)", light_color="Color(1, 0.9, 0.74, 1)",
-         light_energy="1.15", shadow_enabled="true", shadow_blur="1.5", directional_shadow_max_distance="140.0")
+  s.node("Sun", "DirectionalLight3D", ".", transform=T(0, 40, 0), rotation_degrees=SUN_ROT, light_color="Color(1, 0.9, 0.74, 1)",
+         light_energy="0.95", shadow_enabled="true", shadow_blur="1.5", directional_shadow_max_distance="140.0")
   s.node("Map", parent=".", instance=glb)
   s.node("Navigation", "NavigationRegion3D", ".", navigation_mesh=nm)
   s.node("Collision", parent="Navigation", instance=col)
@@ -223,8 +269,27 @@ def main_scene(glb_path, out_name):
          **{"surface_material_override/0": 'SubResource("ground_mat")'})
   s.node("Lamps", "Node3D", ".")
   for i, p in enumerate(meta["lamps"]):
-      s.node(f"Lamp{i}", "OmniLight3D", "Lamps", transform=T(*p), light_color="Color(1, 0.68, 0.36, 1)",
+      s.node(f"Lamp{i}", "OmniLight3D", "Lamps", groups=["lamps"], transform=T(*p), light_color="Color(1, 0.68, 0.36, 1)",
              light_energy="1.4", omni_range="7.0", omni_attenuation="1.6")
+  # 6-bosqich: chiroqdan uzoq yopiq kataklarga ko'rinmas yumshoq to'ldiruvchi yorug'lik (qorong'i burchak qolmasin)
+  for i, p in enumerate(FILL_LIGHTS):
+      s.node(f"Fill{i}", "OmniLight3D", "Lamps", groups=["lamps"], transform=T(*p), light_color="Color(1, 0.86, 0.66, 1)",
+             light_energy="0.55", omni_range="7.5", omni_attenuation="1.2", light_specular="0.1")
+  # fon tovushlari (hudud markazlarida) va yopiq joylarda aks-sado
+  amb = {n: s.add_ext("AudioStream", f"res://audio/amb_{n}.wav", f"a_{n}") for n in AMB_FILES}
+  s.node("Ambient", "Node3D", ".")
+  for i, (name, pos, vol) in enumerate(AMB_SOURCES):
+      s.node(f"Amb{i}_{name}", "AudioStreamPlayer3D", "Ambient", groups=["ambient"], transform=T(*pos), stream=amb[name],
+             volume_db=f(vol), unit_size="12.0", max_distance="45.0", bus='&"Ambient"', **{"metadata/district": f'"{name}"'})
+  s.node("Reverb", "Node3D", ".")
+  for i, (x0, z0, x1, z1, h) in enumerate(REVERB_RECTS):
+      sh = s.add_sub("BoxShape3D", f"rv{i}", size=f"Vector3({f(x1 - x0)}, {f(h)}, {f(z1 - z0)})")
+      s.node(f"Rev{i}", "Area3D", "Reverb", groups=["reverb"], transform=T((x0 + x1) / 2, h / 2, (z0 + z1) / 2),
+             collision_layer="64", collision_mask="0", monitoring="false", reverb_bus_enabled="true", reverb_bus_name='&"Reverb"',
+             reverb_bus_amount="0.7", reverb_bus_uniformity="0.3")
+      s.node("Shape", "CollisionShape3D", f"Reverb/Rev{i}", shape=sh)
+  ascr = s.add_ext("Script", "res://scripts/atmosphere.gd", "7_atm")
+  s.node("Atmosphere", "Node3D", ".", script=ascr)
   s.node("Zones", "Node3D", ".")
   for kind, data, grp, h, vm in (("BombSite", L.BOMB_ZONES, "bomb_sites", 3.5, "vm_site"), ("BuyZone", L.BUY_ZONES, "buy_zones", 5.0, "vm_buy")):
       for k, (x0, z0, x1, z1) in data.items():
@@ -336,6 +401,8 @@ const COVERED_POINT := Vector3(0, 0, -46)
 const COVERED_H := {L.COVER["T"]}
 ## hudud to'ri (2 m kataklar): 1 — T hududi, -1 — CT hududi, 0 — talashuvli, 9 — bino
 const SIDE_GRID := {json.dumps(an["side_grid"])}
+## yopiq kataklar markazlari (aks-sado va yorug'lik qamrovi testlari uchun)
+const COVERED_CELLS := [{", ".join(V3(L.m(c, r), 1.0) for r, c in COVERED)}]
 ## smoke rejasi: [nom, jamoa, nishon, otish joyi]
 const SMOKES := [
 {chr(10).join(f'	[{json.dumps(n, ensure_ascii=False)}, "{t}", {V3(tg)}, {V3(th)}],' for n, t, tg, th, _l in L.SMOKES)}
@@ -418,8 +485,8 @@ s.add_sub("Environment", "env", background_mode="2", sky='SubResource("sky")', a
           ambient_light_color="Color(0.8, 0.74, 0.64, 1)", ambient_light_energy="0.6", tonemap_mode="3", tonemap_exposure="0.95")
 s.node("Bots", "Node3D")
 s.node("WorldEnvironment", "WorldEnvironment", ".", environment='SubResource("env")')
-s.node("Sun", "DirectionalLight3D", ".", transform=f"Transform3D({basis}, 0, 40, 0)", light_color="Color(1, 0.9, 0.74, 1)",
-       light_energy="1.15", shadow_enabled="true", directional_shadow_max_distance="140.0")
+s.node("Sun", "DirectionalLight3D", ".", transform=T(0, 40, 0), rotation_degrees=SUN_ROT, light_color="Color(1, 0.9, 0.74, 1)",
+       light_energy="0.95", shadow_enabled="true", directional_shadow_max_distance="140.0")
 s.node("Map", parent=".", instance=glb)
 s.node("Navigation", "NavigationRegion3D", ".", navigation_mesh=nm)
 s.node("Collision", parent="Navigation", instance=col)
@@ -430,6 +497,38 @@ for team, pts in L.SPAWNS.items():
 s.node("BotMatch", "Node3D", ".", script=mscr)
 s.node("Spectator", "Camera3D", ".", script=cscr, current="true")
 s.save(f"{OUT}/bots.tscn")
+
+# ------------------------------------------------------------------ scripts/atmo_data.gd, default_bus_layout.tres
+open(f"{OUT}/scripts/atmo_data.gd", "w").write('''extends RefCounted
+## AVTOMATIK YARATILGAN (tools/gen_godot5.py). Havodagi chang zonalari: [markaz, o'lcham, zarralar soni]
+const DUST := [
+''' + "\n".join(f"\t[{V3(c)}, {V3(sz)}, {n}]," for c, sz, n in DUST) + "\n]\n")
+open(f"{OUT}/default_bus_layout.tres", "w").write('''[gd_resource type="AudioBusLayout" load_steps=2 format=3]
+
+[sub_resource type="AudioEffectReverb" id="rev"]
+room_size = 0.55
+damping = 0.6
+spread = 0.8
+hipass = 0.15
+dry = 1.0
+wet = 0.22
+
+[resource]
+bus/1/name = &"Reverb"
+bus/1/solo = false
+bus/1/mute = false
+bus/1/bypass_fx = false
+bus/1/volume_db = 0.0
+bus/1/send = &"Master"
+bus/1/effect/0/effect = SubResource("rev")
+bus/1/effect/0/enabled = true
+bus/2/name = &"Ambient"
+bus/2/solo = false
+bus/2/mute = false
+bus/2/bypass_fx = false
+bus/2/volume_db = -4.0
+bus/2/send = &"Master"
+''')
 
 # ------------------------------------------------------------------ project.godot, bake_nav.gd
 open(f"{OUT}/project.godot", "w").write('''; Engine configuration file.
@@ -456,6 +555,10 @@ window/size/viewport_height=900
 3d_physics/layer_6="grenades"
 3d_physics/layer_7="triggers"
 3d_physics/layer_8="smoke"
+
+[audio]
+
+buses/default_bus_layout="res://default_bus_layout.tres"
 
 [rendering]
 

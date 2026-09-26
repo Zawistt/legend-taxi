@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3]
+[gd_scene load_steps=55 format=3]
 
 [ext_resource type="PackedScene" path="res://map/qumtepa5v5.glb" id="1_map"]
 
@@ -11,6 +11,20 @@
 [ext_resource type="Script" path="res://scripts/hud.gd" id="5_hud"]
 
 [ext_resource type="NavigationMesh" path="res://map/navmesh.res" id="6_nav"]
+
+[ext_resource type="AudioStream" path="res://audio/amb_bozor.wav" id="a_bozor"]
+
+[ext_resource type="AudioStream" path="res://audio/amb_masjid.wav" id="a_masjid"]
+
+[ext_resource type="AudioStream" path="res://audio/amb_madrasa.wav" id="a_madrasa"]
+
+[ext_resource type="AudioStream" path="res://audio/amb_karvon.wav" id="a_karvon"]
+
+[ext_resource type="AudioStream" path="res://audio/amb_qala.wav" id="a_qala"]
+
+[ext_resource type="AudioStream" path="res://audio/amb_tunnel.wav" id="a_tunnel"]
+
+[ext_resource type="Script" path="res://scripts/atmosphere.gd" id="7_atm"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.27, 0.49, 0.78, 1)
@@ -28,14 +42,27 @@ ambient_light_source = 2
 ambient_light_color = Color(0.8, 0.74, 0.64, 1)
 ambient_light_energy = 0.6
 tonemap_mode = 3
-tonemap_exposure = 0.95
+tonemap_exposure = 0.92
 ssao_enabled = true
-ssao_radius = 1.2
-ssao_intensity = 1.6
+ssao_radius = 1.4
+ssao_intensity = 1.8
+ssil_enabled = true
+ssil_intensity = 0.8
+glow_enabled = true
+glow_intensity = 0.5
+glow_bloom = 0.05
 fog_enabled = true
-fog_light_color = Color(0.84, 0.76, 0.62, 1)
-fog_density = 0.0025
-fog_sky_affect = 0.2
+fog_light_color = Color(0.86, 0.78, 0.64, 1)
+fog_density = 0.0015
+fog_sky_affect = 0.25
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.004
+volumetric_fog_albedo = Color(0.95, 0.88, 0.75, 1)
+volumetric_fog_anisotropy = 0.5
+volumetric_fog_length = 80.0
+adjustment_enabled = true
+adjustment_saturation = 1.06
+adjustment_contrast = 1.04
 
 [sub_resource type="CapsuleShape3D" id="capsule"]
 radius = 0.35
@@ -106,6 +133,60 @@ radius = 2.6
 height = 5.2
 material = SubResource("vm_smoke")
 
+[sub_resource type="BoxShape3D" id="rv0"]
+size = Vector3(30, 5, 12)
+
+[sub_resource type="BoxShape3D" id="rv1"]
+size = Vector3(10, 4.2, 6)
+
+[sub_resource type="BoxShape3D" id="rv2"]
+size = Vector3(22, 4.2, 6)
+
+[sub_resource type="BoxShape3D" id="rv3"]
+size = Vector3(12, 4.2, 12)
+
+[sub_resource type="BoxShape3D" id="rv4"]
+size = Vector3(8, 4.2, 4)
+
+[sub_resource type="BoxShape3D" id="rv5"]
+size = Vector3(10, 4.2, 12)
+
+[sub_resource type="BoxShape3D" id="rv6"]
+size = Vector3(8, 4.2, 4)
+
+[sub_resource type="BoxShape3D" id="rv7"]
+size = Vector3(8, 4.2, 4)
+
+[sub_resource type="BoxShape3D" id="rv8"]
+size = Vector3(6, 4.2, 24)
+
+[sub_resource type="BoxShape3D" id="rv9"]
+size = Vector3(10, 5.2, 24)
+
+[sub_resource type="BoxShape3D" id="rv10"]
+size = Vector3(6, 4.2, 24)
+
+[sub_resource type="BoxShape3D" id="rv11"]
+size = Vector3(12, 4.2, 4)
+
+[sub_resource type="BoxShape3D" id="rv12"]
+size = Vector3(6, 4.2, 10)
+
+[sub_resource type="BoxShape3D" id="rv13"]
+size = Vector3(10, 4.2, 20)
+
+[sub_resource type="BoxShape3D" id="rv14"]
+size = Vector3(14, 4.2, 6)
+
+[sub_resource type="BoxShape3D" id="rv15"]
+size = Vector3(34, 5, 14)
+
+[sub_resource type="BoxShape3D" id="rv16"]
+size = Vector3(8, 4.2, 8)
+
+[sub_resource type="BoxShape3D" id="rv17"]
+size = Vector3(8, 4.2, 8)
+
 [sub_resource type="BoxShape3D" id="z_BombSiteA"]
 size = Vector3(24, 3.5, 19)
 
@@ -140,9 +221,10 @@ material = SubResource("vm_buy")
 environment = SubResource("env")
 
 [node name="Sun" type="DirectionalLight3D" parent="."]
-transform = Transform3D(-0.51450, 0.00000, 0.85749, 0.67697, 0.61378, 0.40618, -0.52632, 0.78947, -0.31579, 0, 40, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 40, 0)
+rotation_degrees = Vector3(-50, -86, 0)
 light_color = Color(1, 0.9, 0.74, 1)
-light_energy = 1.15
+light_energy = 0.95
 shadow_enabled = true
 shadow_blur = 1.5
 directional_shadow_max_distance = 140.0
@@ -161,369 +243,1091 @@ surface_material_override/0 = SubResource("ground_mat")
 
 [node name="Lamps" type="Node3D" parent="."]
 
-[node name="Lamp0" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp0" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.61, 2.55, -42)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp1" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp1" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.39, 2.55, -36)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp2" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp2" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.61, 2.55, -36)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp3" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp3" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 2.55, -30.61)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp4" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp4" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 2.55, -30.61)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp5" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp5" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2.55, -30.61)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp6" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp6" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 2.55, -30.61)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp7" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp7" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.61, 2.55, -30)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp8" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp8" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.39, 2.55, -24)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp9" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp9" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.61, 2.55, -24)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp10" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp10" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, -18)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp11" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp11" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.39, 2.55, -18)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp12" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp12" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, -18)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp13" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp13" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.61, 2.55, -18)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp14" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp14" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.39, 2.55, -18)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp15" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp15" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, -18)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp16" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp16" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.39, 2.55, -18)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp17" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp17" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 2.55, -18.61)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp18" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp18" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 2.55, -18.61)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp19" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp19" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 2.55, -18.61)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp20" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp20" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 2.55, -18.61)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp21" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp21" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 2.55, -18.61)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp22" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp22" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.61, 2.55, -18)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp23" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp23" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, -12)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp24" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp24" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.39, 2.55, -12)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp25" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp25" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, -12)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp26" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp26" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.61, 2.55, -12)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp27" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp27" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.39, 2.55, -12)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp28" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp28" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, -12)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp29" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp29" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.39, 2.55, -12)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp30" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp30" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.61, 2.55, -12)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp31" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp31" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.39, 2.55, -12)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp32" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp32" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.61, 2.55, -12)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp33" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp33" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, -6)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp34" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp34" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.39, 2.55, -6)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp35" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp35" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, -6)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp36" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp36" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, -6)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp37" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp37" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.39, 2.55, -6)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp38" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp38" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 2.55, -5.39)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp39" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp39" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.61, 2.55, -6)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp40" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp40" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.39, 2.55, -6)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp41" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp41" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.61, 2.55, -6)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp42" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp42" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, 0)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp43" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp43" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.39, 2.55, 0)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp44" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp44" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, 0)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp45" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp45" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.61, 2.55, 0)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp46" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp46" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.39, 2.55, 0)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp47" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp47" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, 0)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp48" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp48" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.39, 2.55, 0)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp49" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp49" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.61, 2.55, 0)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp50" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp50" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, 42)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
 
-[node name="Lamp51" type="OmniLight3D" parent="Lamps"]
+[node name="Lamp51" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, 42)
 light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+
+[node name="Fill0" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3, -50)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill1" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3, -50)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill2" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 3, -50)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill3" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3, -50)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill4" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3, -50)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill5" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 3, -46)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill6" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 3, -44)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill7" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 3, -44)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill8" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 3, -44)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill9" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3, -44)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill10" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -44)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill11" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3, -44)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill12" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 3, -44)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill13" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 3, -44)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill14" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 3, -44)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill15" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3, -40)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill16" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 3, -40)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill17" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 3, -38)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill18" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 3, -32)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill19" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 3, -26)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill20" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 3, -20)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill21" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -16)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill22" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -10)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill23" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 3, -10)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill24" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, -8)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill25" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 3, -8)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill26" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -4)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill27" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 3, -4)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill28" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 2)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill29" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 3, 2)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill30" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 3, 36)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill31" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3, 36)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill32" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 3, 36)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill33" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 3, 36)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill34" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, 36)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill35" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 3, 36)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill36" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 3, 38)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill37" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 3, 40)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill38" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3, 42)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill39" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3, 42)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill40" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 3, 42)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill41" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3, 42)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill42" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3, 42)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill43" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 3, 42)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill44" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 3, 48)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill45" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3, 48)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill46" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 3, 48)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill47" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 3, 48)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill48" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, 48)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Fill49" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 3, 48)
+light_color = Color(1, 0.86, 0.66, 1)
+light_energy = 0.55
+omni_range = 7.5
+omni_attenuation = 1.2
+light_specular = 0.1
+
+[node name="Ambient" type="Node3D" parent="."]
+
+[node name="Amb0_bozor" type="AudioStreamPlayer3D" parent="Ambient" groups=["ambient"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -28)
+stream = ExtResource("a_bozor")
+volume_db = -20
+unit_size = 12.0
+max_distance = 45.0
+bus = &"Ambient"
+metadata/district = "bozor"
+
+[node name="Amb1_masjid" type="AudioStreamPlayer3D" parent="Ambient" groups=["ambient"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 18)
+stream = ExtResource("a_masjid")
+volume_db = -20
+unit_size = 12.0
+max_distance = 45.0
+bus = &"Ambient"
+metadata/district = "masjid"
+
+[node name="Amb2_madrasa" type="AudioStreamPlayer3D" parent="Ambient" groups=["ambient"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34, 5, 8)
+stream = ExtResource("a_madrasa")
+volume_db = -20
+unit_size = 12.0
+max_distance = 45.0
+bus = &"Ambient"
+metadata/district = "madrasa"
+
+[node name="Amb3_karvon" type="AudioStreamPlayer3D" parent="Ambient" groups=["ambient"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 5, 20)
+stream = ExtResource("a_karvon")
+volume_db = -20
+unit_size = 12.0
+max_distance = 45.0
+bus = &"Ambient"
+metadata/district = "karvon"
+
+[node name="Amb4_qala" type="AudioStreamPlayer3D" parent="Ambient" groups=["ambient"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 5, -38)
+stream = ExtResource("a_qala")
+volume_db = -20
+unit_size = 12.0
+max_distance = 45.0
+bus = &"Ambient"
+metadata/district = "qala"
+
+[node name="Amb5_tunnel" type="AudioStreamPlayer3D" parent="Ambient" groups=["ambient"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 2.5, -23)
+stream = ExtResource("a_tunnel")
+volume_db = -22
+unit_size = 12.0
+max_distance = 45.0
+bus = &"Ambient"
+metadata/district = "tunnel"
+
+[node name="Amb6_tunnel" type="AudioStreamPlayer3D" parent="Ambient" groups=["ambient"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 2.5, -38)
+stream = ExtResource("a_tunnel")
+volume_db = -22
+unit_size = 12.0
+max_distance = 45.0
+bus = &"Ambient"
+metadata/district = "tunnel"
+
+[node name="Amb7_tunnel" type="AudioStreamPlayer3D" parent="Ambient" groups=["ambient"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -7)
+stream = ExtResource("a_tunnel")
+volume_db = -22
+unit_size = 12.0
+max_distance = 45.0
+bus = &"Ambient"
+metadata/district = "tunnel"
+
+[node name="Amb8_tunnel" type="AudioStreamPlayer3D" parent="Ambient" groups=["ambient"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 2.5, -9)
+stream = ExtResource("a_tunnel")
+volume_db = -22
+unit_size = 12.0
+max_distance = 45.0
+bus = &"Ambient"
+metadata/district = "tunnel"
+
+[node name="Reverb" type="Node3D" parent="."]
+
+[node name="Rev0" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -45)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev0"]
+shape = SubResource("rv0")
+
+[node name="Rev1" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 2.1, -42)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev1"]
+shape = SubResource("rv1")
+
+[node name="Rev2" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 2.1, -42)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev2"]
+shape = SubResource("rv2")
+
+[node name="Rev3" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 2.1, -33)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev3"]
+shape = SubResource("rv3")
+
+[node name="Rev4" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 2.1, -29)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev4"]
+shape = SubResource("rv4")
+
+[node name="Rev5" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 2.1, -21)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev5"]
+shape = SubResource("rv5")
+
+[node name="Rev6" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 2.1, -21)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev6"]
+shape = SubResource("rv6")
+
+[node name="Rev7" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 2.1, -21)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev7"]
+shape = SubResource("rv7")
+
+[node name="Rev8" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 2.1, -7)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev8"]
+shape = SubResource("rv8")
+
+[node name="Rev9" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6, -7)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev9"]
+shape = SubResource("rv9")
+
+[node name="Rev10" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2.1, -7)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev10"]
+shape = SubResource("rv10")
+
+[node name="Rev11" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43, 2.1, -17)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev11"]
+shape = SubResource("rv11")
+
+[node name="Rev12" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 2.1, -10)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev12"]
+shape = SubResource("rv12")
+
+[node name="Rev13" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 2.1, -5)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev13"]
+shape = SubResource("rv13")
+
+[node name="Rev14" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.1, -6)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev14"]
+shape = SubResource("rv14")
+
+[node name="Rev15" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 42)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev15"]
+shape = SubResource("rv15")
+
+[node name="Rev16" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 2.1, 41)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev16"]
+shape = SubResource("rv16")
+
+[node name="Rev17" type="Area3D" parent="Reverb" groups=["reverb"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 2.1, 41)
+collision_layer = 64
+collision_mask = 0
+monitoring = false
+reverb_bus_enabled = true
+reverb_bus_name = &"Reverb"
+reverb_bus_amount = 0.7
+reverb_bus_uniformity = 0.3
+
+[node name="Shape" type="CollisionShape3D" parent="Reverb/Rev17"]
+shape = SubResource("rv17")
+
+[node name="Atmosphere" type="Node3D" parent="."]
+script = ExtResource("7_atm")
 
 [node name="Zones" type="Node3D" parent="."]
 
