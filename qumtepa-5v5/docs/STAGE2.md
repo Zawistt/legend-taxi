@@ -1,5 +1,7 @@
 # 2-bosqich: Godot greybox — hisobot
 
+> Eslatma: skrinshotlar 4-bosqichda arxitektura bilan yangilangan. Greybox ko'rinishi `main_greybox.tscn` da.
+
 **Natija: 79 / 79 avtomatik test o'tdi** (Godot 4.3, haqiqiy fizika bilan). 2D tahlil: 59 / 59.
 
 Greybox — binolari oddiy qutilardan iborat, lekin to'liq o'ynaladigan xarita. Chiroyli arxitektura

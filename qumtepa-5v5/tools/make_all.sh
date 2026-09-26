@@ -6,10 +6,11 @@ set -euo pipefail
 cd "$(dirname "$0")"
 GODOT="${GODOT:-godot}"
 python3 analyze5.py
-python3 build5.py
+STYLE=greybox python3 build5.py
+STYLE=arch python3 build5.py
 rm -f ../godot/map/navmesh.res
 # Godot GLB dan ajratib olgan eski teksturalarni o'chiramiz (aks holda materiallar aralashib ketadi)
-rm -rf ../godot/.godot ../godot/map/qumtepa5v5_greybox_*.png ../godot/map/*.import
+rm -rf ../godot/.godot ../godot/map/*.png ../godot/map/*.import
 python3 gen_godot5.py
 (cd ../godot && "$GODOT" --headless --import >/dev/null 2>&1 || true)
 (cd ../godot && "$GODOT" --headless -s res://tools/bake_nav.gd 2>&1 | grep -i "poligon")

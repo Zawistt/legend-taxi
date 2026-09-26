@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3]
 
-[ext_resource type="PackedScene" path="res://map/qumtepa5v5_greybox.glb" id="1_map"]
+[ext_resource type="PackedScene" path="res://map/qumtepa5v5.glb" id="1_map"]
 
 [ext_resource type="PackedScene" path="res://map/collision.tscn" id="2_col"]
 

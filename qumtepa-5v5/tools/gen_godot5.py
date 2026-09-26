@@ -170,96 +170,109 @@ for key, name, layer, mat in (("clip_p", "PlayerClip", 2, "m_pclip"), ("clip_g",
     counts[name] = len(boxes)
 s.save(f"{OUT}/map/collision.tscn")
 
-# ------------------------------------------------------------------ main.tscn
-s = Scene()
-glb = s.add_ext("PackedScene", "res://map/qumtepa5v5_greybox.glb", "1_map")
-col = s.add_ext("PackedScene", "res://map/collision.tscn", "2_col")
-pscr = s.add_ext("Script", "res://scripts/player.gd", "3_pl")
-gscr = s.add_ext("Script", "res://scripts/game_mode.gd", "4_gm")
-hscr = s.add_ext("Script", "res://scripts/hud.gd", "5_hud")
-if NAVMESH:
-    nm = s.add_ext("NavigationMesh", "res://map/navmesh.res", "6_nav")
-else:
-    nm = s.add_sub("NavigationMesh", "navmesh", geometry_parsed_geometry_type="1", geometry_collision_mask="1",
-                   cell_size="0.25", cell_height="0.25", agent_height="2.0", agent_radius="0.5",
-                   agent_max_climb="0.25", agent_max_slope="45.0",
-                   filter_baking_aabb=f"AABB({f(E0)}, -1, {f(E0)}, {f(SIZE)}, 4, {f(SIZE)})")
-s.add_sub("ProceduralSkyMaterial", "sky_mat", sky_top_color="Color(0.27, 0.49, 0.78, 1)", sky_horizon_color="Color(0.86, 0.8, 0.68, 1)",
-          ground_bottom_color="Color(0.45, 0.36, 0.25, 1)", ground_horizon_color="Color(0.86, 0.8, 0.68, 1)")
-s.add_sub("Sky", "sky", sky_material='SubResource("sky_mat")')
-s.add_sub("Environment", "env", background_mode="2", sky='SubResource("sky")', ambient_light_source="2", ambient_light_color="Color(0.8, 0.74, 0.64, 1)", ambient_light_energy="0.6",
-          tonemap_mode="3", tonemap_exposure="0.95", ssao_enabled="true", ssao_radius="1.2", ssao_intensity="1.6",
-          fog_enabled="true", fog_light_color="Color(0.84, 0.76, 0.62, 1)", fog_density="0.0025", fog_sky_affect="0.2")
-s.add_sub("CapsuleShape3D", "capsule", radius="0.35", height="1.8")
-s.add_sub("PlaneMesh", "ground", size="Vector2(600, 600)")
-s.add_sub("StandardMaterial3D", "ground_mat", albedo_color="Color(0.62, 0.5, 0.35, 1)", roughness="1.0")
-for k, c in (("site", "Color(0.85, 0.25, 0.18, 0.22)"), ("buy", "Color(0.23, 0.64, 0.35, 0.2)"), ("T", "Color(0.84, 0.38, 0.12, 0.9)"),
-             ("CT", "Color(0.16, 0.36, 0.67, 0.9)"), ("ai", "Color(1, 1, 1, 0.9)"), ("smoke", "Color(0.85, 0.85, 0.85, 0.35)")):
-    s.add_sub("StandardMaterial3D", f"vm_{k}", transparency="1", shading_mode="0", cull_mode="2", no_depth_test="true", albedo_color=c)
-s.add_sub("CylinderMesh", "spawn_disc", top_radius="0.35", bottom_radius="0.35", height="0.06")
-s.add_sub("CylinderMesh", "ai_pole", top_radius="0.06", bottom_radius="0.06", height="1.6", material='SubResource("vm_ai")')
-s.add_sub("SphereMesh", "smoke_sph", radius=f(L.SMOKE_R), height=f(2 * L.SMOKE_R), material='SubResource("vm_smoke")')
+# ------------------------------------------------------------------ main.tscn (arxitektura) va main_greybox.tscn
+ART = os.path.exists(f"{OUT}/map/qumtepa5v5.glb")
 
-s.node("Main", "Node3D")
-s.node("WorldEnvironment", "WorldEnvironment", ".", environment='SubResource("env")')
-x = np.array([-30, 45, -18], float); z_ = x / np.linalg.norm(x)
-xa = np.cross([0, 1, 0], z_); xa /= np.linalg.norm(xa); ya = np.cross(z_, xa)
-basis = ", ".join(f"{v:.5f}" for v in (*xa, *ya, *z_))
-s.node("Sun", "DirectionalLight3D", ".", transform=f"Transform3D({basis}, 0, 40, 0)", light_color="Color(1, 0.9, 0.74, 1)",
-       light_energy="1.15", shadow_enabled="true", shadow_blur="1.5", directional_shadow_max_distance="140.0")
-s.node("Map", parent=".", instance=glb)
-s.node("Navigation", "NavigationRegion3D", ".", navigation_mesh=nm)
-s.node("Collision", parent="Navigation", instance=col)
-s.node("OuterGround", "MeshInstance3D", ".", transform=T(0, -0.32, 0), mesh='SubResource("ground")',
-       **{"surface_material_override/0": 'SubResource("ground_mat")'})
-s.node("Lamps", "Node3D", ".")
-for i, p in enumerate(meta["lamps"]):
-    s.node(f"Lamp{i}", "OmniLight3D", "Lamps", transform=T(*p), light_color="Color(1, 0.68, 0.36, 1)",
-           light_energy="1.4", omni_range="7.0", omni_attenuation="1.6")
-s.node("Zones", "Node3D", ".")
-for kind, data, grp, h, vm in (("BombSite", L.BOMB_ZONES, "bomb_sites", 3.5, "vm_site"), ("BuyZone", L.BUY_ZONES, "buy_zones", 5.0, "vm_buy")):
-    for k, (x0, z0, x1, z1) in data.items():
-        nme = f"{kind}{k}"
-        sh = s.add_sub("BoxShape3D", f"z_{nme}", size=f"Vector3({f(x1 - x0)}, {h}, {f(z1 - z0)})")
-        ms = s.add_sub("BoxMesh", f"zm_{nme}", size=f"Vector3({f(x1 - x0)}, {h}, {f(z1 - z0)})", material=f'SubResource("{vm}")')
-        mkey = "metadata/site" if kind == "BombSite" else "metadata/team"
-        s.node(nme, "Area3D", "Zones", groups=[grp], transform=T((x0 + x1) / 2, h / 2, (z0 + z1) / 2),
-               collision_layer="64", collision_mask="8", monitorable="false", **{mkey: f'"{k}"'})
-        s.node("Shape", "CollisionShape3D", f"Zones/{nme}", shape=sh)
-        s.node("Viz", "MeshInstance3D", f"Zones/{nme}", groups=["debug_viz"], visible="false", mesh=ms)
-s.node("Spawns", "Node3D", ".")
-for team, pts in L.SPAWNS.items():
-    for i, (x0, z0) in enumerate(pts):
-        nme = f"{team}{i + 1}"
-        s.node(nme, "Marker3D", "Spawns", groups=[f"spawn_{team}"], transform=T(x0, 0.05, z0, yaw_pi=(team == "T")))
-        s.node("Viz", "MeshInstance3D", f"Spawns/{nme}", groups=["debug_viz"], visible="false", mesh='SubResource("spawn_disc")',
-               **{"surface_material_override/0": f'SubResource("vm_{team}")'})
-s.node("AIPoints", "Node3D", ".")
-for i, (label, kind, team, x0, z0) in enumerate(L.AI_POINTS):
-    nme = f"P{i:02d}"
-    s.node(nme, "Marker3D", "AIPoints", groups=["ai_points"], transform=T(x0, plat_h(x0, z0), z0),
-           **{"metadata/label": json.dumps(label, ensure_ascii=False), "metadata/kind": f'"{kind}"', "metadata/team": f'"{team}"'})
-    s.node("Pole", "MeshInstance3D", f"AIPoints/{nme}", groups=["debug_viz"], visible="false", transform=T(0, 0.8, 0), mesh='SubResource("ai_pole")')
-    s.node("Label", "Label3D", f"AIPoints/{nme}", groups=["debug_viz"], visible="false", transform=T(0, 1.9, 0), billboard="1",
-           no_depth_test="true", font_size="40", outline_size="10", text=json.dumps(f"{label} ({kind}, {team})", ensure_ascii=False))
-s.node("Smokes", "Node3D", ".")   # F1 da ko'rinadi: smoke rejasidagi nishonlar
-for i, (name, team, tgt, throw, _lines) in enumerate(L.SMOKES):
-    nme = f"Smoke{i:02d}"
-    s.node(nme, "Marker3D", "Smokes", groups=["smoke_targets"], transform=T(tgt[0], 1.0, tgt[1]),
-           **{"metadata/label": json.dumps(name, ensure_ascii=False), "metadata/team": f'"{team}"'})
-    s.node("Viz", "MeshInstance3D", f"Smokes/{nme}", groups=["debug_viz"], visible="false", mesh='SubResource("smoke_sph")')
-    s.node("Label", "Label3D", f"Smokes/{nme}", groups=["debug_viz"], visible="false", transform=T(0, 3.2, 0), billboard="1",
-           no_depth_test="true", font_size="48", outline_size="10", text=json.dumps(f"smoke: {name} ({team})", ensure_ascii=False))
-tx, tz = L.SPAWNS["T"][0]
-s.node("Player", "CharacterBody3D", ".", transform=T(tx, 0.2, tz, yaw_pi=True), collision_layer="8", collision_mask="3", script=pscr)
-s.node("CollisionShape3D", "CollisionShape3D", "Player", transform=T(0, 0.9, 0), shape='SubResource("capsule")')
-s.node("Camera3D", "Camera3D", "Player", transform=T(0, 1.65, 0), fov="80.0", far="400.0")
-s.node("FloorRay", "RayCast3D", "Player", transform=T(0, 0.2, 0), target_position="Vector3(0, -0.6, 0)", collision_mask="1")
-s.node("Steps", "AudioStreamPlayer3D", "Player", transform=T(0, 0.1, 0), volume_db="-8.0", unit_size="4.0")
-s.node("GameMode", "Node", ".", script=gscr)
-s.node("HUD", "CanvasLayer", ".", script=hscr)
-s.save(f"{OUT}/main.tscn")
 
+_x = np.array([-30, 45, -18], float); _z = _x / np.linalg.norm(_x)
+_xa = np.cross([0, 1, 0], _z); _xa /= np.linalg.norm(_xa); _ya = np.cross(_z, _xa)
+basis = ", ".join(f"{v:.5f}" for v in (*_xa, *_ya, *_z))   # quyosh yo'nalishi
+
+
+def main_scene(glb_path, out_name):
+  s = Scene()
+  glb = s.add_ext("PackedScene", glb_path, "1_map")
+  col = s.add_ext("PackedScene", "res://map/collision.tscn", "2_col")
+  pscr = s.add_ext("Script", "res://scripts/player.gd", "3_pl")
+  gscr = s.add_ext("Script", "res://scripts/game_mode.gd", "4_gm")
+  hscr = s.add_ext("Script", "res://scripts/hud.gd", "5_hud")
+  if NAVMESH:
+      nm = s.add_ext("NavigationMesh", "res://map/navmesh.res", "6_nav")
+  else:
+      nm = s.add_sub("NavigationMesh", "navmesh", geometry_parsed_geometry_type="1", geometry_collision_mask="1",
+                     cell_size="0.25", cell_height="0.25", agent_height="2.0", agent_radius="0.5",
+                     agent_max_climb="0.25", agent_max_slope="45.0",
+                     filter_baking_aabb=f"AABB({f(E0)}, -1, {f(E0)}, {f(SIZE)}, 4, {f(SIZE)})")
+  s.add_sub("ProceduralSkyMaterial", "sky_mat", sky_top_color="Color(0.27, 0.49, 0.78, 1)", sky_horizon_color="Color(0.86, 0.8, 0.68, 1)",
+            ground_bottom_color="Color(0.45, 0.36, 0.25, 1)", ground_horizon_color="Color(0.86, 0.8, 0.68, 1)")
+  s.add_sub("Sky", "sky", sky_material='SubResource("sky_mat")')
+  s.add_sub("Environment", "env", background_mode="2", sky='SubResource("sky")', ambient_light_source="2", ambient_light_color="Color(0.8, 0.74, 0.64, 1)", ambient_light_energy="0.6",
+            tonemap_mode="3", tonemap_exposure="0.95", ssao_enabled="true", ssao_radius="1.2", ssao_intensity="1.6",
+            fog_enabled="true", fog_light_color="Color(0.84, 0.76, 0.62, 1)", fog_density="0.0025", fog_sky_affect="0.2")
+  s.add_sub("CapsuleShape3D", "capsule", radius="0.35", height="1.8")
+  s.add_sub("PlaneMesh", "ground", size="Vector2(600, 600)")
+  s.add_sub("StandardMaterial3D", "ground_mat", albedo_color="Color(0.62, 0.5, 0.35, 1)", roughness="1.0")
+  for k, c in (("site", "Color(0.85, 0.25, 0.18, 0.22)"), ("buy", "Color(0.23, 0.64, 0.35, 0.2)"), ("T", "Color(0.84, 0.38, 0.12, 0.9)"),
+               ("CT", "Color(0.16, 0.36, 0.67, 0.9)"), ("ai", "Color(1, 1, 1, 0.9)"), ("smoke", "Color(0.85, 0.85, 0.85, 0.35)")):
+      s.add_sub("StandardMaterial3D", f"vm_{k}", transparency="1", shading_mode="0", cull_mode="2", no_depth_test="true", albedo_color=c)
+  s.add_sub("CylinderMesh", "spawn_disc", top_radius="0.35", bottom_radius="0.35", height="0.06")
+  s.add_sub("CylinderMesh", "ai_pole", top_radius="0.06", bottom_radius="0.06", height="1.6", material='SubResource("vm_ai")')
+  s.add_sub("SphereMesh", "smoke_sph", radius=f(L.SMOKE_R), height=f(2 * L.SMOKE_R), material='SubResource("vm_smoke")')
+
+  s.node("Main", "Node3D")
+  s.node("WorldEnvironment", "WorldEnvironment", ".", environment='SubResource("env")')
+  x = np.array([-30, 45, -18], float); z_ = x / np.linalg.norm(x)
+  xa = np.cross([0, 1, 0], z_); xa /= np.linalg.norm(xa); ya = np.cross(z_, xa)
+  basis = ", ".join(f"{v:.5f}" for v in (*xa, *ya, *z_))
+  s.node("Sun", "DirectionalLight3D", ".", transform=f"Transform3D({basis}, 0, 40, 0)", light_color="Color(1, 0.9, 0.74, 1)",
+         light_energy="1.15", shadow_enabled="true", shadow_blur="1.5", directional_shadow_max_distance="140.0")
+  s.node("Map", parent=".", instance=glb)
+  s.node("Navigation", "NavigationRegion3D", ".", navigation_mesh=nm)
+  s.node("Collision", parent="Navigation", instance=col)
+  s.node("OuterGround", "MeshInstance3D", ".", transform=T(0, -0.32, 0), mesh='SubResource("ground")',
+         **{"surface_material_override/0": 'SubResource("ground_mat")'})
+  s.node("Lamps", "Node3D", ".")
+  for i, p in enumerate(meta["lamps"]):
+      s.node(f"Lamp{i}", "OmniLight3D", "Lamps", transform=T(*p), light_color="Color(1, 0.68, 0.36, 1)",
+             light_energy="1.4", omni_range="7.0", omni_attenuation="1.6")
+  s.node("Zones", "Node3D", ".")
+  for kind, data, grp, h, vm in (("BombSite", L.BOMB_ZONES, "bomb_sites", 3.5, "vm_site"), ("BuyZone", L.BUY_ZONES, "buy_zones", 5.0, "vm_buy")):
+      for k, (x0, z0, x1, z1) in data.items():
+          nme = f"{kind}{k}"
+          sh = s.add_sub("BoxShape3D", f"z_{nme}", size=f"Vector3({f(x1 - x0)}, {h}, {f(z1 - z0)})")
+          ms = s.add_sub("BoxMesh", f"zm_{nme}", size=f"Vector3({f(x1 - x0)}, {h}, {f(z1 - z0)})", material=f'SubResource("{vm}")')
+          mkey = "metadata/site" if kind == "BombSite" else "metadata/team"
+          s.node(nme, "Area3D", "Zones", groups=[grp], transform=T((x0 + x1) / 2, h / 2, (z0 + z1) / 2),
+                 collision_layer="64", collision_mask="8", monitorable="false", **{mkey: f'"{k}"'})
+          s.node("Shape", "CollisionShape3D", f"Zones/{nme}", shape=sh)
+          s.node("Viz", "MeshInstance3D", f"Zones/{nme}", groups=["debug_viz"], visible="false", mesh=ms)
+  s.node("Spawns", "Node3D", ".")
+  for team, pts in L.SPAWNS.items():
+      for i, (x0, z0) in enumerate(pts):
+          nme = f"{team}{i + 1}"
+          s.node(nme, "Marker3D", "Spawns", groups=[f"spawn_{team}"], transform=T(x0, 0.05, z0, yaw_pi=(team == "T")))
+          s.node("Viz", "MeshInstance3D", f"Spawns/{nme}", groups=["debug_viz"], visible="false", mesh='SubResource("spawn_disc")',
+                 **{"surface_material_override/0": f'SubResource("vm_{team}")'})
+  s.node("AIPoints", "Node3D", ".")
+  for i, (label, kind, team, x0, z0) in enumerate(L.AI_POINTS):
+      nme = f"P{i:02d}"
+      s.node(nme, "Marker3D", "AIPoints", groups=["ai_points"], transform=T(x0, plat_h(x0, z0), z0),
+             **{"metadata/label": json.dumps(label, ensure_ascii=False), "metadata/kind": f'"{kind}"', "metadata/team": f'"{team}"'})
+      s.node("Pole", "MeshInstance3D", f"AIPoints/{nme}", groups=["debug_viz"], visible="false", transform=T(0, 0.8, 0), mesh='SubResource("ai_pole")')
+      s.node("Label", "Label3D", f"AIPoints/{nme}", groups=["debug_viz"], visible="false", transform=T(0, 1.9, 0), billboard="1",
+             no_depth_test="true", font_size="40", outline_size="10", text=json.dumps(f"{label} ({kind}, {team})", ensure_ascii=False))
+  s.node("Smokes", "Node3D", ".")   # F1 da ko'rinadi: smoke rejasidagi nishonlar
+  for i, (name, team, tgt, throw, _lines) in enumerate(L.SMOKES):
+      nme = f"Smoke{i:02d}"
+      s.node(nme, "Marker3D", "Smokes", groups=["smoke_targets"], transform=T(tgt[0], 1.0, tgt[1]),
+             **{"metadata/label": json.dumps(name, ensure_ascii=False), "metadata/team": f'"{team}"'})
+      s.node("Viz", "MeshInstance3D", f"Smokes/{nme}", groups=["debug_viz"], visible="false", mesh='SubResource("smoke_sph")')
+      s.node("Label", "Label3D", f"Smokes/{nme}", groups=["debug_viz"], visible="false", transform=T(0, 3.2, 0), billboard="1",
+             no_depth_test="true", font_size="48", outline_size="10", text=json.dumps(f"smoke: {name} ({team})", ensure_ascii=False))
+  tx, tz = L.SPAWNS["T"][0]
+  s.node("Player", "CharacterBody3D", ".", transform=T(tx, 0.2, tz, yaw_pi=True), collision_layer="8", collision_mask="3", script=pscr)
+  s.node("CollisionShape3D", "CollisionShape3D", "Player", transform=T(0, 0.9, 0), shape='SubResource("capsule")')
+  s.node("Camera3D", "Camera3D", "Player", transform=T(0, 1.65, 0), fov="80.0", far="400.0")
+  s.node("FloorRay", "RayCast3D", "Player", transform=T(0, 0.2, 0), target_position="Vector3(0, -0.6, 0)", collision_mask="1")
+  s.node("Steps", "AudioStreamPlayer3D", "Player", transform=T(0, 0.1, 0), volume_db="-8.0", unit_size="4.0")
+  s.node("GameMode", "Node", ".", script=gscr)
+  s.node("HUD", "CanvasLayer", ".", script=hscr)
+  s.save(f"{OUT}/{out_name}")
+
+
+
+main_scene("res://map/qumtepa5v5.glb" if ART else "res://map/qumtepa5v5_greybox.glb", "main.tscn")
+main_scene("res://map/qumtepa5v5_greybox.glb", "main_greybox.tscn")
 # ------------------------------------------------------------------ tests/test_data.gd — testlar uchun xarita ma'lumotlari
 def gd_route(wps):
     return "[" + ", ".join(V3(p) for p in wps) + "]"
@@ -393,7 +406,7 @@ open(f"{OUT}/scripts/strategies.gd", "w").write(st)
 
 # ------------------------------------------------------------------ bots.tscn — 5v5 bot o'yini (kuzatish va balans sinovi)
 s = Scene()
-glb = s.add_ext("PackedScene", "res://map/qumtepa5v5_greybox.glb", "1_map")
+glb = s.add_ext("PackedScene", "res://map/qumtepa5v5.glb" if ART else "res://map/qumtepa5v5_greybox.glb", "1_map")
 col = s.add_ext("PackedScene", "res://map/collision.tscn", "2_col")
 mscr = s.add_ext("Script", "res://scripts/bot_match.gd", "3_bm")
 cscr = s.add_ext("Script", "res://scripts/spectator.gd", "4_sp")

@@ -15,9 +15,12 @@ from trimesh.visual.material import PBRMaterial
 from trimesh.visual import TextureVisuals
 from PIL import Image, ImageDraw, ImageFont
 import layout5 as LY
+import arch5
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT_GLB = os.path.join(HERE, "..", "godot", "map", "qumtepa5v5_greybox.glb")
+# STYLE=greybox (2-bosqich, rangli kodlash) yoki STYLE=arch (4-bosqich, arxitektura). To'qnashuv ikkalasida bir xil.
+STYLE = os.environ.get("STYLE", "greybox")
+OUT_GLB = os.path.join(HERE, "..", "godot", "map", "qumtepa5v5_greybox.glb" if STYLE == "greybox" else "qumtepa5v5.glb")
 OUT_META = os.path.join(HERE, "build", "meta5.json")
 rng = np.random.default_rng(42)
 G = LY.G
@@ -69,8 +72,28 @@ class Buf:
 bufs = {}
 
 
+CUR_DIST = None     # hozir qurilayotgan qismning uslubi (arch rejimida materialni tanlash uchun)
+DIST = LY.DISTRICT
+ART_MAP = {"ceiling": "plaster", "cover_high": "crate", "cover_low": "crate", "metal_crate": "green", "ruin": "sandstone",
+           "platform": "sandstone", "sandbag": "cloth", "trunk": "bark", "barrel": "beam", "urn": "clay", "trim": "sandstone",
+           "floor_site": "flagstone", "floor_cover": "flagstone", "floor_t": "flagstone", "floor_ct": "flagstone"}
+ART_SCALE = {"brick": 1.6, "cobble": 2.5, "flagstone": 3.0, "plaster": 3.0, "plaster_w": 3.0, "tile_blue": 1.0,
+             "tile_turq": 1.0, "dome": 1.5, "roof": 2.0, "cloth": 0.8, "beam": 1.2, "wood_light": 1.2}
+
+
+def resolve(mat):
+    """greybox material nomi -> arch rejimida uslubga mos tekstura"""
+    if STYLE != "arch":
+        return mat
+    if mat in ("wall", "wall2"):
+        return arch5.STYLE[CUR_DIST]["wall"]
+    if mat == "floor_open":
+        return arch5.STYLE[CUR_DIST]["floor"]
+    return ART_MAP.get(mat, mat)
+
+
 def B(group, mat):
-    return bufs.setdefault((group, mat), Buf())
+    return bufs.setdefault((group, resolve(mat)), Buf())
 
 
 def quad(group, mat, p, uv, want_n=None):
@@ -81,8 +104,10 @@ def quad(group, mat, p, uv, want_n=None):
     B(group, mat).add(p, [(0, 1, 2), (0, 2, 3)], uv)
 
 
-def box(group, mat, x0, y0, z0, x1, y1, z1, scale=4.0, unit=False, yaw=0.0, top=True, bottom=False):
+def box(group, mat, x0, y0, z0, x1, y1, z1, scale=None, unit=False, yaw=0.0, top=True, bottom=False):
     """Quti. UV — dunyo koordinatalarida (scale metrda bitta tekstura), shunda 1 m to'r hamma joyda bir xil."""
+    if scale is None:
+        scale = 4.0 if STYLE != "arch" else ART_SCALE.get(resolve(mat), 2.4)
     xs, ys, zs = (x0, x1), (y0, y1), (z0, z1)
     c = np.array([(x0 + x1) / 2, 0, (z0 + z1) / 2])
     ca, sa = math.cos(yaw), math.sin(yaw)
@@ -179,17 +204,21 @@ for r in range(G):
         t = grid[r][c]
         if t == "#" or done[r, c]:
             continue
+        key = lambda rr, cc: (grid[rr][cc], DIST[rr][cc] if STYLE == "arch" else None)
+        k0 = key(r, c)
         w = 1
-        while c + w < G and grid[r][c + w] == t and not done[r, c + w]:
+        while c + w < G and key(r, c + w) == k0 and not done[r, c + w]:
             w += 1
         h = 1
-        while r + h < G and all(grid[r + h][c + k] == t and not done[r + h, c + k] for k in range(w)):
+        while r + h < G and all(key(r + h, c + k) == k0 and not done[r + h, c + k] for k in range(w)):
             h += 1
         done[r:r + h, c:c + w] = True
+        CUR_DIST = DIST[r][c]
         box("Floor-col", FLOOR_MAT[t], cx(c), -0.3, cz(r), cx(c + w), 0.0, cz(r + h))
 
 # ------------------------------------------------------------------ binolar (4x4 katakgacha bloklar, tasodifiy balandlik)
 H = np.zeros((G, G))
+BID = [[0] * G for _ in range(G)]
 done = np.zeros((G, G), bool)
 nblocks = 0
 for r in range(G):
@@ -210,12 +239,19 @@ for r in range(G):
         if not touches:
             hh = 6.0
         H[r:r + h, c:c + w] = hh
+        for rr in range(r, r + h):
+            for cc in range(c, c + w):
+                BID[rr][cc] = nblocks + 1
         x0, z0, x1, z1 = cx(c), cz(r), cx(c + w), cz(r + h)
+        CUR_DIST = DIST[r][c]
         box("Walls-col", "wall" if rng.random() < 0.75 else "wall2", x0, 0, z0, x1, hh, z1)
         COL.append(("stone", x0, 0.0, z0, x1, hh + 0.55, z1))
         p = 0.3   # tom chetidagi devorcha
         for a in ((x0, z0, x1, z0 + p), (x0, z1 - p, x1, z1), (x0, z0, x0 + p, z1), (x1 - p, z0, x1, z1)):
             box("Walls-col", "trim", a[0], hh, a[1], a[2], hh + 0.55, a[3])
+        if STYLE == "arch":
+            box("Decor", "plaster", x0 + 0.3, hh, z0 + 0.3, x1 - 0.3, hh + 0.04, z1 - 0.3, scale=3)        # tom
+            box("Decor", "plaster", x0 - 0.12, hh - 0.35, z0 - 0.12, x1 + 0.12, hh - 0.1, z1 + 0.12, scale=3)  # karniz
         nblocks += 1
 
 # ------------------------------------------------------------------ yopiq yo'laklar: shift, tom, chiroqlar
@@ -259,6 +295,7 @@ for r in range(G):
             key = (dr, dc, r + dr if dr else c + dc, a, b)
             runs.setdefault(key, []).append(c if dr else r)
 for (dr, dc, line, a, b), idx in runs.items():
+    CUR_DIST = DIST[line if dr else idx[0]][idx[0] if dr else line]
     idx.sort()
     groups, cur = [], [idx[0]]
     for i in idx[1:]:
@@ -302,26 +339,71 @@ def stack(x, z, pattern, yaw=0.0):
 def barrel(x, z):
     FP.append((x - .4, z - .4, x + .4, z + .4))
     COL.append(("wood", x - .4, 0.0, z - .4, x + .4, 0.9, z + .4))
-    lathe("Props-col", "cover_low", x, 0, z, [(0.0, 0), (0.36, 0), (0.40, 0.45), (0.36, 0.9), (0.0, 0.9)], 12)
+    if STYLE == "arch":
+        lathe("Props-col", "barrel", x, 0, z, [(0.0, 0), (0.33, 0), (0.38, 0.25), (0.40, 0.45), (0.38, 0.65), (0.33, 0.9), (0.0, 0.9)], 14, 1.5)
+        for y in (0.2, 0.7):
+            lathe("Decor", "metal", x, 0, z, [(0.395, y), (0.405, y + 0.04), (0.395, y + 0.08)], 14)
+    else:
+        lathe("Props-col", "barrel", x, 0, z, [(0.0, 0), (0.36, 0), (0.40, 0.45), (0.36, 0.9), (0.0, 0.9)], 12)
 
 
 def urn(x, z, s=1.0):
     FP.append((x - .34 * s, z - .34 * s, x + .34 * s, z + .34 * s))
     COL.append(("stone", x - .3 * s, 0.0, z - .3 * s, x + .3 * s, 1.0 * s, z + .3 * s))
-    lathe("Props-col", "cover_low", x, 0, z, [(0.0, 0), (0.2 * s, 0), (0.34 * s, 0.45 * s), (0.16 * s, 0.9 * s), (0.12 * s, 1.0 * s), (0.0, 1.0 * s)], 12)
+    if STYLE == "arch":
+        lathe("Props-col", "urn", x, 0, z, [(0.0, 0), (0.18 * s, 0), (0.30 * s, 0.25 * s), (0.34 * s, 0.45 * s), (0.25 * s, 0.75 * s),
+                                            (0.14 * s, 0.9 * s), (0.18 * s, 0.98 * s), (0.12 * s, 1.0 * s)], 16, 1.5)
+    else:
+        lathe("Props-col", "urn", x, 0, z, [(0.0, 0), (0.2 * s, 0), (0.34 * s, 0.45 * s), (0.16 * s, 0.9 * s), (0.12 * s, 1.0 * s), (0.0, 1.0 * s)], 12)
 
 
 def sandbags(x0, z0, x1, z1):
     b = (min(x0, x1) - .3, min(z0, z1) - .22, max(x0, x1) + .3, max(z0, z1) + .22)
     FP.append((b[0], b[1] - .08, b[2], b[3] + .08))
     COL.append(("cloth", b[0], 0.0, b[1], b[2], 0.78, b[3]))
-    box("Props-col", "sandbag", b[0], 0.0, b[1], b[2], 0.78, b[3])
+    if STYLE != "arch":
+        box("Props-col", "sandbag", b[0], 0.0, b[1], b[2], 0.78, b[3])
+        return
+    Ln = math.hypot(x1 - x0, z1 - z0)
+    yaw = -math.atan2(z1 - z0, x1 - x0)
+    n = max(2, int(Ln / 0.6) + 1)
+    for row in range(3):
+        for i in range(n - (row % 2)):
+            t = (i + 0.5 * (row % 2)) / max(n - 1, 1)
+            px_, pz_ = x0 + (x1 - x0) * t, z0 + (z1 - z0) * t
+            box("Props-col", "cloth", px_ - 0.3, row * 0.26, pz_ - 0.2, px_ + 0.3, row * 0.26 + 0.26, pz_ + 0.2, scale=0.8, yaw=yaw)
 
 
 def wall(x0, z0, x1, z1, h):
     COL.append(("stone", x0, 0.0, z0, x1, h, z1))
     CLIP_P.append((x0, h, z0, x1, 12.0, z1))          # tepasiga chiqib bo'lmaydi
     box("Props-col", "ruin", x0, 0.0, z0, x1, h, z1)
+    if STYLE != "arch":
+        return
+    w, d = x1 - x0, z1 - z0
+    if h >= 5.0:
+        # eshik o'rni (Mid doors, B doors, Long doors): yog'och eshik tavaqasi devorga ochib qo'yilgan (ichkaridan 0.08 m)
+        box("Decor", "door", x0 - 0.02, 0.02, z0 - 0.02, x1 + 0.02, 2.6, z0 + 0.06, unit=True) if w >= d else \
+            box("Decor", "door", x0 - 0.02, 0.02, z0 - 0.02, x0 + 0.06, 2.6, z1 + 0.02, unit=True)
+        box("Decor", "sandstone", x0 - 0.05, 0, z0 - 0.05, x1 + 0.05, 0.5, z1 + 0.05)
+    elif 2.4 <= h <= 2.6 and w > 3 and d > 2.5:
+        # quduq (sardoba): tosh devorlar, ustida kichik gumbaz (clip ustida — faqat ko'rinish)
+        box("Decor", "sandstone", x0 - 0.08, h - 0.2, z0 - 0.08, x1 + 0.08, h, z1 + 0.08)
+        r0 = min(w, d) * 0.45
+        prof = [(r0 * math.cos(a), h + r0 * 0.8 * math.sin(a)) for a in np.linspace(0, math.pi / 2, 8)]
+        prof[-1] = (0.0, prof[-1][1])
+        lathe("Decor", "plaster_w", (x0 + x1) / 2, 0, (z0 + z1) / 2, prof, 16, 2)
+    else:
+        # xaroba: tepasi notekis, sinib tushgan toshlar
+        rr = np.random.default_rng(int(abs(x0 * 13 + z0 * 7)))
+        n = max(2, int(max(w, d) / 0.9))
+        for i in range(n):
+            t0, t1 = i / n, (i + 1) / n
+            hh = h + rr.uniform(-0.6, 0.35)
+            if w >= d:
+                box("Decor", "sandstone", x0 + w * t0, h - 0.05, z0, x0 + w * t1 - 0.03, hh, z1)
+            else:
+                box("Decor", "sandstone", x0, h - 0.05, z0 + d * t0, x1, hh, z0 + d * t1 - 0.03)
 
 
 def platform(x0, z0, x1, z1, h, stair_dir):
@@ -345,8 +427,45 @@ def platform(x0, z0, x1, z1, h, stair_dir):
 def palm(x, z, h=7.5):
     FP.append((x - .28, z - .28, x + .28, z + .28))
     COL.append(("wood", x - .22, 0.0, z - .22, x + .22, h * 0.9, z + .22))
+    if STYLE == "arch":
+        palm_art(x, z, h)
+        return
     lathe("Decor", "trunk", x, 0, z, [(0.26, 0), (0.2, h * 0.5), (0.16, h), (0.0, h)], 8)
     lathe("Decor", "foliage", x, 0, z, [(0.0, h + 0.6), (2.6, h - 0.4), (1.8, h - 1.2), (0.0, h - 0.6)], 10)
+
+
+def palm_art(x, z, h, lean=(0.3, 0.2)):
+    """v2 palmasi: egilgan tana va 11 ta osilgan barg (faqat ko'rinish, to'qnashuv — tana silindri)"""
+    prng = np.random.default_rng(int(abs(x * 31 + z * 17)))
+    segs = 10
+    prev = None
+    for i in range(segs + 1):
+        t = i / segs
+        px_ = x + lean[0] * t * t * h * 0.25
+        pz_ = z + lean[1] * t * t * h * 0.25
+        r = 0.24 - 0.08 * t
+        ring = [(px_ + r * math.cos(a), t * h, pz_ + r * math.sin(a)) for a in np.linspace(0, 2 * math.pi, 9)]
+        if prev:
+            for k in range(8):
+                quad("Decor", "bark", [prev[k], prev[k + 1], ring[k + 1], ring[k]],
+                     [(k / 8, (i - 1) / 3), ((k + 1) / 8, (i - 1) / 3), ((k + 1) / 8, i / 3), (k / 8, i / 3)],
+                     np.array([math.cos((k + .5) / 8 * 2 * math.pi), 0, math.sin((k + .5) / 8 * 2 * math.pi)]))
+        prev = ring
+    top = np.array(prev).mean(0)
+    for f in range(11):
+        ang = f / 11 * 2 * math.pi + prng.normal(0, 0.15)
+        Lf = 3.2 + prng.normal(0, 0.3)
+        droop = 0.9 + prng.random() * 0.8
+        dirv = np.array([math.cos(ang), 0, math.sin(ang)])
+        side = np.array([-dirv[2], 0, dirv[0]])
+        pts = [top + dirv * Lf * (i / 8) + np.array([0, 0.9 * (i / 8) - droop * (i / 8) ** 2 * 1.8, 0]) for i in range(9)]
+        for i in range(8):
+            w0 = 0.55 + 0.4 * math.sin(math.pi * min(1, i / 8 + 0.15))
+            w1 = 0.55 + 0.4 * math.sin(math.pi * min(1, (i + 1) / 8 + 0.15))
+            a, b = pts[i], pts[i + 1]
+            quad("Decor", "frond", [a - side * w0, a + side * w0, b + side * w1, b - side * w1],
+                 [(0, i / 8), (1, i / 8), (1, (i + 1) / 8), (0, (i + 1) / 8)], np.array([0, 1, 0]))
+    lathe("Decor", "frond_core", top[0], top[1] - 0.3, top[2], [(0.0, 0), (0.35, 0.1), (0.3, 0.45), (0.0, 0.6)], 8)
 
 
 def decal(x, z, letter, size=4.4):
@@ -440,6 +559,36 @@ M["trunk"] = PBRMaterial(name="trunk", baseColorFactor=[110, 84, 56, 255], metal
 M["foliage"] = PBRMaterial(name="foliage", baseColorFactor=[86, 120, 60, 255], metallicFactor=0, roughnessFactor=1, doubleSided=True)
 M["siteA"] = PBRMaterial(name="site_A", baseColorTexture=site_decal("A"), alphaMode="BLEND", metallicFactor=0, roughnessFactor=0.9)
 M["siteB"] = PBRMaterial(name="site_B", baseColorTexture=site_decal("B"), alphaMode="BLEND", metallicFactor=0, roughnessFactor=0.9)
+M["barrel"] = M["urn"] = M["cover_low"]
+
+# ------------------------------------------------------------------ 4-bosqich: arxitektura bezaklari va teksturali materiallar
+if STYLE == "arch":
+    import textures5 as TX
+    ctx = {"box": box, "quad": quad, "lathe": lathe, "arch_wall": arch_wall, "grid": grid, "H": H, "DIST": DIST, "G": G,
+           "cx": cx, "cz": cz, "ctype": ctype, "COVER": COVER, "BID": BID, "LANDMARKS": LY.LANDMARKS,
+           "ORIGIN": OFF, "CELL": CS}
+    n_col = len(COL)
+    decor_stats = arch5.decorate(ctx)
+    assert len(COL) == n_col, "arxitektura to'qnashuvni o'zgartirmasligi kerak"
+    T = TX.all_textures()
+    M = {}
+    for k, (img, nrm) in T.items():
+        M[k] = PBRMaterial(name=k, baseColorTexture=img, normalTexture=nrm, metallicFactor=0.0,
+                           roughnessFactor={"green": 0.6, "tile_blue": 0.35, "tile_turq": 0.35, "dome": 0.3}.get(k, 0.9))
+    M["dark"] = PBRMaterial(name="window_dark", baseColorFactor=[18, 14, 10, 255], metallicFactor=0, roughnessFactor=0.6)
+    M["dark_tile"] = PBRMaterial(name="niche_dark", baseColorTexture=T["tile_blue"][0], baseColorFactor=[70, 80, 120, 255],
+                                 metallicFactor=0, roughnessFactor=0.5)
+    M["metal"] = PBRMaterial(name="iron", baseColorFactor=[40, 36, 32, 255], metallicFactor=0.8, roughnessFactor=0.5)
+    M["lamp"] = PBRMaterial(name="lamp_glow", baseColorFactor=[255, 200, 120, 255], emissiveFactor=[1.0, 0.72, 0.38], metallicFactor=0)
+    M["cloth"] = PBRMaterial(name="cloth", baseColorTexture=T["plaster"][0], baseColorFactor=[210, 190, 150, 255], metallicFactor=0, roughnessFactor=1)
+    M["clay"] = PBRMaterial(name="clay", baseColorTexture=T["plaster"][0], baseColorFactor=[230, 150, 110, 255], metallicFactor=0, roughnessFactor=0.85)
+    V2T = TX.V2
+    M["frond"] = PBRMaterial(name="palm_frond", baseColorTexture=V2T.frond(), alphaMode="MASK", alphaCutoff=0.5, doubleSided=True, metallicFactor=0, roughnessFactor=0.8)
+    M["frond_core"] = PBRMaterial(name="palm_core", baseColorFactor=[70, 85, 35, 255], metallicFactor=0)
+    M["siteA"] = PBRMaterial(name="site_A", baseColorTexture=V2T.site_decal("A"), alphaMode="BLEND", metallicFactor=0, roughnessFactor=0.9)
+    M["siteB"] = PBRMaterial(name="site_B", baseColorTexture=V2T.site_decal("B"), alphaMode="BLEND", metallicFactor=0, roughnessFactor=0.9)
+    for (g_, m_) in bufs:
+        assert m_ in M, f"material yo'q: {m_}"
 
 # ------------------------------------------------------------------ clip'lar (xarita ustida qopqoq, chegaralar)
 E0, E1 = OFF, OFF + SIZE
@@ -466,7 +615,14 @@ for (group, mat), b in sorted(bufs.items()):
 os.makedirs(os.path.dirname(OUT_GLB), exist_ok=True)
 os.makedirs(os.path.dirname(OUT_META), exist_ok=True)
 scene.export(OUT_GLB, include_normals=True)
-json.dump({"lamps": LAMPS, "tris": tris, "fp": FP, "plat": FP_PLAT, "col": COL, "ramps": RAMPS,
-           "clip_p": CLIP_P, "clip_g": CLIP_G}, open(OUT_META, "w"))
-print(f"uchburchaklar {tris}, bloklar {nblocks}, chiroqlar {len(LAMPS)}, to'qnashuv qutilari {len(COL)}, "
+if STYLE == "greybox":
+    json.dump({"lamps": LAMPS, "tris": tris, "fp": FP, "plat": FP_PLAT, "col": COL, "ramps": RAMPS,
+               "clip_p": CLIP_P, "clip_g": CLIP_G}, open(OUT_META, "w"))
+else:
+    # arxitektura modeli to'qnashuvni o'zgartirmasligini tekshirish
+    old = json.load(open(OUT_META))
+    same = json.loads(json.dumps(COL)) == old["col"] and json.loads(json.dumps(CLIP_P)) == old["clip_p"]
+    assert same, "arch to'qnashuvi greybox bilan bir xil emas — avval STYLE=greybox ni ishga tushiring"
+    print("bezaklar:", decor_stats)
+print(f"[{STYLE}] uchburchaklar {tris}, bloklar {nblocks}, chiroqlar {len(LAMPS)}, to'qnashuv qutilari {len(COL)}, "
       f"GLB {os.path.getsize(OUT_GLB) / 1e6:.1f} MB")

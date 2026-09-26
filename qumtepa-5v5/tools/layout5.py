@@ -53,10 +53,12 @@ ZONES = [
     ("A ramp yo'li",       15, 46, 18, 49, ","),
     ("B ramp yo'li",       36, 46, 39, 49, ","),
 ]
+ZONE_GRID = [[None] * G for _ in range(G)]
 for _n, c0, r0, c1, r1, ch in ZONES:
     for r in range(r0, r1 + 1):
         for c in range(c0, c1 + 1):
             grid[r][c] = ch
+            ZONE_GRID[r][c] = _n
 LAYOUT = "\n".join("".join(row) for row in grid)
 COVER = {",": 4.2, "m": 5.2, "T": 5.0, "C": 5.0}
 
@@ -349,4 +351,56 @@ CT_SETUPS = [
     ("1-1-3 (B kuchli)", ["A platforma", "Mid doors", "B platforma", "B CT tomoni", "B default"]),
     ("2-2-1 (mid kuchli)", ["A platforma", "A CT tomoni", "Mid doors", "CT mid", "B platforma"]),
     ("1-2-2 (mid kuchli)", ["A platforma", "Mid doors", "CT mid", "B platforma", "B CT tomoni"]),
+]
+
+
+# ================================================================== 4-bosqich: hudud uslublari (arxitektura)
+# qala — T tomoni (qal'a: to'q qumtosh, tishli devorlar, tor tuynuklar)
+# bozor — mid (suvoq, do'kon eshiklari, soyabonlar, gilamlar)
+# madrasa — A (oq suvoq, ko'k koshin, peshtoqlar, minora)
+# karvon — B (karvonsaroy: g'isht, yog'och balkonlar, to'sinlar, badgir)
+# masjid — CT tomoni (oq suvoq, firuza koshin, gumbazlar)
+DISTRICT_OF_ZONE = {
+    "T spawn": "qala", "Long doors": "qala", "Outside long": "qala", "Long konnektor": "qala", "T ramp g'arb": "qala",
+    "T ramp sharq": "qala", "Upper tunnels yo'li": "qala", "Upper tunnels": "qala", "Tunnel konnektor": "qala",
+    "Top mid": "bozor", "Mid": "bozor", "Short yo'li": "bozor", "Window yo'li": "bozor", "Mid-window yo'li": "bozor",
+    "Catwalk": "bozor", "B window": "bozor",
+    "Long": "madrasa", "Long ": "madrasa", "Long corner ": "madrasa", "Long pit": "madrasa", "A site": "madrasa",
+    "A ramp": "madrasa", "A CT": "madrasa",
+    "Lower tunnels": "karvon", "Lower tunnels ": "karvon", "Tunnel burchagi": "karvon", "Tunnel cho'ntagi": "karvon",
+    "B site": "karvon", "B ramp": "karvon", "B doors": "karvon",
+    "CT mid": "masjid", "CT mid g'arb": "masjid", "CT mid sharq": "masjid", "CT mid g'arb og'zi": "masjid",
+    "CT mid sharq og'zi": "masjid", "CT spawn": "masjid", "A ramp yo'li": "masjid", "B ramp yo'li": "masjid",
+}
+assert set(DISTRICT_OF_ZONE) == {z[0] for z in ZONES}, set(z[0] for z in ZONES) ^ set(DISTRICT_OF_ZONE)
+
+
+def _district_grid():
+    """har bir katakning uslubi; binolar — eng yaqin yuriladigan katakning uslubi"""
+    from collections import deque
+    D = [[None] * G for _ in range(G)]
+    q = deque()
+    for r in range(G):
+        for c in range(G):
+            if ZONE_GRID[r][c] is not None and grid[r][c] != "#":
+                D[r][c] = DISTRICT_OF_ZONE[ZONE_GRID[r][c]]
+                q.append((r, c))
+    while q:
+        r, c = q.popleft()
+        for dr, dc in ((0, 1), (1, 0), (0, -1), (-1, 0)):
+            rr, cc = r + dr, c + dc
+            if 0 <= rr < G and 0 <= cc < G and D[rr][cc] is None:
+                D[rr][cc] = D[r][c]
+                q.append((rr, cc))
+    return D
+
+
+DISTRICT = _district_grid()
+# Mo'ljal binolari (faqat bezak, to'qnashuvsiz, o'yin maydonidan tashqarida)
+LANDMARKS = [
+    ("minora", -52.0, 31.0),        # A: madrasa minorasi — Long va A site dan ko'rinadi
+    ("badgir", 52.0, 31.0),         # B: karvonsaroy shamol minorasi
+    ("gumbaz", 0.0, 27.0),          # CT: katta firuza gumbaz — Top mid dan Mid doors orqali ko'rinadi
+    ("burj", -17.0, -53.0),         # T: qal'a darvozasi burjlari
+    ("burj", 17.0, -53.0),
 ]
