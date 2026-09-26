@@ -1,0 +1,29 @@
+; Engine configuration file.
+config_version=5
+
+[application]
+
+config/name="Qumtepa v2 - 5v5 cho'l xaritasi"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.3", "Forward Plus")
+
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+
+[layer_names]
+
+3d_physics/layer_1="world"
+3d_physics/layer_2="player_clip"
+3d_physics/layer_3="grenade_clip"
+3d_physics/layer_4="players"
+3d_physics/layer_5="hitboxes"
+3d_physics/layer_6="grenades"
+3d_physics/layer_7="triggers"
+
+[rendering]
+
+anti_aliasing/quality/msaa_3d=2
+lights_and_shadows/directional_shadow/size=8192
+textures/default_filters/anisotropic_filtering_level=4

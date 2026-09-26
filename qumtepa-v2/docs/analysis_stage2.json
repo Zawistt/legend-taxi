@@ -1,0 +1,455 @@
+{
+ "spawns": {
+  "T": {
+   "slots": [
+    {
+     "pos": [
+      -4.0,
+      -20.0
+     ],
+     "nearest_exit_s": 1.26,
+     "exits": {
+      "Long doors": 2.41,
+      "Top mid chiqishi": 1.26,
+      "Tunnels": 3.03
+     },
+     "A_s": 7.86,
+     "B_s": 8.43
+    },
+    {
+     "pos": [
+      -2.0,
+      -20.0
+     ],
+     "nearest_exit_s": 1.07,
+     "exits": {
+      "Long doors": 2.85,
+      "Top mid chiqishi": 1.07,
+      "Tunnels": 2.58
+     },
+     "A_s": 7.81,
+     "B_s": 8.15
+    },
+    {
+     "pos": [
+      0.0,
+      -20.0
+     ],
+     "nearest_exit_s": 0.89,
+     "exits": {
+      "Long doors": 3.3,
+      "Top mid chiqishi": 0.89,
+      "Tunnels": 2.14
+     },
+     "A_s": 7.99,
+     "B_s": 7.96
+    },
+    {
+     "pos": [
+      2.0,
+      -20.0
+     ],
+     "nearest_exit_s": 1.07,
+     "exits": {
+      "Long doors": 3.74,
+      "Top mid chiqishi": 1.07,
+      "Tunnels": 1.69
+     },
+     "A_s": 8.18,
+     "B_s": 7.78
+    },
+    {
+     "pos": [
+      4.0,
+      -20.0
+     ],
+     "nearest_exit_s": 1.25,
+     "exits": {
+      "Long doors": 4.18,
+      "Top mid chiqishi": 1.26,
+      "Tunnels": 1.25
+     },
+     "A_s": 8.59,
+     "B_s": 7.87
+    }
+   ],
+   "nearest_exit_spread_s": 0.37
+  },
+  "CT": {
+   "slots": [
+    {
+     "pos": [
+      -4.0,
+      18.0
+     ],
+     "nearest_exit_s": 1.26,
+     "exits": {
+      "A ramp yo'li": 1.31,
+      "CT mid chiqishi": 1.26,
+      "B ramp yo'li": 3.09
+     },
+     "A_s": 3.82,
+     "B_s": 5.88
+    },
+    {
+     "pos": [
+      -2.0,
+      18.0
+     ],
+     "nearest_exit_s": 1.07,
+     "exits": {
+      "A ramp yo'li": 1.76,
+      "CT mid chiqishi": 1.07,
+      "B ramp yo'li": 2.65
+     },
+     "A_s": 4.26,
+     "B_s": 5.44
+    },
+    {
+     "pos": [
+      0.0,
+      18.0
+     ],
+     "nearest_exit_s": 0.89,
+     "exits": {
+      "A ramp yo'li": 2.2,
+      "CT mid chiqishi": 0.89,
+      "B ramp yo'li": 2.2
+     },
+     "A_s": 4.71,
+     "B_s": 4.99
+    },
+    {
+     "pos": [
+      2.0,
+      18.0
+     ],
+     "nearest_exit_s": 1.07,
+     "exits": {
+      "A ramp yo'li": 2.65,
+      "CT mid chiqishi": 1.07,
+      "B ramp yo'li": 1.76
+     },
+     "A_s": 5.15,
+     "B_s": 4.55
+    },
+    {
+     "pos": [
+      4.0,
+      18.0
+     ],
+     "nearest_exit_s": 1.26,
+     "exits": {
+      "A ramp yo'li": 3.09,
+      "CT mid chiqishi": 1.26,
+      "B ramp yo'li": 1.31
+     },
+     "A_s": 5.6,
+     "B_s": 4.1
+    }
+   ],
+   "nearest_exit_spread_s": 0.37
+  }
+ },
+ "ai_points": [
+  {
+   "label": "A plant",
+   "kind": "plant",
+   "team": "T",
+   "pos": [
+    -15.0,
+    0.0,
+    8.0
+   ],
+   "walkable": true,
+   "from_spawn_s": 8.0,
+   "callout": "A site"
+  },
+  {
+   "label": "A back platform",
+   "kind": "hold",
+   "team": "CT",
+   "pos": [
+    -21.8,
+    1.3,
+    10.0
+   ],
+   "walkable": true,
+   "from_spawn_s": 5.6,
+   "callout": "A site"
+  },
+  {
+   "label": "A default box",
+   "kind": "hold",
+   "team": "CT",
+   "pos": [
+    -17.6,
+    0.0,
+    6.4
+   ],
+   "walkable": true,
+   "from_spawn_s": 5.4,
+   "callout": "A site"
+  },
+  {
+   "label": "A CT side",
+   "kind": "hold",
+   "team": "CT",
+   "pos": [
+    -10.6,
+    0.0,
+    12.3
+   ],
+   "walkable": true,
+   "from_spawn_s": 3.5,
+   "callout": "A site"
+  },
+  {
+   "label": "A long exit",
+   "kind": "entry",
+   "team": "T",
+   "pos": [
+    -20.0,
+    0.0,
+    -2.2
+   ],
+   "walkable": true,
+   "from_spawn_s": 7.6,
+   "callout": "Long"
+  },
+  {
+   "label": "A short exit",
+   "kind": "entry",
+   "team": "T",
+   "pos": [
+    -11.0,
+    0.0,
+    -2.2
+   ],
+   "walkable": true,
+   "from_spawn_s": 5.3,
+   "callout": "Short (catwalk)"
+  },
+  {
+   "label": "A ramp",
+   "kind": "retake",
+   "team": "CT",
+   "pos": [
+    -14.0,
+    0.0,
+    14.0
+   ],
+   "walkable": true,
+   "from_spawn_s": 3.5,
+   "callout": "A ramp"
+  },
+  {
+   "label": "B plant",
+   "kind": "plant",
+   "team": "T",
+   "pos": [
+    16.0,
+    0.0,
+    7.0
+   ],
+   "walkable": true,
+   "from_spawn_s": 8.0,
+   "callout": "B site"
+  },
+  {
+   "label": "B back platform",
+   "kind": "hold",
+   "team": "CT",
+   "pos": [
+    22.0,
+    1.3,
+    6.5
+   ],
+   "walkable": true,
+   "from_spawn_s": 6.0,
+   "callout": "B site"
+  },
+  {
+   "label": "B doors",
+   "kind": "hold",
+   "team": "CT",
+   "pos": [
+    9.3,
+    0.0,
+    6.0
+   ],
+   "walkable": true,
+   "from_spawn_s": 4.6,
+   "callout": "B site"
+  },
+  {
+   "label": "B tunnel box",
+   "kind": "hold",
+   "team": "CT",
+   "pos": [
+    17.0,
+    0.0,
+    2.9
+   ],
+   "walkable": true,
+   "from_spawn_s": 6.0,
+   "callout": "B site"
+  },
+  {
+   "label": "B tunnel exit",
+   "kind": "entry",
+   "team": "T",
+   "pos": [
+    13.0,
+    0.0,
+    -2.2
+   ],
+   "walkable": true,
+   "from_spawn_s": 5.6,
+   "callout": "Lower tunnels"
+  },
+  {
+   "label": "B ramp",
+   "kind": "retake",
+   "team": "CT",
+   "pos": [
+    14.0,
+    0.0,
+    14.0
+   ],
+   "walkable": true,
+   "from_spawn_s": 3.5,
+   "callout": "B ramp"
+  },
+  {
+   "label": "Top mid",
+   "kind": "hold",
+   "team": "T",
+   "pos": [
+    0.0,
+    0.0,
+    -11.0
+   ],
+   "walkable": true,
+   "from_spawn_s": 2.0,
+   "callout": "Top mid"
+  },
+  {
+   "label": "Mid corridor",
+   "kind": "hold",
+   "team": "T",
+   "pos": [
+    -2.0,
+    0.0,
+    -2.0
+   ],
+   "walkable": true,
+   "from_spawn_s": 4.2,
+   "callout": "Mid"
+  },
+  {
+   "label": "CT mid",
+   "kind": "hold",
+   "team": "CT",
+   "pos": [
+    0.0,
+    0.0,
+    8.0
+   ],
+   "walkable": true,
+   "from_spawn_s": 2.2,
+   "callout": "CT mid"
+  },
+  {
+   "label": "Catwalk",
+   "kind": "rotate",
+   "team": "T",
+   "pos": [
+    -10.0,
+    0.0,
+    -8.0
+   ],
+   "walkable": true,
+   "from_spawn_s": 4.0,
+   "callout": "Short (catwalk)"
+  },
+  {
+   "label": "Lower tunnels",
+   "kind": "rotate",
+   "team": "T",
+   "pos": [
+    13.0,
+    0.0,
+    -7.5
+   ],
+   "walkable": true,
+   "from_spawn_s": 4.5,
+   "callout": "Lower tunnels"
+  },
+  {
+   "label": "Upper tunnels",
+   "kind": "rotate",
+   "team": "T",
+   "pos": [
+    16.2,
+    0.0,
+    -14.5
+   ],
+   "walkable": true,
+   "from_spawn_s": 4.6,
+   "callout": "Upper tunnels"
+  },
+  {
+   "label": "Long corner",
+   "kind": "hold",
+   "team": "T",
+   "pos": [
+    -21.0,
+    0.0,
+    -10.5
+   ],
+   "walkable": true,
+   "from_spawn_s": 6.5,
+   "callout": "Long"
+  },
+  {
+   "label": "Long doors",
+   "kind": "entry",
+   "team": "T",
+   "pos": [
+    -14.0,
+    0.0,
+    -22.0
+   ],
+   "walkable": true,
+   "from_spawn_s": 3.3,
+   "callout": "Long doors"
+  },
+  {
+   "label": "CT spawn",
+   "kind": "rotate",
+   "team": "CT",
+   "pos": [
+    0.0,
+    0.0,
+    18.0
+   ],
+   "walkable": true,
+   "from_spawn_s": 0.0,
+   "callout": "CT spawn"
+  }
+ ],
+ "zone_checks": {
+  "A plant inside A zone": true,
+  "B plant inside B zone": true,
+  "spawns inside own buy zone": true,
+  "all spawns walkable": true,
+  "all AI points reachable": true
+ },
+ "retake": {
+  "worst_CT_arrival_s": 9.2,
+  "defuse_s": 7.0,
+  "bomb_timer_s": 35.0,
+  "spare_s": 18.8
+ }
+}
