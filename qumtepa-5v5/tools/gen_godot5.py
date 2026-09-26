@@ -248,8 +248,8 @@ def sky_env_lowpoly(s, full=True):
               sun_angle_max="18.0", sun_curve="0.12", energy_multiplier="1.0")
     s.add_sub("Sky", "sky", sky_material='SubResource("sky_mat")', radiance_size="1")
     props = dict(background_mode="2", sky='SubResource("sky")', ambient_light_source="3", ambient_light_color="Color(0.8, 0.76, 0.7, 1)",
-                 ambient_light_sky_contribution="0.7", ambient_light_energy="1.0", reflected_light_source="2",
-                 tonemap_mode="2", tonemap_exposure="1.0", tonemap_white="6.0",
+                 ambient_light_sky_contribution="0.7", ambient_light_energy="0.75", reflected_light_source="2",
+                 tonemap_mode="2", tonemap_exposure="0.85", tonemap_white="6.0",
                  fog_enabled="true", fog_light_color="Color(0.82, 0.84, 0.86, 1)", fog_density="0.0015", fog_sky_affect="0.1",
                  volumetric_fog_density="0.0")
     if full:

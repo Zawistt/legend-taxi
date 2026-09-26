@@ -1,7 +1,7 @@
 """O'ynash uchun yengil nusxa (bitta zip, ≤ 30 MB): python3 pack_play.py <chiqish.zip>
 
 Asl loyiha o'zgarmaydi. Nusxada:
-  - ishlatilmaydigan eski CT modeli (ct_soldier, ct_arms) va Godot keshlari yo'q;
+  - low-poly ko'rinishda ishlatilmaydigan PBR teksturalar, eski personaj modellari va Godot keshlari yo'q;
   - textures/: rang xaritalari 1024 px JPEG 72%, normal/ORM/relyef 512 px;
   - GLB ichidagi rasmlar: shaffofligi yo'q PNG -> JPEG 85%, personaj teksturalari ≤ 1024 px.
 """
@@ -10,7 +10,7 @@ from PIL import Image
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "..", "godot")
-SKIP_DIRS = {".godot"}
+SKIP_DIRS = {".godot", "characters", "textures"}   # low-poly: teksturalar va eski personajlar ishlatilmaydi
 SKIP_FILES = {"characters/ct_soldier.glb", "characters/ct_soldier.glb.import", "characters/ct_arms.glb", "characters/ct_arms.glb.import"}
 
 
@@ -88,7 +88,7 @@ def main(out_zip):
                 shutil.copy(full, dst)
     for f in ("README.md",):
         shutil.copy(os.path.join(HERE, "..", f), os.path.join(tmp, "qumtepa-5v5", f))
-    for f in ("YAKUNIY_HISOBOT.md", "STAGE8.md"):
+    for f in ("YAKUNIY_HISOBOT.md", "STAGE8.md", "STAGE9.md"):
         os.makedirs(os.path.join(tmp, "qumtepa-5v5", "docs"), exist_ok=True)
         shutil.copy(os.path.join(HERE, "..", "docs", f), os.path.join(tmp, "qumtepa-5v5", "docs", f))
     with zipfile.ZipFile(out_zip, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:

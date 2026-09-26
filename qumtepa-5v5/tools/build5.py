@@ -676,14 +676,14 @@ if STYLE == "arch":
     if LOWPOLY:
         # stilizatsiya: har material — bitta tekis rang (O'zbekiston palitrasi), teksturasiz; faqat A/B belgilari rasm
         PAL = {
-            "sandstone": (224, 188, 136), "sandstone_dk": (190, 150, 104), "plaster": (234, 214, 178), "plaster_w": (244, 236, 220),
-            "brick": (198, 122, 84), "cobble": (168, 152, 132), "flagstone": (206, 186, 152), "roof": (164, 104, 70),
+            "sandstone": (212, 172, 120), "sandstone_dk": (190, 150, 104), "plaster": (222, 198, 160), "plaster_w": (226, 216, 196),
+            "brick": (198, 122, 84), "cobble": (150, 134, 114), "flagstone": (178, 156, 122), "roof": (164, 104, 70),
             "tile_blue": (38, 96, 176), "tile_turq": (36, 170, 178), "dome": (44, 182, 190), "girih": (52, 128, 186),
-            "majolica": (58, 150, 196), "ganch": (240, 232, 214), "wood_light": (190, 138, 86), "beam": (126, 86, 54),
+            "majolica": (58, 150, 196), "ganch": (226, 216, 196), "wood_light": (190, 138, 86), "beam": (126, 86, 54),
             "carved_wood": (146, 98, 60), "door": (120, 78, 48), "bark": (122, 98, 74), "crate": (182, 136, 82),
             "green": (88, 124, 72), "awning_r": (200, 64, 54), "awning_b": (54, 96, 172), "awning_g": (72, 142, 84),
             "carpet": (160, 50, 56), "atlas_1": (210, 62, 98), "atlas_2": (152, 62, 144), "suzani": (196, 74, 62),
-            "paxta": (244, 244, 236), "vassa": (174, 122, 80), "cloth": (216, 198, 160), "clay": (210, 124, 88),
+            "paxta": (236, 236, 228), "vassa": (174, 122, 80), "cloth": (216, 198, 160), "clay": (210, 124, 88),
             "dark": (46, 38, 32), "dark_tile": (58, 82, 138), "metal": (64, 60, 56), "lamp": (255, 206, 128),
             "frond": (104, 156, 66), "frond_core": (86, 114, 52), "leaves": (98, 156, 74), "lagan": (40, 112, 186),
             "bark_light": (200, 184, 154),

@@ -12,8 +12,8 @@ const MAG := 30
 ## qurol ekranda CS dagidek o'ng pastda: kameraga nisbatan siljish (m, kichraytirishdan oldin) va og'ish (°)
 ## har bir personaj uchun alohida: [siljish, og'ish °, ko'tarilish °] (qurol ekranda o'ng pastda, og'zi nishon tomonga)
 const TUNE := {
-	"T": [Vector3(0.0, 0.1, 0.0), 0.0, 0.0],
-	"CT": [Vector3(0.0, 0.1, 0.0), 0.0, 0.0],
+	"T": [Vector3(0.16, 0.05, -0.2), 3.0, 0.0],
+	"CT": [Vector3(0.16, 0.05, -0.2), 3.0, 0.0],
 }
 
 var player: CharacterBody3D
