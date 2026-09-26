@@ -23,9 +23,14 @@ const RUN_SPEED := 4.5
 const WALK_SPEED := 2.3
 const CROUCH_SPEED := 1.55
 const SCENES := {
-	"T": "res://characters/t_operator.glb", "CT": "res://characters/ct_soldier.glb",
-	"T_fp": "res://characters/t_arms.glb", "CT_fp": "res://characters/ct_arms.glb",
+	"T": "res://characters/t_operator.glb", "CT": "res://characters/ct_hero.glb",
+	"T_fp": "res://characters/t_arms.glb", "CT_fp": "res://characters/ct_hero_arms.glb",
 }
+## CT qahramoni — foydalanuvchi bergan model va animatsiyalar (Mixamo skeleti, tools/hero_ct.py). Masshtab: ct_hero.json
+const HERO_INFO := "res://characters/ct_hero.json"
+## skelet turlari: suyak nomlari (bizning skelet / Mixamo)
+const MIXAMO_UPPER := ["Spine1", "Spine2", "Neck", "Head", "LeftShoulder", "RightShoulder", "LeftArm", "RightArm",
+	"LeftForeArm", "RightForeArm", "LeftHand", "RightHand", "LeftHandMiddle4", "RightHandMiddle4"]
 
 @export var team := "T"
 @export var first_person := false
@@ -70,7 +75,10 @@ func load_model(t: String) -> void:
 	add_child(model)
 	skel = _find(model, "Skeleton3D")
 	anim = _find(model, "AnimationPlayer")
-	_head = skel.find_bone("head") if skel else -1
+	mixamo = skel.find_bone("mixamorig_Hips") >= 0
+	model.scale = Vector3.ONE * _hero_scale() if mixamo else Vector3.ONE
+	# glTF import animatsiya nomini "<nom>" qiladi; eski eksportlarda "<nom>_Skeleton" bo'lishi mumkin
+	_head = skel.find_bone("mixamorig_Head" if mixamo else "head")
 	for n in LOOPS:
 		if anim.has_animation(n):
 			anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
@@ -105,10 +113,25 @@ func _all(n: Node, cls: String, out: Array = []) -> Array:
 	return out
 
 
+var mixamo := false
+
+
+func _hero_scale() -> float:
+	if not FileAccess.file_exists(HERO_INFO):
+		return 1.0
+	var d = JSON.parse_string(FileAccess.get_file_as_string(HERO_INFO))
+	return float(d.get("scale", 1.0)) if d is Dictionary else 1.0
+
+
+## animatsiya hali berilmagan bo'lsa — tik turish ishlatiladi (qahramon animatsiyalari bittadan qo'shib boriladi)
 func _a(name: String) -> AnimationNodeAnimation:
 	var a := AnimationNodeAnimation.new()
-	a.animation = name
+	a.animation = name if anim.has_animation(name) else "idle"
 	return a
+
+
+func has_anim(name: String) -> bool:
+	return anim != null and anim.has_animation(name)
 
 
 func _space(prefix: String, center: String, r: float) -> AnimationNodeBlendSpace2D:
@@ -186,7 +209,8 @@ func _build_tree() -> void:
 	tree.tree_root = bt
 	tree.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	tree.active = true
-	_spine = [skel.find_bone("spine1"), skel.find_bone("chest")]
+	_spine = [skel.find_bone("mixamorig_Spine1"), skel.find_bone("mixamorig_Spine2")] if mixamo \
+		else [skel.find_bone("spine1"), skel.find_bone("chest")]
 
 
 func _upper_paths() -> Array:
@@ -195,7 +219,7 @@ func _upper_paths() -> Array:
 	for i in a.get_track_count():
 		var p := a.track_get_path(i)
 		var bone := p.get_concatenated_subnames()
-		if bone in UPPER:
+		if bone in UPPER or bone.trim_prefix("mixamorig_") in MIXAMO_UPPER:
 			out.append(p)
 	return out
 
@@ -241,7 +265,8 @@ func eye_point() -> Vector3:
 	if skel == null or _head < 0:
 		return Vector3(0, 1.67, 0.09)
 	var hp := skel.get_bone_global_pose(_head).origin
-	return (skel.transform * hp) + Vector3(0, 0.08, 0.09)
+	var k := model.scale.x
+	return to_local(skel.to_global(hp)) if not is_inside_tree() else (to_local(skel.to_global(hp)) + Vector3(0, 0.08, 0.09) * k)
 
 
 func _process(delta: float) -> void:

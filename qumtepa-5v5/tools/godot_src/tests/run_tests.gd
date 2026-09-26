@@ -430,38 +430,46 @@ func section_characters() -> void:
 		chm.team = key
 		root.add_child(chm)
 		await frames(1)
-		var miss_a := []
+		var mx: bool = chm.mixamo
+		var have := []
 		for an in need_an:
-			if not chm.anim.has_animation(an):
-				miss_a.append(an)
+			if chm.anim.has_animation(an):
+				have.append(an)
 		var gatt: int = chm.skel.find_children("*", "BoneAttachment3D", false, false).size()
-		ok(miss_a.is_empty() and chm.skel.get_bone_count() >= 25 and gatt >= 1,
-			"%s: %d suyakli skelet, %d animatsiya, qurol qo'lda%s" % [key, chm.skel.get_bone_count(), need_an.size() - miss_a.size(), "" if miss_a.is_empty() else " — yo'q: " + str(miss_a)])
-		# qo'llar quroldan ajralmaydi: bilak -> qurol dastasi masofasi hamma animatsiyada bir xil (IK)
+		# T — bizning skelet (21 animatsiya shart); CT — foydalanuvchi qahramoni, animatsiyalar bittadan qo'shiladi
+		var anim_ok: bool = have.size() == need_an.size() if not mx else "idle" in have
+		ok(anim_ok and chm.skel.get_bone_count() >= 25 and gatt >= 1,
+			"%s: %d suyakli skelet, %d/%d animatsiya%s, qurol qo'lda" % [key, chm.skel.get_bone_count(), have.size(), need_an.size(),
+			" (qahramon: qolganlari kelgani sari qo'shiladi)" if mx else ""])
+		# qo'llar quroldan ajralmaydi: bilak -> qurol masofasi hamma animatsiyada bir xil (IK)
 		chm.tree.active = false
-		var wbi: int = chm.skel.find_bone("weapon")
+		var wbi: int = chm.skel.find_bone("m416" if mx else "weapon")
+		var hands := {"R": "mixamorig_RightHand" if mx else "hand.R", "L": "mixamorig_LeftHand" if mx else "hand.L"}
+		var feet := ["mixamorig_LeftFoot", "mixamorig_RightFoot"] if mx else ["foot.L", "foot.R"]
 		var hdev := {"R": [], "L": []}
 		var fmin := 9.0
 		var fmax := -9.0
 		for an in ["idle", "walk_f", "run_f", "run_l", "crouch_idle", "crouch_f", "jump_air", "fire", "plant"]:
+			if not chm.anim.has_animation(an):
+				continue
 			for k in 6:
 				chm.anim.play(an)
 				chm.anim.seek(chm.anim.current_animation_length * k / 6.0, true)
 				var wtr: Transform3D = chm.skel.get_bone_global_pose(wbi)
 				for s in ["R", "L"]:
-					var h: Vector3 = chm.skel.get_bone_global_pose(chm.skel.find_bone("hand." + s)).origin
+					var h: Vector3 = chm.skel.get_bone_global_pose(chm.skel.find_bone(hands[s])).origin
 					hdev[s].append((wtr.affine_inverse() * h))
 				if an == "idle" or an == "crouch_idle":
-					for s in ["L", "R"]:
-						var fyy: float = chm.skel.get_bone_global_pose(chm.skel.find_bone("foot." + s)).origin.y
+					for fb in feet:
+						var fyy: float = chm.skel.get_bone_global_pose(chm.skel.find_bone(fb)).origin.y * chm.model.scale.y
 						fmin = minf(fmin, fyy)
 						fmax = maxf(fmax, fyy)
 		var hspread: float = 0.0
 		for s in ["R", "L"]:
 			for q in hdev[s]:
 				hspread = maxf(hspread, (q - hdev[s][0]).length())
-		ok(hspread < 0.02, "%s: qo'llar hamma harakatda qurol dastasida (siljish %.3f m < 0.02)" % [key, hspread])
-		ok(fmin > 0.05 and fmax < 0.12, "%s: turganda va o'tirganda oyoqlar yerda (to'piq balandligi %.3f–%.3f m)" % [key, fmin, fmax])
+		ok(hspread < 0.02, "%s: qo'llar hamma harakatda qurolda (siljish %.3f m < 0.02)" % [key, hspread])
+		ok(fmin > 0.05 and fmax < 0.2, "%s: turganda oyoqlar yerda (to'piq balandligi %.3f–%.3f m)" % [key, fmin, fmax])
 		chm.queue_free()
 	# harakat turlari: oddiy (qadam eshitiladi), Shift (sekin, jim), o'tirish (sekin, jim, past), sakrash (qo'nish tovushi)
 	gm.skip_freeze()

@@ -10,9 +10,11 @@ const SCALE := 0.6
 const FIRE_INTERVAL := 0.1
 const MAG := 30
 ## qurol ekranda CS dagidek o'ng pastda: kameraga nisbatan siljish (m, kichraytirishdan oldin) va og'ish (°)
-const OFFSET := Vector3(0.13, 0.07, -0.06)
-const YAW := 5.0
-const PITCH := 1.5
+## har bir personaj uchun alohida: [siljish, og'ish °, ko'tarilish °] (qurol ekranda o'ng pastda, og'zi nishon tomonga)
+const TUNE := {
+	"T": [Vector3(0.13, 0.07, -0.06), 5.0, 1.5],
+	"CT": [Vector3(0.09, 0.12, -0.1), 4.0, 5.0],
+}
 
 var player: CharacterBody3D
 var ch: Node3D
@@ -121,9 +123,10 @@ func _process(delta: float) -> void:
 	# ko'z nuqtasi kameraga: sekin o'zgarishlar (o'tirish) to'liq qoplanadi, tez tebranish qoladi
 	var e: Vector3 = ch.eye_point()
 	_eye_s = e if _eye_s == Vector3.ZERO else _eye_s.lerp(e, 1.0 - exp(-delta * 4.0))
-	var r := Basis(Vector3.UP, deg_to_rad(YAW)) * Basis(Vector3.RIGHT, deg_to_rad(PITCH))
+	var tn: Array = TUNE.get(_team, TUNE["T"])
+	var r := Basis(Vector3.UP, deg_to_rad(tn[1])) * Basis(Vector3.RIGHT, deg_to_rad(tn[2]))
 	var b := (r * Basis(Vector3.UP, PI)).scaled(Vector3.ONE * SCALE)
-	ch.transform = Transform3D(b, -(b * _eye_s) + OFFSET * SCALE)
+	ch.transform = Transform3D(b, -(b * _eye_s) + tn[0] * SCALE)
 	_label.text = "%d / %d" % [ammo, reserve]
 	# 1-shaxs faqat o'yinchining o'z kamerasi faol bo'lganda (boshqa kamerada o'yinchi 3-shaxs tana bo'lib ko'rinadi)
 	_label.visible = player.cam.current
