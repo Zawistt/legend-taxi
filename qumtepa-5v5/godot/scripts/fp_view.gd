@@ -13,7 +13,7 @@ const MAG := 30
 ## har bir personaj uchun alohida: [siljish, og'ish °, ko'tarilish °] (qurol ekranda o'ng pastda, og'zi nishon tomonga)
 const TUNE := {
 	"T": [Vector3(0.13, 0.07, -0.06), 5.0, 1.5],
-	"CT": [Vector3(0.09, 0.12, -0.1), 4.0, 5.0],
+	"CT": [Vector3.ZERO, 0.0, 0.0],        # qahramon: qurol joyi tools/hero_ct.py da (VM) ko'zga nisbatan pishirilgan
 }
 
 var player: CharacterBody3D
@@ -30,6 +30,10 @@ var _reload_snd: AudioStreamPlayer
 var _label: Label
 var _t := 0.0
 var _reload_end := -1.0
+## CS2 uslubidagi tabiiy harakat: yurganda qadam tebranishi, sichqoncha burilganda qurolning biroz kechikishi
+var _bob_t := 0.0
+var _sway := Vector2.ZERO
+var _last_look := Vector2.ZERO
 
 
 func _ready() -> void:
@@ -124,9 +128,20 @@ func _process(delta: float) -> void:
 	var e: Vector3 = ch.eye_point()
 	_eye_s = e if _eye_s == Vector3.ZERO else _eye_s.lerp(e, 1.0 - exp(-delta * 4.0))
 	var tn: Array = TUNE.get(_team, TUNE["T"])
-	var r := Basis(Vector3.UP, deg_to_rad(tn[1])) * Basis(Vector3.RIGHT, deg_to_rad(tn[2]))
+	# qadam tebranishi (tezlikka mos), sichqoncha kechikishi (burilishga teskari, silliq qaytadi)
+	var hs := Vector2(player.velocity.x, player.velocity.z).length()
+	var k := clampf(hs / 4.5, 0.0, 1.0) if player.is_on_floor() else 0.0
+	_bob_t += delta * (6.0 + 4.0 * k) * (1.0 if k > 0.05 else 0.3)
+	var bob := Vector3(sin(_bob_t) * 0.006, -absf(cos(_bob_t)) * 0.007, 0.0) * (0.25 + k)
+	var look := Vector2(player.rotation.y, player.cam.rotation.x)
+	var dl := look - _last_look
+	_last_look = look
+	if dl.length() < 0.5:
+		_sway = (_sway + Vector2(dl.x, dl.y) * 0.8).clamp(Vector2(-0.06, -0.04), Vector2(0.06, 0.04))
+	_sway = _sway.lerp(Vector2.ZERO, 1.0 - exp(-delta * 8.0))
+	var r := Basis(Vector3.UP, deg_to_rad(tn[1]) + _sway.x) * Basis(Vector3.RIGHT, deg_to_rad(tn[2]) + _sway.y)
 	var b := (r * Basis(Vector3.UP, PI)).scaled(Vector3.ONE * SCALE)
-	ch.transform = Transform3D(b, -(b * _eye_s) + tn[0] * SCALE)
+	ch.transform = Transform3D(b, -(b * _eye_s) + (tn[0] + bob) * SCALE)
 	_label.text = "%d / %d" % [ammo, reserve]
 	# 1-shaxs faqat o'yinchining o'z kamerasi faol bo'lganda (boshqa kamerada o'yinchi 3-shaxs tana bo'lib ko'rinadi)
 	_label.visible = player.cam.current

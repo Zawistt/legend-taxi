@@ -7,6 +7,16 @@
   }
  },
  "height_src": 1.7000003025168162,
+ "first_person": {
+  "vm": {
+   "right": 0.14,
+   "down": 0.19,
+   "fwd": 0.34,
+   "yaw": 5.0,
+   "pitch": 3.0
+  },
+  "clavicle_protraction": 36
+ },
  "weapon": "m416",
  "fore_local": [
   0.0,
