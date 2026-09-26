@@ -3,3 +3,4 @@ tools/build/
 godot/.godot/
 godot/map/*.png
 godot/map/*.import
+godot/ui/*.import

@@ -32,6 +32,7 @@ func _run() -> void:
 	var main: Node = load("res://main.tscn").instantiate()
 	root.add_child(main)
 	main.get_node("HUD").visible = false
+	main.get_node("UI").visible = false
 	var gm := main.get_node("GameMode")
 	var cam := Camera3D.new()
 	cam.far = 500.0
@@ -58,4 +59,24 @@ func _run() -> void:
 		var img := root.get_texture().get_image()
 		img.save_png(ProjectSettings.globalize_path("res://../docs/shots/%s.png" % v[0]))
 		print("saqlandi: ", v[0])
+	# o'yin ekrani: HUD + minimap, keyin katta xarita (M)
+	main.get_node("HUD").visible = true
+	main.get_node("UI").visible = true
+	main.get_node("Atmosphere").set_dusk(false)
+	var pl: Node3D = main.get_node("Player")
+	pl.global_position = Vector3(-34, 0.1, 22)
+	pl.rotation.y = atan2(34.0 - 44.0, 22.0 - 4.0) + PI
+	cam.projection = Camera3D.PROJECTION_PERSPECTIVE
+	cam.fov = 80.0
+	cam.global_position = Vector3(-34, 1.7, 22)
+	cam.look_at(Vector3(-44, 1.5, 4), Vector3.UP)
+	for i in 20:
+		await process_frame
+	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/19_hud_minimap.png"))
+	var mm = main.get_node("UI/Minimap")
+	mm.big = true
+	for i in 6:
+		await process_frame
+	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/20_katta_xarita.png"))
+	print("saqlandi: HUD va xarita")
 	quit()

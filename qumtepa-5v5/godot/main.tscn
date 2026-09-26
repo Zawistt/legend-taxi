@@ -1,4 +1,4 @@
-[gd_scene load_steps=55 format=3]
+[gd_scene load_steps=163 format=3]
 
 [ext_resource type="PackedScene" path="res://map/qumtepa5v5.glb" id="1_map"]
 
@@ -25,6 +25,12 @@
 [ext_resource type="AudioStream" path="res://audio/amb_tunnel.wav" id="a_tunnel"]
 
 [ext_resource type="Script" path="res://scripts/atmosphere.gd" id="7_atm"]
+
+[ext_resource type="Script" path="res://scripts/map_lod.gd" id="8_lod"]
+
+[ext_resource type="Script" path="res://scripts/minimap.gd" id="9_mm"]
+
+[ext_resource type="Script" path="res://scripts/perf_overlay.gd" id="10_po"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.27, 0.49, 0.78, 1)
@@ -187,6 +193,321 @@ size = Vector3(8, 4.2, 8)
 [sub_resource type="BoxShape3D" id="rv17"]
 size = Vector3(8, 4.2, 8)
 
+[sub_resource type="BoxOccluder3D" id="oc0"]
+size = Vector3(7.9, 9.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc1"]
+size = Vector3(7.9, 10.9, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc2"]
+size = Vector3(7.9, 10.9, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc3"]
+size = Vector3(7.9, 8.9, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc4"]
+size = Vector3(7.9, 10.9, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc5"]
+size = Vector3(1.9, 8.4, 5.9)
+
+[sub_resource type="BoxOccluder3D" id="oc6"]
+size = Vector3(7.9, 9.4, 1.9)
+
+[sub_resource type="BoxOccluder3D" id="oc7"]
+size = Vector3(7.9, 7.4, 1.9)
+
+[sub_resource type="BoxOccluder3D" id="oc8"]
+size = Vector3(7.9, 6.4, 1.9)
+
+[sub_resource type="BoxOccluder3D" id="oc9"]
+size = Vector3(7.9, 9.4, 1.9)
+
+[sub_resource type="BoxOccluder3D" id="oc10"]
+size = Vector3(7.9, 8.4, 1.9)
+
+[sub_resource type="BoxOccluder3D" id="oc11"]
+size = Vector3(7.9, 9.4, 1.9)
+
+[sub_resource type="BoxOccluder3D" id="oc12"]
+size = Vector3(1.9, 6.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc13"]
+size = Vector3(3.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc14"]
+size = Vector3(7.9, 8.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc15"]
+size = Vector3(7.9, 7.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc16"]
+size = Vector3(7.9, 9.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc17"]
+size = Vector3(1.9, 6.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc18"]
+size = Vector3(7.9, 8.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc19"]
+size = Vector3(7.9, 9.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc20"]
+size = Vector3(1.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc21"]
+size = Vector3(3.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc22"]
+size = Vector3(7.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc23"]
+size = Vector3(1.9, 6.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc24"]
+size = Vector3(1.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc25"]
+size = Vector3(3.9, 7.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc26"]
+size = Vector3(7.9, 7.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc27"]
+size = Vector3(1.9, 9.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc28"]
+size = Vector3(7.9, 10.9, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc29"]
+size = Vector3(7.9, 9.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc30"]
+size = Vector3(1.9, 7.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc31"]
+size = Vector3(7.9, 6.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc32"]
+size = Vector3(5.9, 9.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc33"]
+size = Vector3(1.9, 7.4, 1.9)
+
+[sub_resource type="BoxOccluder3D" id="oc34"]
+size = Vector3(3.9, 7.4, 1.9)
+
+[sub_resource type="BoxOccluder3D" id="oc35"]
+size = Vector3(5.9, 8.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc36"]
+size = Vector3(7.9, 6.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc37"]
+size = Vector3(5.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc38"]
+size = Vector3(7.9, 7.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc39"]
+size = Vector3(5.9, 9.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc40"]
+size = Vector3(1.9, 6.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc41"]
+size = Vector3(5.9, 6.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc42"]
+size = Vector3(1.9, 7.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc43"]
+size = Vector3(5.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc44"]
+size = Vector3(5.9, 8.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc45"]
+size = Vector3(5.9, 8.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc46"]
+size = Vector3(7.9, 9.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc47"]
+size = Vector3(5.9, 7.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc48"]
+size = Vector3(7.9, 7.4, 1.9)
+
+[sub_resource type="BoxOccluder3D" id="oc49"]
+size = Vector3(5.9, 7.4, 1.9)
+
+[sub_resource type="BoxOccluder3D" id="oc50"]
+size = Vector3(1.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc51"]
+size = Vector3(5.9, 6.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc52"]
+size = Vector3(1.9, 6.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc53"]
+size = Vector3(5.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc54"]
+size = Vector3(5.9, 7.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc55"]
+size = Vector3(5.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc56"]
+size = Vector3(5.9, 6.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc57"]
+size = Vector3(5.9, 8.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc58"]
+size = Vector3(7.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc59"]
+size = Vector3(5.9, 6.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc60"]
+size = Vector3(7.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc61"]
+size = Vector3(5.9, 9.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc62"]
+size = Vector3(1.9, 7.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc63"]
+size = Vector3(5.9, 6.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc64"]
+size = Vector3(1.9, 7.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc65"]
+size = Vector3(5.9, 6.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc66"]
+size = Vector3(5.9, 9.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc67"]
+size = Vector3(5.9, 9.4, 1.9)
+
+[sub_resource type="BoxOccluder3D" id="oc68"]
+size = Vector3(5.9, 8.4, 1.9)
+
+[sub_resource type="BoxOccluder3D" id="oc69"]
+size = Vector3(5.9, 8.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc70"]
+size = Vector3(5.9, 6.4, 5.9)
+
+[sub_resource type="BoxOccluder3D" id="oc71"]
+size = Vector3(5.9, 7.4, 5.9)
+
+[sub_resource type="BoxOccluder3D" id="oc72"]
+size = Vector3(5.9, 10.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc73"]
+size = Vector3(5.9, 9.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc74"]
+size = Vector3(5.9, 8.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc75"]
+size = Vector3(5.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc76"]
+size = Vector3(5.9, 7.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc77"]
+size = Vector3(5.9, 9.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc78"]
+size = Vector3(7.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc79"]
+size = Vector3(5.9, 7.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc80"]
+size = Vector3(5.9, 10.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc81"]
+size = Vector3(5.9, 7.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc82"]
+size = Vector3(5.9, 8.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc83"]
+size = Vector3(7.9, 7.9, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc84"]
+size = Vector3(7.9, 7.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc85"]
+size = Vector3(7.9, 9.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc86"]
+size = Vector3(1.9, 9.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc87"]
+size = Vector3(1.9, 9.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc88"]
+size = Vector3(7.9, 6.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc89"]
+size = Vector3(7.9, 8.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc90"]
+size = Vector3(1.9, 7.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc91"]
+size = Vector3(1.9, 9.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc92"]
+size = Vector3(5.9, 7.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc93"]
+size = Vector3(1.9, 8.4, 3.9)
+
+[sub_resource type="BoxOccluder3D" id="oc94"]
+size = Vector3(7.9, 9.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc95"]
+size = Vector3(7.9, 9.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc96"]
+size = Vector3(5.9, 7.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc97"]
+size = Vector3(5.9, 7.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc98"]
+size = Vector3(7.9, 6.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc99"]
+size = Vector3(7.9, 6.4, 7.9)
+
+[sub_resource type="BoxOccluder3D" id="oc100"]
+size = Vector3(7.9, 8.9, 5.9)
+
+[sub_resource type="BoxOccluder3D" id="oc101"]
+size = Vector3(7.9, 10.9, 5.9)
+
+[sub_resource type="BoxOccluder3D" id="oc102"]
+size = Vector3(7.9, 10.9, 5.9)
+
+[sub_resource type="BoxOccluder3D" id="oc103"]
+size = Vector3(7.9, 7.9, 5.9)
+
+[sub_resource type="BoxOccluder3D" id="oc104"]
+size = Vector3(1.9, 7.9, 5.9)
+
 [sub_resource type="BoxShape3D" id="z_BombSiteA"]
 size = Vector3(24, 3.5, 19)
 
@@ -227,7 +548,8 @@ light_color = Color(1, 0.9, 0.74, 1)
 light_energy = 0.95
 shadow_enabled = true
 shadow_blur = 1.5
-directional_shadow_max_distance = 140.0
+directional_shadow_max_distance = 80.0
+directional_shadow_mode = 1
 
 [node name="Map" parent="." instance=ExtResource("1_map")]
 
@@ -249,6 +571,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp1" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.39, 2.55, -36)
@@ -256,6 +581,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp2" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.61, 2.55, -36)
@@ -263,6 +591,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp3" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 2.55, -30.61)
@@ -270,6 +601,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp4" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 2.55, -30.61)
@@ -277,6 +611,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp5" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2.55, -30.61)
@@ -284,6 +621,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp6" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 2.55, -30.61)
@@ -291,6 +631,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp7" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.61, 2.55, -30)
@@ -298,6 +641,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp8" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.39, 2.55, -24)
@@ -305,6 +651,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp9" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.61, 2.55, -24)
@@ -312,6 +661,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp10" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, -18)
@@ -319,6 +671,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp11" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.39, 2.55, -18)
@@ -326,6 +681,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp12" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, -18)
@@ -333,6 +691,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp13" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.61, 2.55, -18)
@@ -340,6 +701,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp14" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.39, 2.55, -18)
@@ -347,6 +711,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp15" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, -18)
@@ -354,6 +721,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp16" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.39, 2.55, -18)
@@ -361,6 +731,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp17" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 2.55, -18.61)
@@ -368,6 +741,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp18" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 2.55, -18.61)
@@ -375,6 +751,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp19" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 2.55, -18.61)
@@ -382,6 +761,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp20" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 2.55, -18.61)
@@ -389,6 +771,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp21" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 2.55, -18.61)
@@ -396,6 +781,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp22" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.61, 2.55, -18)
@@ -403,6 +791,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp23" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, -12)
@@ -410,6 +801,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp24" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.39, 2.55, -12)
@@ -417,6 +811,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp25" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, -12)
@@ -424,6 +821,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp26" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.61, 2.55, -12)
@@ -431,6 +831,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp27" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.39, 2.55, -12)
@@ -438,6 +841,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp28" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, -12)
@@ -445,6 +851,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp29" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.39, 2.55, -12)
@@ -452,6 +861,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp30" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.61, 2.55, -12)
@@ -459,6 +871,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp31" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.39, 2.55, -12)
@@ -466,6 +881,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp32" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.61, 2.55, -12)
@@ -473,6 +891,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp33" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, -6)
@@ -480,6 +901,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp34" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.39, 2.55, -6)
@@ -487,6 +911,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp35" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, -6)
@@ -494,6 +921,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp36" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, -6)
@@ -501,6 +931,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp37" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.39, 2.55, -6)
@@ -508,6 +941,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp38" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 2.55, -5.39)
@@ -515,6 +951,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp39" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.61, 2.55, -6)
@@ -522,6 +961,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp40" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.39, 2.55, -6)
@@ -529,6 +971,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp41" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.61, 2.55, -6)
@@ -536,6 +981,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp42" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, 0)
@@ -543,6 +991,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp43" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.39, 2.55, 0)
@@ -550,6 +1001,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp44" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, 0)
@@ -557,6 +1011,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp45" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.61, 2.55, 0)
@@ -564,6 +1021,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp46" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.39, 2.55, 0)
@@ -571,6 +1031,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp47" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, 0)
@@ -578,6 +1041,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp48" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.39, 2.55, 0)
@@ -585,6 +1051,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp49" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.61, 2.55, 0)
@@ -592,6 +1061,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp50" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, 42)
@@ -599,6 +1071,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Lamp51" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, 42)
@@ -606,6 +1081,9 @@ light_color = Color(1, 0.68, 0.36, 1)
 light_energy = 1.4
 omni_range = 7.0
 omni_attenuation = 1.6
+distance_fade_enabled = true
+distance_fade_begin = 45.0
+distance_fade_length = 10.0
 
 [node name="Fill0" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3, -50)
@@ -614,6 +1092,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill1" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3, -50)
@@ -622,6 +1103,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill2" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 3, -50)
@@ -630,6 +1114,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill3" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3, -50)
@@ -638,6 +1125,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill4" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3, -50)
@@ -646,6 +1136,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill5" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 3, -46)
@@ -654,6 +1147,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill6" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 3, -44)
@@ -662,6 +1158,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill7" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 3, -44)
@@ -670,6 +1169,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill8" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 3, -44)
@@ -678,6 +1180,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill9" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3, -44)
@@ -686,6 +1191,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill10" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -44)
@@ -694,6 +1202,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill11" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 3, -44)
@@ -702,6 +1213,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill12" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 3, -44)
@@ -710,6 +1224,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill13" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 3, -44)
@@ -718,6 +1235,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill14" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 3, -44)
@@ -726,6 +1246,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill15" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3, -40)
@@ -734,6 +1257,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill16" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 3, -40)
@@ -742,6 +1268,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill17" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 3, -38)
@@ -750,6 +1279,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill18" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 3, -32)
@@ -758,6 +1290,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill19" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 3, -26)
@@ -766,6 +1301,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill20" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32, 3, -20)
@@ -774,6 +1312,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill21" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -16)
@@ -782,6 +1323,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill22" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -10)
@@ -790,6 +1334,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill23" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 3, -10)
@@ -798,6 +1345,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill24" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, -8)
@@ -806,6 +1356,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill25" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 3, -8)
@@ -814,6 +1367,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill26" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, -4)
@@ -822,6 +1378,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill27" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 3, -4)
@@ -830,6 +1389,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill28" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 2)
@@ -838,6 +1400,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill29" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 3, 2)
@@ -846,6 +1411,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill30" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 3, 36)
@@ -854,6 +1422,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill31" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3, 36)
@@ -862,6 +1433,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill32" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 3, 36)
@@ -870,6 +1444,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill33" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 3, 36)
@@ -878,6 +1455,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill34" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, 36)
@@ -886,6 +1466,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill35" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 3, 36)
@@ -894,6 +1477,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill36" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 3, 38)
@@ -902,6 +1488,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill37" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 3, 40)
@@ -910,6 +1499,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill38" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3, 42)
@@ -918,6 +1510,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill39" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3, 42)
@@ -926,6 +1521,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill40" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 3, 42)
@@ -934,6 +1532,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill41" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3, 42)
@@ -942,6 +1543,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill42" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3, 42)
@@ -950,6 +1554,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill43" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 3, 42)
@@ -958,6 +1565,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill44" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 3, 48)
@@ -966,6 +1576,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill45" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3, 48)
@@ -974,6 +1587,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill46" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 3, 48)
@@ -982,6 +1598,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill47" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 3, 48)
@@ -990,6 +1609,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill48" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3, 48)
@@ -998,6 +1620,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Fill49" type="OmniLight3D" parent="Lamps" groups=["lamps"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 3, 48)
@@ -1006,6 +1631,9 @@ light_energy = 0.55
 omni_range = 7.5
 omni_attenuation = 1.2
 light_specular = 0.1
+distance_fade_enabled = true
+distance_fade_begin = 40.0
+distance_fade_length = 10.0
 
 [node name="Ambient" type="Node3D" parent="."]
 
@@ -1328,6 +1956,440 @@ shape = SubResource("rv17")
 
 [node name="Atmosphere" type="Node3D" parent="."]
 script = ExtResource("7_atm")
+
+[node name="Occluders" type="Node3D" parent="."]
+
+[node name="Occ0" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 5, -51)
+occluder = SubResource("oc0")
+
+[node name="Occ1" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 5.5, -53)
+occluder = SubResource("oc1")
+
+[node name="Occ2" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 5.5, -53)
+occluder = SubResource("oc2")
+
+[node name="Occ3" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 4.5, -53)
+occluder = SubResource("oc3")
+
+[node name="Occ4" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 5.5, -53)
+occluder = SubResource("oc4")
+
+[node name="Occ5" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 4.25, -48)
+occluder = SubResource("oc5")
+
+[node name="Occ6" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35, 4.75, -46)
+occluder = SubResource("oc6")
+
+[node name="Occ7" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27, 3.75, -46)
+occluder = SubResource("oc7")
+
+[node name="Occ8" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 3.25, -46)
+occluder = SubResource("oc8")
+
+[node name="Occ9" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 4.75, -46)
+occluder = SubResource("oc9")
+
+[node name="Occ10" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29, 4.25, -46)
+occluder = SubResource("oc10")
+
+[node name="Occ11" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37, 4.75, -46)
+occluder = SubResource("oc11")
+
+[node name="Occ12" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 3.25, -41)
+occluder = SubResource("oc12")
+
+[node name="Occ13" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39, 4.25, -41)
+occluder = SubResource("oc13")
+
+[node name="Occ14" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 4.25, -37)
+occluder = SubResource("oc14")
+
+[node name="Occ15" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 3.75, -37)
+occluder = SubResource("oc15")
+
+[node name="Occ16" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 4.75, -37)
+occluder = SubResource("oc16")
+
+[node name="Occ17" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3.25, -37)
+occluder = SubResource("oc17")
+
+[node name="Occ18" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 4.25, -37)
+occluder = SubResource("oc18")
+
+[node name="Occ19" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 4.75, -35)
+occluder = SubResource("oc19")
+
+[node name="Occ20" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 4.25, -33)
+occluder = SubResource("oc20")
+
+[node name="Occ21" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39, 4.25, -33)
+occluder = SubResource("oc21")
+
+[node name="Occ22" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23, 4.25, -27)
+occluder = SubResource("oc22")
+
+[node name="Occ23" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 3.25, -27)
+occluder = SubResource("oc23")
+
+[node name="Occ24" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 4.25, -25)
+occluder = SubResource("oc24")
+
+[node name="Occ25" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39, 3.75, -25)
+occluder = SubResource("oc25")
+
+[node name="Occ26" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 3.75, -25)
+occluder = SubResource("oc26")
+
+[node name="Occ27" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 4.75, -23)
+occluder = SubResource("oc27")
+
+[node name="Occ28" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -51, 5.5, -21)
+occluder = SubResource("oc28")
+
+[node name="Occ29" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -43, 4.75, -21)
+occluder = SubResource("oc29")
+
+[node name="Occ30" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 3.75, -19)
+occluder = SubResource("oc30")
+
+[node name="Occ31" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 45, 3.25, -21)
+occluder = SubResource("oc31")
+
+[node name="Occ32" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 5, -19)
+occluder = SubResource("oc32")
+
+[node name="Occ33" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38, 3.75, -20)
+occluder = SubResource("oc33")
+
+[node name="Occ34" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39, 3.75, -20)
+occluder = SubResource("oc34")
+
+[node name="Occ35" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52, 4.5, -15)
+occluder = SubResource("oc35")
+
+[node name="Occ36" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 3.25, -15)
+occluder = SubResource("oc36")
+
+[node name="Occ37" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 4.25, -15)
+occluder = SubResource("oc37")
+
+[node name="Occ38" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 3.75, -15)
+occluder = SubResource("oc38")
+
+[node name="Occ39" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 4.75, -15)
+occluder = SubResource("oc39")
+
+[node name="Occ40" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 3.25, -15)
+occluder = SubResource("oc40")
+
+[node name="Occ41" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 3.25, -11)
+occluder = SubResource("oc41")
+
+[node name="Occ42" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 3.75, -11)
+occluder = SubResource("oc42")
+
+[node name="Occ43" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 4.25, -11)
+occluder = SubResource("oc43")
+
+[node name="Occ44" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 4.5, -11)
+occluder = SubResource("oc44")
+
+[node name="Occ45" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52, 4.5, -7)
+occluder = SubResource("oc45")
+
+[node name="Occ46" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 4.75, -7)
+occluder = SubResource("oc46")
+
+[node name="Occ47" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3.75, -7)
+occluder = SubResource("oc47")
+
+[node name="Occ48" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 3.75, -10)
+occluder = SubResource("oc48")
+
+[node name="Occ49" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 3.75, -10)
+occluder = SubResource("oc49")
+
+[node name="Occ50" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 4.25, -7)
+occluder = SubResource("oc50")
+
+[node name="Occ51" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 3.25, -3)
+occluder = SubResource("oc51")
+
+[node name="Occ52" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 3.25, -3)
+occluder = SubResource("oc52")
+
+[node name="Occ53" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 4.25, -3)
+occluder = SubResource("oc53")
+
+[node name="Occ54" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 4, -3)
+occluder = SubResource("oc54")
+
+[node name="Occ55" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 4.25, -1)
+occluder = SubResource("oc55")
+
+[node name="Occ56" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 3.25, -1)
+occluder = SubResource("oc56")
+
+[node name="Occ57" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52, 4.5, 1)
+occluder = SubResource("oc57")
+
+[node name="Occ58" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 4.25, 1)
+occluder = SubResource("oc58")
+
+[node name="Occ59" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3.25, 1)
+occluder = SubResource("oc59")
+
+[node name="Occ60" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 4.25, 1)
+occluder = SubResource("oc60")
+
+[node name="Occ61" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 4.75, 1)
+occluder = SubResource("oc61")
+
+[node name="Occ62" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26, 3.75, 1)
+occluder = SubResource("oc62")
+
+[node name="Occ63" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36, 3.25, 3)
+occluder = SubResource("oc63")
+
+[node name="Occ64" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26, 3.75, 3)
+occluder = SubResource("oc64")
+
+[node name="Occ65" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36, 3.25, 3)
+occluder = SubResource("oc65")
+
+[node name="Occ66" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 5, 5)
+occluder = SubResource("oc66")
+
+[node name="Occ67" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30, 4.75, 4)
+occluder = SubResource("oc67")
+
+[node name="Occ68" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 4.25, 4)
+occluder = SubResource("oc68")
+
+[node name="Occ69" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52, 4.5, 9)
+occluder = SubResource("oc69")
+
+[node name="Occ70" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.25, 8)
+occluder = SubResource("oc70")
+
+[node name="Occ71" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 3.75, 8)
+occluder = SubResource("oc71")
+
+[node name="Occ72" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 5.5, 13)
+occluder = SubResource("oc72")
+
+[node name="Occ73" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52, 5, 17)
+occluder = SubResource("oc73")
+
+[node name="Occ74" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 4.5, 21)
+occluder = SubResource("oc74")
+
+[node name="Occ75" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 4.25, 23)
+occluder = SubResource("oc75")
+
+[node name="Occ76" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 3.75, 23)
+occluder = SubResource("oc76")
+
+[node name="Occ77" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -52, 5, 25)
+occluder = SubResource("oc77")
+
+[node name="Occ78" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 4.25, 27)
+occluder = SubResource("oc78")
+
+[node name="Occ79" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3.75, 27)
+occluder = SubResource("oc79")
+
+[node name="Occ80" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 52, 5.5, 29)
+occluder = SubResource("oc80")
+
+[node name="Occ81" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.75, 29)
+occluder = SubResource("oc81")
+
+[node name="Occ82" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 4.25, 29)
+occluder = SubResource("oc82")
+
+[node name="Occ83" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -51, 4, 33)
+occluder = SubResource("oc83")
+
+[node name="Occ84" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -43, 3.75, 33)
+occluder = SubResource("oc84")
+
+[node name="Occ85" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35, 4.75, 33)
+occluder = SubResource("oc85")
+
+[node name="Occ86" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 4.75, 33)
+occluder = SubResource("oc86")
+
+[node name="Occ87" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 4.75, 33)
+occluder = SubResource("oc87")
+
+[node name="Occ88" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 3.25, 33)
+occluder = SubResource("oc88")
+
+[node name="Occ89" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43, 4.25, 33)
+occluder = SubResource("oc89")
+
+[node name="Occ90" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48, 3.75, 33)
+occluder = SubResource("oc90")
+
+[node name="Occ91" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 4.75, 33)
+occluder = SubResource("oc91")
+
+[node name="Occ92" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.75, 33)
+occluder = SubResource("oc92")
+
+[node name="Occ93" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 4.25, 33)
+occluder = SubResource("oc93")
+
+[node name="Occ94" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35, 4.75, 41)
+occluder = SubResource("oc94")
+
+[node name="Occ95" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35, 4.75, 41)
+occluder = SubResource("oc95")
+
+[node name="Occ96" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 3.75, 45)
+occluder = SubResource("oc96")
+
+[node name="Occ97" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 3.75, 45)
+occluder = SubResource("oc97")
+
+[node name="Occ98" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 3.25, 49)
+occluder = SubResource("oc98")
+
+[node name="Occ99" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 3.25, 49)
+occluder = SubResource("oc99")
+
+[node name="Occ100" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 4.5, 52)
+occluder = SubResource("oc100")
+
+[node name="Occ101" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 5.5, 52)
+occluder = SubResource("oc101")
+
+[node name="Occ102" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 5.5, 52)
+occluder = SubResource("oc102")
+
+[node name="Occ103" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 4, 52)
+occluder = SubResource("oc103")
+
+[node name="Occ104" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 4, 52)
+occluder = SubResource("oc104")
+
+[node name="MapLOD" type="Node" parent="."]
+script = ExtResource("8_lod")
+
+[node name="UI" type="CanvasLayer" parent="."]
+layer = 5
+
+[node name="Minimap" type="Control" parent="UI"]
+script = ExtResource("9_mm")
+
+[node name="Perf" type="Label" parent="UI"]
+script = ExtResource("10_po")
 
 [node name="Zones" type="Node3D" parent="."]
 

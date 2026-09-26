@@ -356,6 +356,31 @@ func _run() -> void:
 	ok(rv_ok == D.COVERED_CELLS.size(), "hamma yopiq kataklarda aks-sado bor (%d/%d)" % [rv_ok, D.COVERED_CELLS.size()])
 	ok(lit_ok == D.COVERED_CELLS.size(), "hamma yopiq kataklar chiroqdan ≤ 6 m (%d/%d): qorong'i burchak yo'q" % [lit_ok, D.COVERED_CELLS.size()])
 
+	print("\n16) Optimallashtirish va minimap (7-bosqich)")
+	var occ := main.get_node("Occluders").get_child_count()
+	ok(occ >= 100 and ProjectSettings.get_setting("rendering/occlusion_culling/use_occlusion_culling"), "occlusion culling yoqilgan, %d ta bino occluder'i" % occ)
+	var lodn: Node = main.get_node("MapLOD")
+	var hidden_gameplay := 0
+	var chunks := 0
+	var stack := [main.get_node("Map")]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		if n is GeometryInstance3D:
+			chunks += 1
+			var gi := n as GeometryInstance3D
+			if gi.visibility_range_end > 0.0 and not ("_Decor_" in n.name):
+				hidden_gameplay += 1
+		stack.append_array(n.get_children())
+	ok(lodn.decor_nodes > 20 and hidden_gameplay == 0, "masofada faqat bezak so'nadi (%d bo'lak); panalar, devorlar, pol doim ko'rinadi (%d ta mesh bo'lagi)" % [lodn.decor_nodes, chunks])
+	var fade_ok := 0
+	for l in get_nodes_in_group("lamps"):
+		if (l as Light3D).distance_fade_enabled:
+			fade_ok += 1
+	ok(fade_ok == get_nodes_in_group("lamps").size(), "hamma chiroqlar uzoqda so'nadi (%d)" % fade_ok)
+	ok(sun.directional_shadow_mode == DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS and sun.directional_shadow_max_distance <= 90.0, "quyosh soyasi: 2 bo'lak, ≤ 90 m")
+	var mm: Control = main.get_node_or_null("UI/Minimap")
+	ok(mm != null and mm.MAP != null and mm.player == pl, "minimap bor va o'yinchini kuzatadi")
+
 	print("\nVAQTLAR (2D tahlil -> 3D fizika):")
 	for row in timing_rows:
 		print("  %-28s %5.1f s -> %5.1f s" % [row[0], row[1], row[2]])

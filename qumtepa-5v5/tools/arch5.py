@@ -278,11 +278,11 @@ def decorate(ctx):
                 dx, dz = (x0 + x1) / 2, (z0 + z1) / 2
                 rad = min(w, d) * (0.34 if kind == "dome" else 0.26)
                 drum = 1.2 if kind == "dome" else 0.6
-                box("Decor", st["wall"], dx - rad - .3, hh, dz - rad - .3, dx + rad + .3, hh + drum, dz + rad + .3, scale=2.4)
+                box("Landmark", st["wall"], dx - rad - .3, hh, dz - rad - .3, dx + rad + .3, hh + drum, dz + rad + .3, scale=2.4)
                 prof = [(rad * math.cos(a), hh + drum + rad * 1.1 * math.sin(a)) for a in np.linspace(0, math.pi / 2, 10)]
                 prof[-1] = (0.0, prof[-1][1])
-                lathe("Decor", "dome" if kind == "dome" else "tile_turq", dx, 0, dz, prof, 24, 3)
-                lathe("Decor", "metal", dx, 0, dz, [(0.08, hh + drum + rad * 1.1), (0.05, hh + drum + rad * 1.1 + 0.8), (0.0, hh + drum + rad * 1.1 + 0.85)], 8)
+                lathe("Landmark", "dome" if kind == "dome" else "tile_turq", dx, 0, dz, prof, 24, 3)
+                lathe("Landmark", "metal", dx, 0, dz, [(0.08, hh + drum + rad * 1.1), (0.05, hh + drum + rad * 1.1 + 0.8), (0.0, hh + drum + rad * 1.1 + 0.85)], 8)
                 stats["gumbaz"] += 1
             elif kind == "shed" and rng.random() < p:
                 sx0, sz0 = x0 + 0.6, z0 + 0.6
@@ -341,49 +341,49 @@ def decorate(ctx):
         base = H[int((z - ctx["ORIGIN"]) // ctx["CELL"]), int((x - ctx["ORIGIN"]) // ctx["CELL"])]
         if kind == "minora":
             prof = [(2.2, 0), (2.2, base + 1), (1.9, base + 1.2), (1.6, base + 14), (1.5, base + 16)]
-            lathe("Decor", "brick", x, 0, z, prof, 24, 1.6)
+            lathe("Landmark", "brick", x, 0, z, prof, 24, 1.6)
             for yb in (base + 4, base + 8, base + 12):
-                lathe("Decor", "tile_blue", x, 0, z, [(1.62 - (yb - base) * 0.017, yb), (1.62 - (yb - base) * 0.017, yb + 0.9)], 24, 1.0)
+                lathe("Landmark", "tile_blue", x, 0, z, [(1.62 - (yb - base) * 0.017, yb), (1.62 - (yb - base) * 0.017, yb + 0.9)], 24, 1.0)
             y = base + 16
-            lathe("Decor", "wood_light", x, 0, z, [(1.5, y), (2.4, y + 0.3), (2.4, y + 0.5), (1.5, y + 0.6)], 24, 1.2)
-            lathe("Decor", "plaster_w", x, 0, z, [(1.3, y + 0.6), (1.3, y + 3.4), (1.45, y + 3.6), (0.0, y + 3.6)], 20, 2)
+            lathe("Landmark", "wood_light", x, 0, z, [(1.5, y), (2.4, y + 0.3), (2.4, y + 0.5), (1.5, y + 0.6)], 24, 1.2)
+            lathe("Landmark", "plaster_w", x, 0, z, [(1.3, y + 0.6), (1.3, y + 3.4), (1.45, y + 3.6), (0.0, y + 3.6)], 20, 2)
             for k in range(8):
                 a = k / 8 * 2 * math.pi
-                box("Decor", "dark", x + 1.31 * math.cos(a) - 0.2, y + 1.2, z + 1.31 * math.sin(a) - 0.2,
+                box("Landmark", "dark", x + 1.31 * math.cos(a) - 0.2, y + 1.2, z + 1.31 * math.sin(a) - 0.2,
                     x + 1.31 * math.cos(a) + 0.2, y + 2.8, z + 1.31 * math.sin(a) + 0.2)
-            lathe("Decor", "dome", x, 0, z, [(1.45, y + 3.6), (1.2, y + 4.6), (0.6, y + 5.4), (0.0, y + 5.8)], 20, 2)
+            lathe("Landmark", "dome", x, 0, z, [(1.45, y + 3.6), (1.2, y + 4.6), (0.6, y + 5.4), (0.0, y + 5.8)], 20, 2)
         elif kind == "kalta_minor":
             # Kalta Minor (Xiva): yo'g'on, qisqa, tugallanmagan minora, butunlay sirli koshin tasmalar bilan qoplangan
             H0 = base + 12
             prof = [(3.4, 0), (3.4, base + 0.5), (3.1, base + 0.8), (2.6, H0)]
-            lathe("Decor", "brick", x, 0, z, prof, 32, 1.6)
+            lathe("Landmark", "brick", x, 0, z, prof, 32, 1.6)
             bands = ["tile_turq", "majolica", "girih", "tile_turq", "majolica", "dome"]
             for i, mat in enumerate(bands):
                 y0 = base + 1.4 + i * 1.75
                 r0 = 3.1 - (y0 - base - 0.8) / (H0 - base - 0.8) * 0.5 + 0.02
                 r1 = 3.1 - (y0 + 1.1 - base - 0.8) / (H0 - base - 0.8) * 0.5 + 0.02
-                lathe("Decor", mat, x, 0, z, [(r0, y0), (r1, y0 + 1.1)], 32, 1.0)
-            lathe("Decor", "sandstone", x, 0, z, [(2.62, H0), (2.8, H0 + 0.25), (2.3, H0 + 0.3), (0.0, H0 + 0.3)], 32, 2)
+                lathe("Landmark", mat, x, 0, z, [(r0, y0), (r1, y0 + 1.1)], 32, 1.0)
+            lathe("Landmark", "sandstone", x, 0, z, [(2.62, H0), (2.8, H0 + 0.25), (2.3, H0 + 0.3), (0.0, H0 + 0.3)], 32, 2)
         elif kind == "gumbaz":
             rad = 5.5
-            lathe("Decor", "plaster_w", x, 0, z, [(rad + 0.4, base), (rad + 0.4, base + 2.6), (rad + 0.7, base + 2.8), (rad, base + 3.0)], 32, 3)
-            lathe("Decor", "tile_turq", x, 0, z, [(rad + 0.42, base + 1.2), (rad + 0.42, base + 2.2)], 32, 1.0)
+            lathe("Landmark", "plaster_w", x, 0, z, [(rad + 0.4, base), (rad + 0.4, base + 2.6), (rad + 0.7, base + 2.8), (rad, base + 3.0)], 32, 3)
+            lathe("Landmark", "tile_turq", x, 0, z, [(rad + 0.42, base + 1.2), (rad + 0.42, base + 2.2)], 32, 1.0)
             prof = [(rad * math.cos(a), base + 3.0 + rad * 1.15 * math.sin(a)) for a in np.linspace(0, math.pi / 2, 14)]
             prof[-1] = (0.0, prof[-1][1])
-            lathe("Decor", "dome", x, 0, z, prof, 36, 3)
+            lathe("Landmark", "dome", x, 0, z, prof, 36, 3)
             top = base + 3.0 + rad * 1.15
-            lathe("Decor", "metal", x, 0, z, [(0.2, top), (0.12, top + 1.4), (0.0, top + 1.6)], 10)
+            lathe("Landmark", "metal", x, 0, z, [(0.2, top), (0.12, top + 1.4), (0.0, top + 1.6)], 10)
             stats["gumbaz"] += 1
         elif kind == "burj":
             s = 2.4
-            box("Decor", "sandstone_dk", x - s, 0, z - s, x + s, base + 6, z + s, scale=2.4)
-            box("Decor", "sandstone", x - s - 0.3, base + 6, z - s - 0.3, x + s + 0.3, base + 6.4, z + s + 0.3, scale=2.4)
+            box("Landmark", "sandstone_dk", x - s, 0, z - s, x + s, base + 6, z + s, scale=2.4)
+            box("Landmark", "sandstone", x - s - 0.3, base + 6, z - s - 0.3, x + s + 0.3, base + 6.4, z + s + 0.3, scale=2.4)
             for xx in np.arange(x - s, x + s - 0.2, 0.9):
                 for za, zb in ((z - s - 0.3, z - s + 0.1), (z + s - 0.1, z + s + 0.3)):
-                    box("Decor", "sandstone_dk", xx, base + 6.4, za, xx + 0.45, base + 7.2, zb, scale=2.4)
+                    box("Landmark", "sandstone_dk", xx, base + 6.4, za, xx + 0.45, base + 7.2, zb, scale=2.4)
             for zz in np.arange(z - s, z + s - 0.2, 0.9):
                 for xa, xb in ((x - s - 0.3, x - s + 0.1), (x + s - 0.1, x + s + 0.3)):
-                    box("Decor", "sandstone_dk", xa, base + 6.4, zz, xb, base + 7.2, zz + 0.45, scale=2.4)
+                    box("Landmark", "sandstone_dk", xa, base + 6.4, zz, xb, base + 7.2, zz + 0.45, scale=2.4)
             for side in (-1, 1):
-                box("Decor", "dark", x - 0.12, base + 2.5, z + side * s - 0.02, x + 0.12, base + 4.0, z + side * s + 0.02)
+                box("Landmark", "dark", x - 0.12, base + 2.5, z + side * s - 0.02, x + 0.12, base + 4.0, z + side * s + 0.02)
     return stats

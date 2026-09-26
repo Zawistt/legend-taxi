@@ -1,0 +1,48 @@
+Godot Engine v4.3.stable.official.77dcf97d8 - https://godotengine.org
+5v5 BOT O'YINLARI: 360 raund, seed 3, 542 s
+  T yutdi: 55.6%   bomba o'rnatildi: 85.0%   o'rnatilgandan keyin CT qaytarib oldi: 40.5%   birinchi o'lim: 16.3 s
+  Site bo'yicha (T taktikasi qaysi site'ga):
+    A    160 raund, T  58.8%, o'rnatildi 138
+    B    200 raund, T  53.0%, o'rnatildi 168
+  T taktikasi bo'yicha:
+    A rush (Long)                       40 raund, T  77.5%, o'rnatildi 36
+    B split (Tunnels + Window)          40 raund, T  55.0%, o'rnatildi 34
+    B rush (Tunnels)                    40 raund, T  65.0%, o'rnatildi 33
+    Mid → B (Mid-window)                40 raund, T  70.0%, o'rnatildi 34
+    Mid → A (Mid doors, A CT)           40 raund, T  62.5%, o'rnatildi 40
+    Mid → B (Mid doors, B doors)        40 raund, T  50.0%, o'rnatildi 37
+    Default → A (kech)                  40 raund, T  40.0%, o'rnatildi 28
+    Default → B (kech)                  40 raund, T  25.0%, o'rnatildi 30
+    A split (Long + Short)              40 raund, T  55.0%, o'rnatildi 34
+  CT joylashuvi bo'yicha:
+    2-1-2                   72 raund, T  47.2%
+    3-1-1 (A kuchli)        72 raund, T  51.4%
+    1-1-3 (B kuchli)        72 raund, T  55.6%
+    2-2-1 (mid kuchli)      72 raund, T  55.6%
+    1-2-2 (mid kuchli)      72 raund, T  68.1%
+  Raund qanday tugadi:
+    CT lar yo'q qilindi          199
+    bomba zararsizlantirildi     124
+    T lar yo'q qilindi           29
+    vaqt tugadi                  7
+    bomba portladi               1
+  Eng ko'p o'lim bo'lgan joylar:
+    B site                 408
+    A site                 366
+    CT mid                 266
+    Mid doors              228
+    B platforma            209
+    A platforma            184
+    Lower tunnels          166
+    A default              138
+    Long                   128
+    B default              100
+  Birinchi o'lim (qayerdan → qayerga):
+    Lower tunnels → B platforma (T o'ldirdi)         71
+    Long → A platforma (T o'ldirdi)                  70
+    A platforma → Long (CT o'ldirdi)                 65
+    B platforma → Lower tunnels (CT o'ldirdi)        51
+    Mid doors → Mid doors (T o'ldirdi)               26
+    Catwalk → A platforma (T o'ldirdi)               18
+    A default → Catwalk (CT o'ldirdi)                16
+    Mid doors → Mid doors (CT o'ldirdi)              11

@@ -224,6 +224,21 @@ for zname, n in (("A site", 260), ("B site", 260), ("Top mid", 200), ("CT mid", 
 SUN_ROT = "Vector3(-50, -86, 0)"
 
 
+def perf_nodes(s, root_is_main=True):
+    """7-bosqich: occluder'lar (bino bloklari), masofa bo'yicha bezakni yashirish, minimap va F9 ko'rsatkichlari"""
+    s.node("Occluders", "Node3D", ".")
+    for i, (x0, z0, x1, z1, h) in enumerate(meta["blocks"]):
+        oc = s.add_sub("BoxOccluder3D", f"oc{i}", size=f"Vector3({f(x1 - x0 - 0.1)}, {f(h - 0.1)}, {f(z1 - z0 - 0.1)})")
+        s.node(f"Occ{i}", "OccluderInstance3D", "Occluders", transform=T((x0 + x1) / 2, h / 2, (z0 + z1) / 2), occluder=oc)
+    lod = s.add_ext("Script", "res://scripts/map_lod.gd", "8_lod")
+    s.node("MapLOD", "Node", ".", script=lod)
+    mm = s.add_ext("Script", "res://scripts/minimap.gd", "9_mm")
+    po = s.add_ext("Script", "res://scripts/perf_overlay.gd", "10_po")
+    s.node("UI", "CanvasLayer", ".", layer="5")
+    s.node("Minimap", "Control", "UI", script=mm)
+    s.node("Perf", "Label", "UI", script=po)
+
+
 def main_scene(glb_path, out_name):
   s = Scene()
   glb = s.add_ext("PackedScene", glb_path, "1_map")
@@ -261,7 +276,7 @@ def main_scene(glb_path, out_name):
   s.node("Main", "Node3D")
   s.node("WorldEnvironment", "WorldEnvironment", ".", environment='SubResource("env")')
   s.node("Sun", "DirectionalLight3D", ".", transform=T(0, 40, 0), rotation_degrees=SUN_ROT, light_color="Color(1, 0.9, 0.74, 1)",
-         light_energy="0.95", shadow_enabled="true", shadow_blur="1.5", directional_shadow_max_distance="140.0")
+         light_energy="0.95", shadow_enabled="true", shadow_blur="1.5", directional_shadow_max_distance="80.0", directional_shadow_mode="1")
   s.node("Map", parent=".", instance=glb)
   s.node("Navigation", "NavigationRegion3D", ".", navigation_mesh=nm)
   s.node("Collision", parent="Navigation", instance=col)
@@ -270,11 +285,13 @@ def main_scene(glb_path, out_name):
   s.node("Lamps", "Node3D", ".")
   for i, p in enumerate(meta["lamps"]):
       s.node(f"Lamp{i}", "OmniLight3D", "Lamps", groups=["lamps"], transform=T(*p), light_color="Color(1, 0.68, 0.36, 1)",
-             light_energy="1.4", omni_range="7.0", omni_attenuation="1.6")
+             light_energy="1.4", omni_range="7.0", omni_attenuation="1.6",
+             distance_fade_enabled="true", distance_fade_begin="45.0", distance_fade_length="10.0")
   # 6-bosqich: chiroqdan uzoq yopiq kataklarga ko'rinmas yumshoq to'ldiruvchi yorug'lik (qorong'i burchak qolmasin)
   for i, p in enumerate(FILL_LIGHTS):
       s.node(f"Fill{i}", "OmniLight3D", "Lamps", groups=["lamps"], transform=T(*p), light_color="Color(1, 0.86, 0.66, 1)",
-             light_energy="0.55", omni_range="7.5", omni_attenuation="1.2", light_specular="0.1")
+             light_energy="0.55", omni_range="7.5", omni_attenuation="1.2", light_specular="0.1",
+             distance_fade_enabled="true", distance_fade_begin="40.0", distance_fade_length="10.0")
   # fon tovushlari (hudud markazlarida) va yopiq joylarda aks-sado
   amb = {n: s.add_ext("AudioStream", f"res://audio/amb_{n}.wav", f"a_{n}") for n in AMB_FILES}
   s.node("Ambient", "Node3D", ".")
@@ -290,6 +307,7 @@ def main_scene(glb_path, out_name):
       s.node("Shape", "CollisionShape3D", f"Reverb/Rev{i}", shape=sh)
   ascr = s.add_ext("Script", "res://scripts/atmosphere.gd", "7_atm")
   s.node("Atmosphere", "Node3D", ".", script=ascr)
+  perf_nodes(s)
   s.node("Zones", "Node3D", ".")
   for kind, data, grp, h, vm in (("BombSite", L.BOMB_ZONES, "bomb_sites", 3.5, "vm_site"), ("BuyZone", L.BUY_ZONES, "buy_zones", 5.0, "vm_buy")):
       for k, (x0, z0, x1, z1) in data.items():
@@ -486,7 +504,7 @@ s.add_sub("Environment", "env", background_mode="2", sky='SubResource("sky")', a
 s.node("Bots", "Node3D")
 s.node("WorldEnvironment", "WorldEnvironment", ".", environment='SubResource("env")')
 s.node("Sun", "DirectionalLight3D", ".", transform=T(0, 40, 0), rotation_degrees=SUN_ROT, light_color="Color(1, 0.9, 0.74, 1)",
-       light_energy="0.95", shadow_enabled="true", directional_shadow_max_distance="140.0")
+       light_energy="0.95", shadow_enabled="true", directional_shadow_max_distance="80.0", directional_shadow_mode="1")
 s.node("Map", parent=".", instance=glb)
 s.node("Navigation", "NavigationRegion3D", ".", navigation_mesh=nm)
 s.node("Collision", parent="Navigation", instance=col)
@@ -495,6 +513,7 @@ for team, pts in L.SPAWNS.items():
     for i, (x0, z0) in enumerate(pts):
         s.node(f"{team}{i + 1}", "Marker3D", "Spawns", groups=[f"spawn_{team}"], transform=T(x0, 0.05, z0, yaw_pi=(team == "T")))
 s.node("BotMatch", "Node3D", ".", script=mscr)
+perf_nodes(s)
 s.node("Spectator", "Camera3D", ".", script=cscr, current="true")
 s.save(f"{OUT}/bots.tscn")
 
@@ -562,6 +581,7 @@ buses/default_bus_layout="res://default_bus_layout.tres"
 
 [rendering]
 
+occlusion_culling/use_occlusion_culling=true
 anti_aliasing/quality/msaa_3d=2
 lights_and_shadows/directional_shadow/size=8192
 textures/default_filters/anisotropic_filtering_level=4

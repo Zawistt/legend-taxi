@@ -7,6 +7,7 @@ cd "$(dirname "$0")"
 GODOT="${GODOT:-godot}"
 python3 analyze5.py
 python3 audio5.py
+python3 minimap5.py
 STYLE=greybox python3 build5.py
 STYLE=arch python3 build5.py
 rm -f ../godot/map/navmesh.res
@@ -23,6 +24,7 @@ python3 gen_godot5.py
 if [ -n "${SHOTS:-}" ]; then
   (cd ../godot && xvfb-run -a -s "-screen 0 1600x900x24" "$GODOT" --rendering-method gl_compatibility --rendering-driver opengl3 -s res://tools/screenshots.gd 2>&1 | grep -c saqlandi)
   python3 check_shots.py | tail -1
+  (cd ../godot && xvfb-run -a -s "-screen 0 1600x900x24" "$GODOT" --rendering-method gl_compatibility --rendering-driver opengl3 -s res://tools/perf.gd 2>&1 | grep "O'RTACHA")
 fi
 # 5v5 bot o'yinlari (uzoq: ~1.3 s / raund). BOTS=360 ./make_all.sh
 if [ -n "${BOTS:-}" ]; then

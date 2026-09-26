@@ -1,5 +1,7 @@
 # Qumtepa 5v5
 
+**Loyiha yakunlandi — [yakuniy hisobot](docs/YAKUNIY_HISOBOT.md).**
+
 Qumtepa v2 (2v2, 50×50 m) asosida 5v5 uchun yangi xarita: **110×110 m**, 55×55 katak (har biri 2 m).
 Godot 4.3, bomba rejimi (T hujum qiladi, CT himoya qiladi).
 
@@ -20,11 +22,11 @@ Godot 4.3, bomba rejimi (T hujum qiladi, CT himoya qiladi).
 | 4 | Arxitektura: 5 hudud uslubi (qal'a, bozor, madrasa, karvonsaroy, masjid), mo'ljal binolari | ✅ ([hisobot](docs/STAGE4.md)) |
 | 5 | Milliy buyumlar va teksturalar: girih, majolika, ganch, ayvon, vassa, atlas, so'zana, tandir, so'ri, paxta, chinor, Kalta Minor | ✅ ([hisobot](docs/STAGE5.md)) |
 | 6 | Yorug'lik (adolatli quyosh, qorong'i burchaksiz), shom rejimi, 6 xil fon tovushi, aks-sado | ✅ ([hisobot](docs/STAGE6.md)) |
-| 7 | Optimallashtirish (occlusion, LOD, MultiMesh), minimap, yakuniy testlar | ⏳ |
+| 7 | Optimallashtirish (bo'laklar, occlusion, masofada yashirish: −69% chizish), minimap, F9, yakuniy tekshiruv | ✅ ([hisobot](docs/STAGE7.md)) |
 
 ## O'ynash
 
-Godot 4.3 → Import → `qumtepa-5v5/godot/project.godot` → F5 (o'zingiz o'ynaysiz). `bots.tscn` → F6 — 5v5 bot o'yinini kuzatish. Boshqaruv: [STAGE2.md](docs/STAGE2.md), [STAGE3.md](docs/STAGE3.md).
+Godot 4.3 → Import → `qumtepa-5v5/godot/project.godot` → F5 (o'zingiz o'ynaysiz; M — xarita, F4 — shom, F9 — FPS). `bots.tscn` → F6 — 5v5 bot o'yinini kuzatish. Boshqaruv: [STAGE2.md](docs/STAGE2.md), [STAGE3.md](docs/STAGE3.md).
 
 ## Tuzilma
 
@@ -39,6 +41,7 @@ qumtepa-5v5/
 │   ├── textures5.py    # protsedural teksturalar (v2 + koshin, girih, majolika, ganch, atlas, so'zana ...)
 │   ├── audio5.py       # 6-bosqich: hududlarning fon tovushlari
 │   ├── check_shots.py  # 6-bosqich: skrinshotlardan ko'rinish (yorqinlik) tekshiruvi
+│   ├── minimap5.py     # 7-bosqich: minimap rasmi
 │   ├── gen_godot5.py   # Godot loyihasini yaratadi (sahna, collision, map_data, test ma'lumotlari)
 │   ├── make_all.sh     # hammasi ketma-ket + NavMesh + 79 ta Godot testi
 │   └── godot_src/      # Godot testlari va skrinshot skripti (manba)
@@ -53,7 +56,7 @@ O'yin skriptlari (o'yinchi, raund, HUD, bomba) va tovushlar `qumtepa-v2/` dan ol
 ```
 pip install numpy scipy pillow trimesh
 cd qumtepa-5v5/tools
-GODOT=/yo'l/godot4 ./make_all.sh     # 2D 59/59, Godot 88/88, smoke 10/10
+GODOT=/yo'l/godot4 ./make_all.sh     # 2D 59/59, Godot 93/93, smoke 10/10
 SHOTS=1 BOTS=360 GODOT=... ./make_all.sh   # + skrinshotlar va ko'rinish tekshiruvi, + 5v5 bot o'yinlari
 ```
 

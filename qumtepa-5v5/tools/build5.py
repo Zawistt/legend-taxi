@@ -221,6 +221,7 @@ for r in range(G):
 # ------------------------------------------------------------------ binolar (4x4 katakgacha bloklar, tasodifiy balandlik)
 H = np.zeros((G, G))
 BID = [[0] * G for _ in range(G)]
+BLOCKS = []
 done = np.zeros((G, G), bool)
 nblocks = 0
 for r in range(G):
@@ -245,6 +246,8 @@ for r in range(G):
             for cc in range(c, c + w):
                 BID[rr][cc] = nblocks + 1
         x0, z0, x1, z1 = cx(c), cz(r), cx(c + w), cz(r + h)
+        if touches:
+            BLOCKS.append((x0, z0, x1, z1, hh))      # 7-bosqich: occluder'lar uchun
         CUR_DIST = DIST[r][c]
         box("Walls-col", "wall" if rng.random() < 0.75 else "wall2", x0, 0, z0, x1, hh, z1)
         COL.append(("stone", x0, 0.0, z0, x1, hh + 0.55, z1))
@@ -677,30 +680,54 @@ for (a, b_, c_, d_) in ((E0 - 1, E0 - 1, E0, E1 + 1), (E1, E0 - 1, E1 + 1, E1 + 
     CLIP_P.append((a, 0.0, b_, c_, 12.0, d_))
 
 # ------------------------------------------------------------------ eksport
+# 7-bosqich: har bir (guruh, material) meshi 4x4 hududiy bo'lakka (27.5 m) ajratiladi — kameraga ko'rinmaydigan
+# bo'laklar chizilmaydi (frustum va occlusion culling), mayda bezaklarni masofa bo'yicha yashirish mumkin.
+# "Landmark" (mo'ljal binolari, tomdagi gumbazlar) bo'linmaydi — ular uzoqdan ko'rinishi kerak.
+CHUNKS = int(os.environ.get("CHUNKS", "4"))
+CH = SIZE / CHUNKS
 scene = trimesh.Scene()
 tris = 0
+nodes = 0
 for (group, mat), b in sorted(bufs.items()):
     if not b.f:
         continue
-    V = np.array(b.v); F = np.array(b.f)
+    V = np.array(b.v); F = np.array(b.f); UV = np.array(b.uv)
     area = np.linalg.norm(np.cross(V[F[:, 1]] - V[F[:, 0]], V[F[:, 2]] - V[F[:, 0]]), axis=1)
     F = F[area > 1e-9]
-    mesh = trimesh.Trimesh(vertices=V, faces=F, process=False)
-    mesh.visual = TextureVisuals(uv=np.array(b.uv), material=M[mat])
     tris += len(F)
-    name = f"{mat}_{group.replace('-col', '')}"
-    scene.add_geometry(mesh, node_name=name, geom_name=name)
+    gname = group.replace('-col', '')
+    if group.startswith("Landmark") or CHUNKS <= 1:
+        parts = {(0, 0): F}
+    else:
+        cen = V[F].mean(1)
+        ci = np.clip(((cen[:, 0] - OFF) // CH).astype(int), 0, CHUNKS - 1)
+        cj = np.clip(((cen[:, 2] - OFF) // CH).astype(int), 0, CHUNKS - 1)
+        parts = {}
+        for i_ in range(CHUNKS):
+            for j_ in range(CHUNKS):
+                sel = F[(ci == i_) & (cj == j_)]
+                if len(sel):
+                    parts[(i_, j_)] = sel
+    for (i_, j_), Fp in parts.items():
+        used = np.unique(Fp)
+        remap = -np.ones(len(V), int)
+        remap[used] = np.arange(len(used))
+        mesh = trimesh.Trimesh(vertices=V[used], faces=remap[Fp], process=False)
+        mesh.visual = TextureVisuals(uv=UV[used], material=M[mat])
+        name = f"{mat}_{gname}" + ("" if len(parts) == 1 and (i_, j_) == (0, 0) and (group.startswith("Landmark") or CHUNKS <= 1) else f"_c{i_}{j_}")
+        scene.add_geometry(mesh, node_name=name, geom_name=name)
+        nodes += 1
 os.makedirs(os.path.dirname(OUT_GLB), exist_ok=True)
 os.makedirs(os.path.dirname(OUT_META), exist_ok=True)
 scene.export(OUT_GLB, include_normals=True)
 if STYLE == "greybox":
     json.dump({"lamps": LAMPS, "tris": tris, "fp": FP, "plat": FP_PLAT, "col": COL, "ramps": RAMPS,
-               "clip_p": CLIP_P, "clip_g": CLIP_G}, open(OUT_META, "w"))
+               "clip_p": CLIP_P, "clip_g": CLIP_G, "blocks": BLOCKS}, open(OUT_META, "w"))
 else:
     # arxitektura modeli to'qnashuvni o'zgartirmasligini tekshirish
     old = json.load(open(OUT_META))
     same = json.loads(json.dumps(COL)) == old["col"] and json.loads(json.dumps(CLIP_P)) == old["clip_p"]
     assert same, "arch to'qnashuvi greybox bilan bir xil emas — avval STYLE=greybox ni ishga tushiring"
     print("bezaklar:", decor_stats)
-print(f"[{STYLE}] uchburchaklar {tris}, bloklar {nblocks}, chiroqlar {len(LAMPS)}, to'qnashuv qutilari {len(COL)}, "
+print(f"[{STYLE}] mesh bo'laklari {nodes}, uchburchaklar {tris}, bloklar {nblocks}, chiroqlar {len(LAMPS)}, to'qnashuv qutilari {len(COL)}, "
       f"GLB {os.path.getsize(OUT_GLB) / 1e6:.1f} MB")
