@@ -169,6 +169,21 @@ Hamma yurishlar bir xil siklda (0.6 s). Shu sababli sekin yurish ↔ yugurish �
 2. **Animatsiyalar kod bilan yozilgan, harakatni yozib olish (mocap) emas.** Ular aniq va bir xil, lekin professional mocap'dek jonli emas. Mixamo yoki mocap animatsiyasini xuddi shu skeletga qo'yish mumkin.
 3. **O'yinchining o'qi faqat ko'rinish va tovush.** Hozircha o'yinchi otganda zarar berish tizimi yo'q, u keyingi ish. Botlarning o'z jang modeli bor.
 
-## 4. Yakuniy bot sinovi
+## 4. Yakuniy bot sinovi (360 raund, seed 3)
 
-`bots_final.txt` ga qarang (360 raund, seed 3, 7-bosqich AI, yangi NavMesh).
+| | 7-bosqich | 8-bosqich (yakuniy) |
+|---|---|---|
+| T umumiy | 55.6% | 60.6% |
+| T, A site'ga | 58.8% | 61.9% |
+| T, B site'ga | 53.0% | 59.5% |
+| **A va B farqi** | 5.8 foiz | **2.4 foiz** ✅ (maqsad ≤ 10) |
+| Bomba o'rnatildi | 85.0% | 84.4% |
+| Qaytarib olish | 40.5% | 32.6% |
+
+- **Site balansi yaxshilandi.** A va B deyarli teng.
+- **T umumiy g'alabasi 45–55% maqsaddan yuqori.**
+  - Sababi: NavMesh tozalangach, botlarning yo'llari o'zgardi. Xarita (devorlar, panalar, masofalar) o'zgarmadi.
+  - CT botlar sust aylanadi va qaytarib olishda yakkama-yakka kiradi.
+  - Buni tuzatishga urinish bo'ldi (1-bo'lim, 4-band), lekin ahvol yomonlashdi va u qaytarildi.
+  - Bu bot mantig'i masalasi. Haqiqiy o'yinchilar bilan tekshirish kerak.
+- **Batafsil:** `bots_final_stage8.txt` va `bots_final_stage8.json`.

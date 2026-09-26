@@ -43,7 +43,7 @@ Me'morchiligi o'zbek milliy uslubida. 8 bosqichning hammasi bajarildi: xarita, a
 | Teksturalar | 28 ta 1024 px PBR material (rang, normal, ORM, relyef) + osmon panoramasi + 4 decal |
 | Personajlar | T (AKM) va CT (M416): 29 suyak, 21 animatsiya |
 | To'qnashuv qutilari | 986 |
-| Bot sinovlari | 5 × 360 = 1800 raund |
+| Bot sinovlari | 8 × 360 = 2880 raund |
 | Avtomatik tekshiruvlar | 59 + 111 + 10 + 6 + 22 = **208** |
 
 ## Qanday ochish
@@ -84,8 +84,8 @@ Har bir o'zgarishdan keyin testlar balans buzilmaganini darhol ko'rsatadi.
 
 ## Ochiq qolgan masalalar (haqiqiy o'yinchilar sinovi kerak)
 
-1. **T umumiy g'alabasi botlarda 55–58%, maqsad 45–55%.** Asosan bot mantig'idan: CT botlar sekin aylanadi.
-   Haqiqiy o'yinchilar bilan tekshirish kerak.
+1. **T umumiy g'alabasi botlarda 55–61%, maqsad 45–55%.** A/B farqi atigi 2.4 foiz, ya'ni site'lar teng.
+   Ortiqcha T ustunligi bot mantig'idan kelib chiqadi (CT botlar sekin aylanadi). Haqiqiy o'yinchilar bilan tekshirish kerak.
 2. **Mid doors smoke kuchli.** Mid taktikalari botlarda 60–74% natija berdi. CT mid'ga qo'shimcha burchak kerakmi, o'yinda ko'rish kerak.
 3. **Platforma duellari (birinchi o'limlar):** B platforma ↔ Lower tunnels dueli T foydasiga (~57%),
    A platforma ↔ Long dueli esa taxminan teng (48–53%). Site umumiy natijasi teng, lekin buni o'yinda kuzatish foydali.
