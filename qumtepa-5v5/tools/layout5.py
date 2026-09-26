@@ -399,8 +399,18 @@ DISTRICT = _district_grid()
 # Mo'ljal binolari (faqat bezak, to'qnashuvsiz, o'yin maydonidan tashqarida)
 LANDMARKS = [
     ("minora", -52.0, 31.0),        # A: madrasa minorasi — Long va A site dan ko'rinadi
-    ("badgir", 52.0, 31.0),         # B: karvonsaroy shamol minorasi
+    ("kalta_minor", 52.0, 31.0),    # B: Xivadagi Kalta Minor uslubidagi yo'g'on koshinli minora
     ("gumbaz", 0.0, 27.0),          # CT: katta firuza gumbaz — Top mid dan Mid doors orqali ko'rinadi
     ("burj", -17.0, -53.0),         # T: qal'a darvozasi burjlari
     ("burj", 17.0, -53.0),
 ]
+
+# ================================================================== 5-bosqich: milliy buyumlar (faqat mavjud panalar o'rnida)
+# Paxta toylari: karvonsaroy va bozor hududidagi qutilar (sirt — mato). Tandir: bozor va masjid hududidagi bochkalar (sirt — tosh).
+# So'ri (sufa): platformalar (sirt — yog'och). Chinor: palmalar o'rnida (to'qnashuv — o'sha tana).
+PAXTA_DISTRICTS = {"karvon", "bozor"}
+TANDIR_DISTRICTS = {"bozor", "masjid"}
+
+
+def district_at(x, z):
+    return DISTRICT[int((z - ORIGIN) // CELL)][int((x - ORIGIN) // CELL)]

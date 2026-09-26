@@ -5,6 +5,8 @@ Godot 4.3, bomba rejimi (T hujum qiladi, CT himoya qiladi).
 
 ![B site — karvonsaroy](docs/shots/09_b_site_karvonsaroy.png)
 
+![Kalta Minor](docs/shots/16_kalta_minor.png)
+
 ![1-bosqich chizmasi](docs/blueprint_stage1.png)
 
 ## Bosqichlar
@@ -16,8 +18,8 @@ Godot 4.3, bomba rejimi (T hujum qiladi, CT himoya qiladi).
 | 2 | Godot greybox: qutilardan 3D, collision, NavMesh, spawn, zonalar, raund, testlar | ✅ ([hisobot](docs/STAGE2.md)) |
 | 3 | Balans sinovi: smoke lineup'lari, 5v5 botlar (1080 raund), tuzatishlar | ✅ ([hisobot](docs/STAGE3.md)) |
 | 4 | Arxitektura: 5 hudud uslubi (qal'a, bozor, madrasa, karvonsaroy, masjid), mo'ljal binolari | ✅ ([hisobot](docs/STAGE4.md)) |
-| 5 | Props va teksturalar, sirt turlari | ⏳ |
-| 6 | Yorug'lik, osmon, atmosfera, tovush zonalari | — |
+| 5 | Milliy buyumlar va teksturalar: girih, majolika, ganch, ayvon, vassa, atlas, so'zana, tandir, so'ri, paxta, chinor, Kalta Minor | ✅ ([hisobot](docs/STAGE5.md)) |
+| 6 | Yorug'lik, osmon, atmosfera, tovush zonalari | ⏳ |
 | 7 | Optimallashtirish (occlusion, LOD, MultiMesh), minimap, yakuniy testlar | — |
 
 ## O'ynash

@@ -14,22 +14,22 @@ import numpy as np
 STYLE = {
     "qala":    {"wall": "sandstone_dk", "trim": "sandstone", "floor": "flagstone", "door": 0.10, "win": 0.55, "slit": True,
                 "balcony": 0.0, "awning": 0.0, "carpet": 0.0, "pishtoq": 0.0, "pilaster": 0.0, "beams": 0.2, "crenel": 0.95,
-                "roof": ("none", 0.0), "frieze": None},
+                "roof": ("none", 0.0), "frieze": None, "ceiling": "vassa"},
     "bozor":   {"wall": "plaster", "trim": "sandstone", "floor": "cobble", "door": 0.5, "win": 0.3, "slit": False,
                 "balcony": 0.08, "awning": 0.85, "carpet": 0.5, "pishtoq": 0.0, "pilaster": 0.0, "beams": 0.5, "crenel": 0.0,
-                "roof": ("shed", 0.35), "frieze": None},
+                "roof": ("shed", 0.35), "frieze": None, "ceiling": "vassa", "ayvon": 0.12, "lagan": 0.14},
     "madrasa": {"wall": "plaster_w", "trim": "sandstone", "floor": "flagstone", "door": 0.12, "win": 0.4, "slit": False,
                 "balcony": 0.0, "awning": 0.0, "carpet": 0.0, "pishtoq": 0.22, "pilaster": 0.0, "beams": 0.0, "crenel": 0.0,
-                "roof": ("dome_small", 0.25), "frieze": "tile_blue"},
+                "roof": ("dome_small", 0.25), "frieze": "girih", "ceiling": "plaster", "ayvon": 0.08},
     "karvon":  {"wall": "brick", "trim": "sandstone", "floor": "flagstone", "door": 0.12, "win": 0.4, "slit": False,
                 "balcony": 0.22, "awning": 0.1, "carpet": 0.0, "pishtoq": 0.0, "pilaster": 0.0, "beams": 0.8, "crenel": 0.0,
-                "roof": ("pergola", 0.3), "frieze": None},
+                "roof": ("pergola", 0.3), "frieze": None, "ceiling": "vassa"},
     "masjid":  {"wall": "plaster_w", "trim": "sandstone", "floor": "flagstone", "door": 0.12, "win": 0.45, "slit": False,
                 "balcony": 0.0, "awning": 0.0, "carpet": 0.0, "pishtoq": 0.12, "pilaster": 0.45, "beams": 0.0, "crenel": 0.0,
-                "roof": ("dome", 0.45), "frieze": "tile_turq"},
+                "roof": ("dome", 0.45), "frieze": "majolica", "ceiling": "plaster_w", "ayvon": 0.12, "lagan": 0.1},
 }
 OPEN = set(".AB")
-AWNINGS = ["awning_r", "awning_b", "awning_g"]
+AWNINGS = ["awning_r", "awning_b", "awning_g", "atlas_1", "atlas_2", "atlas_1"]
 
 
 def decorate(ctx):
@@ -38,7 +38,7 @@ def decorate(ctx):
     grid, H, DIST, G = ctx["grid"], ctx["H"], ctx["DIST"], ctx["G"]
     cx, cz, ctype, COVER, BID = ctx["cx"], ctx["cz"], ctx["ctype"], ctx["COVER"], ctx["BID"]
     rng = np.random.default_rng(7)
-    stats = {"eshik": 0, "deraza": 0, "balkon": 0, "soyabon": 0, "gilam": 0, "peshtoq": 0, "gumbaz": 0}
+    stats = {"eshik": 0, "deraza": 0, "balkon": 0, "soyabon": 0, "gilam": 0, "peshtoq": 0, "gumbaz": 0, "ayvon": 0, "lagan": 0}
 
     # ------------------------------------------------------------------ facade yordamchilari (v2 dan, uslubga moslangan)
     def quoins(ax, fx, out, end, s2, hh, mat):
@@ -82,8 +82,8 @@ def decorate(ctx):
         fbox("Decor", trim, m - 0.3, m + 0.3, wy + 1.2, wy + 1.35, 0, 0.12)
         stats["deraza"] += 1
 
-    def arched_door(fbox, ax, fx, out, m, trim):
-        fbox("Decor", "door", m - 0.62, m + 0.62, 0.02, 2.4, 0.0, 0.05, unit=True)
+    def arched_door(fbox, ax, fx, out, m, trim, door="carved_wood"):
+        fbox("Decor", door, m - 0.62, m + 0.62, 0.02, 2.4, 0.0, 0.05, unit=True)
         fbox("Decor", "dark", m - 0.62, m + 0.62, 2.4, 3.0, 0.0, 0.02)
         for sgn in (-1, 1):
             a, b = sorted((m + sgn * 0.62, m + sgn * 0.86))
@@ -110,7 +110,7 @@ def decorate(ctx):
         stats["soyabon"] += 1
 
     def carpet(fbox, m):
-        fbox("Decor", "carpet", m - 0.7, m + 0.7, 2.7, 4.9, 0.0, 0.04, unit=True)
+        fbox("Decor", "suzani" if rng.random() < 0.6 else "carpet", m - 0.7, m + 0.7, 2.7, 4.9, 0.0, 0.04, unit=True)
         fbox("Decor", "beam", m - 0.85, m + 0.85, 4.9, 5.0, 0.0, 0.08, scale=1)
         stats["gilam"] += 1
 
@@ -145,6 +145,30 @@ def decorate(ctx):
         arch_wall("Decor", ax, fx + out * 0.06, 0.06, m - 0.42, m + 0.42, ntop + 0.35, ntop, mat="plaster_w", seg=12, col=False)
         fbox("Decor", "sandstone", m - 1.0, m + 1.0, top, top + 0.15, 0, 0.14)
         stats["peshtoq"] += 1
+
+    def ayvon(fbox, a0, a1, hh):
+        # ayvon: devorga yopishgan ikki o'ymakor yarim ustun va 3.3 m balandlikdagi vassa soyabon (ko'z chizig'idan yuqori)
+        for p in (a0 + 0.3, a1 - 0.3):
+            fbox("Decor", "carved_wood", p - 0.11, p + 0.11, 0.0, 3.05, 0.0, 0.14, unit=True)
+            fbox("Decor", "carved_wood", p - 0.2, p + 0.2, 3.05, 3.3, 0.0, 0.2, unit=True)
+        fbox("Decor", "vassa", a0 - 0.05, a1 + 0.05, 3.3, 3.42, 0.0, 1.3, scale=1.2)
+        fbox("Decor", "beam", a0 - 0.08, a1 + 0.08, 3.42, 3.6, 1.18, 1.34, scale=1)
+        fbox("Decor", "ganch", a0 + 0.45, a1 - 0.45, 0.55, 3.0, 0.0, 0.03, scale=1.2)
+        stats["ayvon"] += 1
+
+    def lagans(fbox, a0, a1, ax, fx, out):
+        # Rishton laganlari devorda (disklar, 0.02 m chiqadi)
+        for k, (p, y, r) in enumerate(((a0 + 0.5, 3.1, 0.28), (a0 + 1.0, 3.35, 0.34), (a1 - 0.5, 3.1, 0.28))):
+            n = 16
+            ctr = (p, y, fx + out * 0.03) if ax == "x" else (fx + out * 0.03, y, p)
+            for i in range(n):
+                t0, t1 = 2 * math.pi * i / n, 2 * math.pi * (i + 1) / n
+                def P(t):
+                    return (p + r * math.cos(t), y + r * math.sin(t), fx + out * 0.03) if ax == "x" else (fx + out * 0.03, y + r * math.sin(t), p + r * math.cos(t))
+                uv = lambda t: (0.5 + 0.5 * math.cos(t), 0.5 - 0.5 * math.sin(t))
+                nrm = np.array((0, 0, out)) if ax == "x" else np.array((out, 0, 0))
+                quad("Decor", "lagan", [ctr, P(t0), P(t1), ctr], [(0.5, 0.5), uv(t0), uv(t1), (0.5, 0.5)], nrm)
+        stats["lagan"] += 1
 
     # ------------------------------------------------------------------ facade'lar
     QUO = set()
@@ -195,10 +219,12 @@ def decorate(ctx):
                     if st["pilaster"] and (r + c) % 2 == 0 and rng.random() < st["pilaster"]:
                         fbox("Decor", trim, a0, a0 + 0.22, 0.55, hh - 0.4, 0, 0.14)
                     roll = rng.random()
-                    if roll < st["pishtoq"] and hh > 6.4:
+                    if st.get("ayvon") and rng.random() < st["ayvon"] and hh > 6.4:
+                        ayvon(fbox, a0, a1, hh)
+                    elif roll < st["pishtoq"] and hh > 6.4:
                         pishtoq(fbox, ax, fx, out, m, hh, st["frieze"] or "tile_blue")
                     elif roll < st["pishtoq"] + st["door"]:
-                        arched_door(fbox, ax, fx, out, m, trim)
+                        arched_door(fbox, ax, fx, out, m, trim, "door" if DIST[r][c] == "qala" else "carved_wood")
                         if rng.random() < st["awning"]:
                             awning(fbox, ax, fx, out, m, AWNINGS[int(rng.integers(3))])
                     elif hh > 6.4 and roll < st["pishtoq"] + st["door"] + st["balcony"]:
@@ -213,9 +239,15 @@ def decorate(ctx):
                             fbox("Decor", AWNINGS[int(rng.integers(3))], m - 0.75, m + 0.75, wy + 1.55, wy + 1.62, 0, 0.7, scale=2)
                     elif rng.random() < st["carpet"]:
                         carpet(fbox, m)
+                    elif st.get("lagan") and rng.random() < st["lagan"] / 0.5:
+                        lagans(fbox, a0, a1, ax, fx, out)
                 elif nt in COVER:
-                    # yopiq yo'lak devori: past poydevor, suvoq tasma
-                    fbox("Decor", "plaster", a0, a1, 2.2, 2.3, 0, 0.06)
+                    # yopiq yo'lak devori: suvoq tasma; masjid hududida ganch panel
+                    if DIST[r][c] == "masjid":
+                        fbox("Decor", "ganch", a0, a1, 2.3, 3.6, 0, 0.03, scale=1.2)
+                        fbox("Decor", "sandstone", a0, a1, 2.2, 2.3, 0, 0.06)
+                    else:
+                        fbox("Decor", "plaster", a0, a1, 2.2, 2.3, 0, 0.06)
 
     # ------------------------------------------------------------------ tomlar: tishli devorlar, gumbazlar, soyabonlar
     done = set()
@@ -320,15 +352,18 @@ def decorate(ctx):
                 box("Decor", "dark", x + 1.31 * math.cos(a) - 0.2, y + 1.2, z + 1.31 * math.sin(a) - 0.2,
                     x + 1.31 * math.cos(a) + 0.2, y + 2.8, z + 1.31 * math.sin(a) + 0.2)
             lathe("Decor", "dome", x, 0, z, [(1.45, y + 3.6), (1.2, y + 4.6), (0.6, y + 5.4), (0.0, y + 5.8)], 20, 2)
-        elif kind == "badgir":
-            s = 1.8
-            box("Decor", "brick", x - s, 0, z - s, x + s, base + 9, z + s, scale=1.6)
-            for k in range(3):
-                for side in (-1, 1):
-                    xx = x - s + 0.4 + k * 1.2
-                    box("Decor", "dark", xx, base + 6.2, z + side * s - 0.02, xx + 0.5, base + 8.4, z + side * s + 0.02)
-                    box("Decor", "dark", x + side * s - 0.02, base + 6.2, z - s + 0.4 + k * 1.2, x + side * s + 0.02, base + 8.4, z - s + 0.9 + k * 1.2)
-            box("Decor", "wood_light", x - s - 0.3, base + 9, z - s - 0.3, x + s + 0.3, base + 9.3, z + s + 0.3, scale=1.2)
+        elif kind == "kalta_minor":
+            # Kalta Minor (Xiva): yo'g'on, qisqa, tugallanmagan minora, butunlay sirli koshin tasmalar bilan qoplangan
+            H0 = base + 12
+            prof = [(3.4, 0), (3.4, base + 0.5), (3.1, base + 0.8), (2.6, H0)]
+            lathe("Decor", "brick", x, 0, z, prof, 32, 1.6)
+            bands = ["tile_turq", "majolica", "girih", "tile_turq", "majolica", "dome"]
+            for i, mat in enumerate(bands):
+                y0 = base + 1.4 + i * 1.75
+                r0 = 3.1 - (y0 - base - 0.8) / (H0 - base - 0.8) * 0.5 + 0.02
+                r1 = 3.1 - (y0 + 1.1 - base - 0.8) / (H0 - base - 0.8) * 0.5 + 0.02
+                lathe("Decor", mat, x, 0, z, [(r0, y0), (r1, y0 + 1.1)], 32, 1.0)
+            lathe("Decor", "sandstone", x, 0, z, [(2.62, H0), (2.8, H0 + 0.25), (2.3, H0 + 0.3), (0.0, H0 + 0.3)], 32, 2)
         elif kind == "gumbaz":
             rad = 5.5
             lathe("Decor", "plaster_w", x, 0, z, [(rad + 0.4, base), (rad + 0.4, base + 2.6), (rad + 0.7, base + 2.8), (rad, base + 3.0)], 32, 3)

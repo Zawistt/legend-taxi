@@ -1,5 +1,7 @@
 # 4-bosqich: arxitektura — hisobot
 
+> Eslatma: 5-bosqichda badgir Kalta Minor'ga, palmalar chinorga almashtirildi; skrinshotlar yangilangan.
+
 **Natija:** greybox qutilari o'rniga 5 ta hudud uslubidagi arxitektura qurildi. O'yin geometriyasi
 **aynan bir xil** qoldi. Buning isboti: 3-bosqichdagi 360 raundlik bot sinovi xuddi shu seed bilan qayta o'ynaldi
 va natija raqamma-raqam bir xil chiqdi (T 57.8%, A 56.9%, B 58.5%). Testlar: 2D 59/59, Godot 79/79, smoke 10/10.

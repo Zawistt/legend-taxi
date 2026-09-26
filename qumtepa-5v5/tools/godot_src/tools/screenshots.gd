@@ -16,6 +16,9 @@ const VIEWS := [
 	["11_ct_spawn", Vector3(3, 1.7, 47), Vector3(0, 11.0, 27), 80.0],
 	["12_a_site_minora", Vector3(-24, 1.7, 26), Vector3(-50, 12.0, 31), 80.0],
 	["13_t_spawn_qala", Vector3(0, 1.7, -40.5), Vector3(0, 2.0, -50), 80.0],
+	["14_tandir_bozor", Vector3(11.5, 1.6, -25.0), Vector3(13.5, 0.6, -22.5), 70.0],
+	["15_sori_b_platforma", Vector3(41.0, 2.2, 21.0), Vector3(47.5, 1.0, 23.0), 75.0],
+	["16_kalta_minor", Vector3(38.0, 1.7, 22.0), Vector3(52.0, 12.0, 31.0), 75.0],
 ]
 
 

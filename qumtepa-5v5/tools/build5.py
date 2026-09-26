@@ -75,9 +75,9 @@ bufs = {}
 CUR_DIST = None     # hozir qurilayotgan qismning uslubi (arch rejimida materialni tanlash uchun)
 DIST = LY.DISTRICT
 ART_MAP = {"ceiling": "plaster", "cover_high": "crate", "cover_low": "crate", "metal_crate": "green", "ruin": "sandstone",
-           "platform": "sandstone", "sandbag": "cloth", "trunk": "bark", "barrel": "beam", "urn": "clay", "trim": "sandstone",
+           "platform": "wood_light", "sandbag": "cloth", "trunk": "bark", "barrel": "beam", "urn": "clay", "trim": "sandstone",
            "floor_site": "flagstone", "floor_cover": "flagstone", "floor_t": "flagstone", "floor_ct": "flagstone"}
-ART_SCALE = {"brick": 1.6, "cobble": 2.5, "flagstone": 3.0, "plaster": 3.0, "plaster_w": 3.0, "tile_blue": 1.0,
+ART_SCALE = {"vassa": 1.2, "girih": 1.5, "majolica": 1.0, "ganch": 1.2, "atlas_1": 1.5, "atlas_2": 1.5, "brick": 1.6, "cobble": 2.5, "flagstone": 3.0, "plaster": 3.0, "plaster_w": 3.0, "tile_blue": 1.0,
              "tile_turq": 1.0, "dome": 1.5, "roof": 2.0, "cloth": 0.8, "beam": 1.2, "wood_light": 1.2}
 
 
@@ -89,6 +89,8 @@ def resolve(mat):
         return arch5.STYLE[CUR_DIST]["wall"]
     if mat == "floor_open":
         return arch5.STYLE[CUR_DIST]["floor"]
+    if mat == "ceiling":
+        return arch5.STYLE[CUR_DIST].get("ceiling", "plaster")
     return ART_MAP.get(mat, mat)
 
 
@@ -260,6 +262,7 @@ for r in range(G):
         t = grid[r][c]
         if t in COVER:
             h = COVER[t]
+            CUR_DIST = DIST[r][c]
             box("Walls-col", "ceiling", cx(c), h, cz(r), cx(c) + CS, h + SLAB, cz(r) + CS, bottom=True)
             COL.append(("stone", cx(c), h, cz(r), cx(c) + CS, h + SLAB + 0.05, cz(r) + CS))
             CLIP_P.append((cx(c), h + SLAB + 0.05, cz(r), cx(c) + CS, 12.0, cz(r) + CS))
@@ -328,17 +331,37 @@ def crate(x, z, s=1.1, y=0.0, yaw=0.0, green=False):
 
 def stack(x, z, pattern, yaw=0.0):
     tall = max(y + s for _dx, _dz, y, s, _g in pattern) >= EYE_BLOCK
+    paxta = LY.district_at(x, z) in LY.PAXTA_DISTRICTS      # 5-bosqich: paxta toylari (mato sirti)
     for dx, dz, y, s, g in pattern:
         if y == 0:
             FP.append((x + dx - s / 2, z + dz - s / 2, x + dx + s / 2, z + dz + s / 2))
-        COL.append(("metal" if g else "wood", x + dx - s / 2, y, z + dz - s / 2, x + dx + s / 2, y + s, z + dz + s / 2))
+        surf = "metal" if g else ("cloth" if paxta else "wood")
+        COL.append((surf, x + dx - s / 2, y, z + dz - s / 2, x + dx + s / 2, y + s, z + dz + s / 2))
+        if STYLE == "arch" and paxta and not g:
+            bale(x + dx, y, z + dz, s)
+            continue
         mat = "metal_crate" if g else ("cover_high" if tall else "cover_low")
         box("Props-col", mat, x + dx - s / 2, y, z + dz - s / 2, x + dx + s / 2, y + s, z + dz + s / 2, unit=True, yaw=yaw)
 
 
+def bale(x, y, z, s):
+    """paxta toyi: biroz yumaloqlangan qanor bo'lak, arqon bilan bog'langan (to'qnashuv — o'sha quti)"""
+    e = 0.04
+    box("Props-col", "paxta", x - s / 2 + e, y, z - s / 2 + e, x + s / 2 - e, y + s - e, z + s / 2 - e, unit=True)
+    box("Props-col", "paxta", x - s / 2, y + 0.08, z - s / 2 + 0.1, x + s / 2, y + s - 0.12, z + s / 2 - 0.1, unit=True)
+    box("Props-col", "paxta", x - s / 2 + 0.1, y + 0.08, z - s / 2, x + s / 2 - 0.1, y + s - 0.12, z + s / 2, unit=True)
+
+
 def barrel(x, z):
     FP.append((x - .4, z - .4, x + .4, z + .4))
-    COL.append(("wood", x - .4, 0.0, z - .4, x + .4, 0.9, z + .4))
+    tandir = LY.district_at(x, z) in LY.TANDIR_DISTRICTS    # 5-bosqich: tandir (tosh sirti)
+    COL.append(("stone" if tandir else "wood", x - .4, 0.0, z - .4, x + .4, 0.9, z + .4))
+    if STYLE == "arch" and tandir:
+        # tandir: loy gumbaz, yon tomonida og'zi, pastida g'isht supa
+        box("Props-col", "brick", x - 0.42, 0, z - 0.42, x + 0.42, 0.22, z + 0.42, scale=1.6)
+        lathe("Props-col", "clay", x, 0, z, [(0.40, 0.22), (0.41, 0.45), (0.36, 0.7), (0.24, 0.86), (0.16, 0.9), (0.0, 0.9)], 16, 1.5)
+        lathe("Decor", "dark", x, 0, z, [(0.15, 0.905), (0.0, 0.905)], 12)
+        return
     if STYLE == "arch":
         lathe("Props-col", "barrel", x, 0, z, [(0.0, 0), (0.33, 0), (0.38, 0.25), (0.40, 0.45), (0.38, 0.65), (0.33, 0.9), (0.0, 0.9)], 14, 1.5)
         for y in (0.2, 0.7):
@@ -408,8 +431,10 @@ def wall(x0, z0, x1, z1, h):
 
 def platform(x0, z0, x1, z1, h, stair_dir):
     FP_PLAT.append((x0, z0, x1, z1, h))
-    COL.append(("stone", x0, 0.0, z0, x1, h, z1))
+    COL.append(("wood", x0, 0.0, z0, x1, h, z1))          # 5-bosqich: so'ri (yog'och sirti)
     box("Props-col", "platform", x0, 0, z0, x1, h, z1)
+    if STYLE == "arch":
+        sufa_decor(x0, z0, x1, z1, h, stair_dir)
     steps = 4
     L = steps * 0.35 + 0.35
     zA, zB = z0 + 0.3, z1 - 0.3
@@ -424,11 +449,61 @@ def platform(x0, z0, x1, z1, h, stair_dir):
             box("Props-col", "platform", x0 - d, 0, z0 + 0.3, x0, sh, z1 - 0.3)
 
 
+def sufa_decor(x0, z0, x1, z1, h, stair_dir):
+    """so'ri: o'ymakor yog'och yon devorlar, ustida so'zana to'shalgan, orqa chetida yostiqlar (faqat ko'rinish)"""
+    for zz in (z0, z1 - 0.06):
+        box("Decor", "carved_wood", x0 - 0.02, 0.05, zz - 0.02, x1 + 0.02, h - 0.05, zz + 0.08, unit=True)
+    bx = x0 if stair_dir == "+x" else x1 - 0.06
+    box("Decor", "carved_wood", bx - 0.02, 0.05, z0, bx + 0.08, h - 0.05, z1, unit=True)
+    box("Decor", "wood_light", x0 - 0.05, h - 0.06, z0 - 0.05, x1 + 0.05, h, z1 + 0.05, scale=1.2)
+    quad("Decor", "suzani", [(x0 + 0.2, h + 0.01, z0 + 0.3), (x1 - 0.2, h + 0.01, z0 + 0.3), (x1 - 0.2, h + 0.01, z1 - 0.3), (x0 + 0.2, h + 0.01, z1 - 0.3)],
+         [(0, 0), (1, 0), (1, 3), (0, 3)], np.array([0, 1, 0]))
+    # yostiqlar orqa chetda (zinapoyaning qarshi tomonida), 0.25 m — ko'rishga ta'sir qilmaydi
+    cx0 = x0 + 0.05 if stair_dir == "+x" else x1 - 0.45
+    zz = z0 + 0.4
+    k = 0
+    while zz < z1 - 0.8:
+        box("Decor", "atlas_1" if k % 2 == 0 else "atlas_2", cx0, h, zz, cx0 + 0.4, h + 0.28, zz + 0.9, unit=True)
+        zz += 1.0
+        k += 1
+
+
+def chinor(x, z, h=7.5):
+    """chinor daraxti: yo'g'on oqish tana, 3 ta shox, barg kartochkalaridan toj (faqat tana to'qnashuvi)"""
+    prng = np.random.default_rng(int(abs(x * 29 + z * 11)))
+    lathe("Decor", "bark_light", x, 0, z, [(0.27, 0), (0.22, h * 0.45), (0.18, h * 0.6), (0.0, h * 0.62)], 10, 1.0)
+    crowns = [(x, h * 0.9, z, 2.8)]
+    for k in range(3):
+        a = k * 2.1 + prng.uniform(0, 0.8)
+        ex, ez = x + math.cos(a) * 1.6, z + math.sin(a) * 1.6
+        ey = h * 0.62 + prng.uniform(0.8, 1.6)
+        v = np.array([ex - x, ey - h * 0.55, ez - z])
+        L_ = np.linalg.norm(v)
+        for i in range(6):
+            t0, t1 = i / 6, (i + 1) / 6
+            p0 = np.array([x, h * 0.55, z]) + v * t0
+            p1 = np.array([x, h * 0.55, z]) + v * t1
+            r0, r1 = 0.14 * (1 - t0 * 0.5), 0.14 * (1 - t1 * 0.5)
+            side = np.array([-v[2], 0, v[0]]) / max(1e-6, math.hypot(v[0], v[2]))
+            quad("Decor", "bark_light", [p0 - side * r0, p0 + side * r0, p1 + side * r1, p1 - side * r1], [(0, 0), (1, 0), (1, 1), (0, 1)], np.array([0, 0, 1]))
+            quad("Decor", "bark_light", [p0 - side * r0, p0 + side * r0, p1 + side * r1, p1 - side * r1][::-1], [(0, 0), (1, 0), (1, 1), (0, 1)][::-1], np.array([0, 0, -1]))
+        crowns.append((ex, ey + 0.6, ez, 2.2))
+    for (px_, py_, pz_, r) in crowns:
+        for k in range(4):
+            a = k * math.pi / 4 + prng.uniform(0, 0.3)
+            dx, dz = math.cos(a) * r, math.sin(a) * r
+            quad("Decor", "leaves", [(px_ - dx, py_ - r * 0.8, pz_ - dz), (px_ + dx, py_ - r * 0.8, pz_ + dz),
+                                     (px_ + dx, py_ + r * 0.8, pz_ + dz), (px_ - dx, py_ + r * 0.8, pz_ - dz)],
+                 [(0, 1), (1, 1), (1, 0), (0, 0)], np.array([-dz, 0, dx]))
+        quad("Decor", "leaves", [(px_ - r, py_, pz_ - r), (px_ + r, py_, pz_ - r), (px_ + r, py_, pz_ + r), (px_ - r, py_, pz_ + r)],
+             [(0, 1), (1, 1), (1, 0), (0, 0)], np.array([0, 1, 0]))
+
+
 def palm(x, z, h=7.5):
     FP.append((x - .28, z - .28, x + .28, z + .28))
     COL.append(("wood", x - .22, 0.0, z - .22, x + .22, h * 0.9, z + .22))
     if STYLE == "arch":
-        palm_art(x, z, h)
+        chinor(x, z, h)          # 5-bosqich: palma o'rnida chinor
         return
     lathe("Decor", "trunk", x, 0, z, [(0.26, 0), (0.2, h * 0.5), (0.16, h), (0.0, h)], 8)
     lathe("Decor", "foliage", x, 0, z, [(0.0, h + 0.6), (2.6, h - 0.4), (1.8, h - 1.2), (0.0, h - 0.6)], 10)
@@ -585,6 +660,9 @@ if STYLE == "arch":
     V2T = TX.V2
     M["frond"] = PBRMaterial(name="palm_frond", baseColorTexture=V2T.frond(), alphaMode="MASK", alphaCutoff=0.5, doubleSided=True, metallicFactor=0, roughnessFactor=0.8)
     M["frond_core"] = PBRMaterial(name="palm_core", baseColorFactor=[70, 85, 35, 255], metallicFactor=0)
+    M["leaves"] = PBRMaterial(name="chinor_leaves", baseColorTexture=TX.leaves(), alphaMode="MASK", alphaCutoff=0.5, doubleSided=True, metallicFactor=0, roughnessFactor=0.9)
+    M["lagan"] = PBRMaterial(name="lagan", baseColorTexture=TX.lagan(), alphaMode="MASK", alphaCutoff=0.5, metallicFactor=0, roughnessFactor=0.3)
+    M["bark_light"] = PBRMaterial(name="chinor_bark", baseColorTexture=T["bark"][0], baseColorFactor=[220, 205, 180, 255], doubleSided=True, metallicFactor=0, roughnessFactor=1)
     M["siteA"] = PBRMaterial(name="site_A", baseColorTexture=V2T.site_decal("A"), alphaMode="BLEND", metallicFactor=0, roughnessFactor=0.9)
     M["siteB"] = PBRMaterial(name="site_B", baseColorTexture=V2T.site_decal("B"), alphaMode="BLEND", metallicFactor=0, roughnessFactor=0.9)
     for (g_, m_) in bufs:
