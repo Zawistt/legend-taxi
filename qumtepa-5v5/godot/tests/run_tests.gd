@@ -381,6 +381,35 @@ func _run() -> void:
 	var mm: Control = main.get_node_or_null("UI/Minimap")
 	ok(mm != null and mm.MAP != null and mm.player == pl, "minimap bor va o'yinchini kuzatadi")
 
+	print("\n17) Realistik ko'rinish (8-bosqich)")
+	var matn: Node = main.get_node_or_null("Materials")
+	var lib_ok := 0
+	var lib_n := 0
+	if matn:
+		for k in matn.lib:
+			if matn.lib[k] != null:
+				lib_n += 1
+				var smat: StandardMaterial3D = matn.lib[k]
+				if smat.albedo_texture and smat.normal_texture and smat.roughness_texture:
+					lib_ok += 1
+	ok(matn != null and matn.replaced > 200 and lib_n >= 20 and lib_ok == lib_n, "PBR materiallar: %d ta sirt, %d material (albedo + normal + ORM)" % [matn.replaced if matn else 0, lib_n])
+	var dec := main.get_node_or_null("Decals")
+	var dec_in := 0
+	var dec_n := 0
+	if dec:
+		for d in dec.get_children():
+			if d is Decal:
+				dec_n += 1
+				var dp: Vector3 = d.global_position
+				if absf(dp.x) <= 56.0 and absf(dp.z) <= 56.0 and d.distance_fade_enabled:
+					dec_in += 1
+	ok(dec_n > 200 and dec_in == dec_n, "eskirish izlari: %d ta decal (kir, yomg'ir izi, yoriq, dog'), hammasi xarita ichida va uzoqda so'nadi" % dec_n)
+	var skym = env.sky.sky_material if env.sky else null
+	ok(skym is PanoramaSkyMaterial and skym.panorama != null and env.ambient_light_source == Environment.AMBIENT_SOURCE_SKY, "bulutli osmon panoramasi, atrof yorug'ligi osmondan")
+	ok(env.sdfgi_enabled and env.ssr_enabled, "SDFGI (qaytgan yorug'lik) va SSR (koshinlarda aks) yoqilgan")
+
+	await section_characters()
+
 	print("\nVAQTLAR (2D tahlil -> 3D fizika):")
 	for row in timing_rows:
 		print("  %-28s %5.1f s -> %5.1f s" % [row[0], row[1], row[2]])
@@ -388,3 +417,84 @@ func _run() -> void:
 	main.queue_free()
 	await frames(2)
 	quit(1 if fails else 0)
+
+
+## 18-bo'lim alohida funksiyada (o'zgaruvchi nomlari _run bilan to'qnashmasin)
+func section_characters() -> void:
+	print("\n18) Personajlar, animatsiyalar, qurol ushlash, harakat turlari (8-bosqich)")
+	var need_an := ["idle", "walk_f", "walk_b", "walk_l", "walk_r", "run_f", "run_b", "run_l", "run_r", "crouch_idle",
+		"crouch_f", "crouch_b", "crouch_l", "crouch_r", "jump_start", "jump_air", "jump_land", "fire", "reload", "plant", "death"]
+	for key in ["T", "CT"]:
+		var chm = load("res://scripts/character_model.gd").new()
+		chm.team = key
+		root.add_child(chm)
+		await frames(1)
+		var miss_a := []
+		for an in need_an:
+			if not chm.anim.has_animation(an):
+				miss_a.append(an)
+		var gatt: int = chm.skel.find_children("*", "BoneAttachment3D", false, false).size()
+		ok(miss_a.is_empty() and chm.skel.get_bone_count() >= 25 and gatt >= 1,
+			"%s: %d suyakli skelet, %d animatsiya, qurol qo'lda%s" % [key, chm.skel.get_bone_count(), need_an.size() - miss_a.size(), "" if miss_a.is_empty() else " — yo'q: " + str(miss_a)])
+		# qo'llar quroldan ajralmaydi: bilak -> qurol dastasi masofasi hamma animatsiyada bir xil (IK)
+		chm.tree.active = false
+		var wbi: int = chm.skel.find_bone("weapon")
+		var hdev := {"R": [], "L": []}
+		var fmin := 9.0
+		var fmax := -9.0
+		for an in ["idle", "walk_f", "run_f", "run_l", "crouch_idle", "crouch_f", "jump_air", "fire", "plant"]:
+			for k in 6:
+				chm.anim.play(an)
+				chm.anim.seek(chm.anim.current_animation_length * k / 6.0, true)
+				var wtr: Transform3D = chm.skel.get_bone_global_pose(wbi)
+				for s in ["R", "L"]:
+					var h: Vector3 = chm.skel.get_bone_global_pose(chm.skel.find_bone("hand." + s)).origin
+					hdev[s].append((wtr.affine_inverse() * h))
+				if an == "idle" or an == "crouch_idle":
+					for s in ["L", "R"]:
+						var fyy: float = chm.skel.get_bone_global_pose(chm.skel.find_bone("foot." + s)).origin.y
+						fmin = minf(fmin, fyy)
+						fmax = maxf(fmax, fyy)
+		var hspread: float = 0.0
+		for s in ["R", "L"]:
+			for q in hdev[s]:
+				hspread = maxf(hspread, (q - hdev[s][0]).length())
+		ok(hspread < 0.02, "%s: qo'llar hamma harakatda qurol dastasida (siljish %.3f m < 0.02)" % [key, hspread])
+		ok(fmin > 0.05 and fmax < 0.12, "%s: turganda va o'tirganda oyoqlar yerda (to'piq balandligi %.3f–%.3f m)" % [key, fmin, fmax])
+		chm.queue_free()
+	# harakat turlari: oddiy (qadam eshitiladi), Shift (sekin, jim), o'tirish (sekin, jim, past), sakrash (qo'nish tovushi)
+	gm.skip_freeze()
+	gm.time_left = 1.0e6
+	var open_pt := Vector3(0, 0.1, -24)
+	var mvmodes := [["oddiy", false, false, 4.5, true], ["Shift — sekin yurish", true, false, 2.3, false], ["o'tirib yurish", false, true, 1.55, false]]
+	for mo in mvmodes:
+		pl.teleport(Transform3D(Basis(), open_pt))
+		pl.force_walk = mo[1]
+		pl.force_crouch = mo[2]
+		await frames(3)
+		var st0: int = pl.steps_played
+		var pp0: Vector3 = pl.global_position
+		pl.ai_move = Vector3(1, 0, 0)
+		await secs(1.5)
+		pl.ai_move = Vector3.ZERO
+		var vv := Vector2(pl.global_position.x - pp0.x, pl.global_position.z - pp0.z).length() / 1.5
+		var nst: int = pl.steps_played - st0
+		ok(absf(vv - mo[3]) < 0.25 and ((nst >= 3) if mo[4] else (nst == 0)),
+			"%s: %.2f m/s, qadam tovushi %d ta%s" % [mo[0], vv, nst, " (eshitiladi)" if mo[4] else " (jim)"])
+	ok(pl.crouching and absf((pl.get_node("CollisionShape3D").shape as CapsuleShape3D).height - 1.25) < 0.01 and pl.cam.position.y < 1.2,
+		"o'tirganda bo'y 1.25 m, ko'z %.2f m" % pl.cam.position.y)
+	pl.force_crouch = false
+	pl.force_walk = false
+	await frames(3)
+	ok(not pl.crouching, "tugma qo'yib yuborilganda qaddini tiklaydi")
+	var ld0: int = pl.lands_played
+	pl.velocity.y = pl.jump_velocity
+	await secs(1.2)
+	ok(pl.lands_played == ld0 + 1, "sakrab qo'nganda tovush chiqadi")
+	var fpv = pl.get_node_or_null("Camera3D/FPView")
+	ok(fpv != null and fpv.ch != null and fpv.ch.model != null, "birinchi shaxs: qo'llar va qurol kamerada")
+	if fpv:
+		var am0: int = fpv.ammo
+		fpv.fire()
+		await frames(2)
+		ok(fpv.ammo == am0 - 1 and bool(fpv.ch.tree.get("parameters/fire/active")), "o'q uzish: o'q soni kamaydi, tepki animatsiyasi o'ynadi")

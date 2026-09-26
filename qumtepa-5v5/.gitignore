@@ -4,3 +4,8 @@ godot/.godot/
 godot/map/*.png
 godot/map/*.import
 godot/ui/*.import
+godot/characters/*.jpg
+godot/characters/*.jpg.import
+godot/characters/*.png
+godot/characters/*.png.import
+docs/characters/frames/

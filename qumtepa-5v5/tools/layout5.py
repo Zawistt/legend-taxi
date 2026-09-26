@@ -415,6 +415,3 @@ TANDIR_DISTRICTS = {"bozor", "masjid"}
 def district_at(x, z):
     return DISTRICT[int((z - ORIGIN) // CELL)][int((x - ORIGIN) // CELL)]
 
-# ================================================================== yakuniy bosqich: CT qaytarib olish to'planish joylari
-# Bomba o'rnatilgach CT lar shu yerda yig'iladi va kamida 2 kishi bo'lganda (yoki vaqt kam qolsa) birga kiradi.
-RETAKE_GATHER = {"A": [(-27.5, 38.0), (-13.0, 15.0)], "B": [(27.5, 38.0), (13.0, 15.0)]}

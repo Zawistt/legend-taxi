@@ -31,5 +31,13 @@ buses/default_bus_layout="res://default_bus_layout.tres"
 
 occlusion_culling/use_occlusion_culling=true
 anti_aliasing/quality/msaa_3d=2
+anti_aliasing/quality/screen_space_aa=1
+anti_aliasing/quality/use_debanding=true
 lights_and_shadows/directional_shadow/size=8192
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3
+lights_and_shadows/positional_shadow/soft_shadow_filter_quality=3
 textures/default_filters/anisotropic_filtering_level=4
+limits/cluster_builder/max_clustered_elements=4096
+environment/ssao/quality=2
+environment/ssil/quality=1
+global_illumination/sdfgi/probe_ray_count=1

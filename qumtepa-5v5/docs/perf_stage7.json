@@ -2,189 +2,189 @@
  "decor_chunks_with_lod": 226,
  "occluders": 105,
  "reduction_pct": {
-  "draw_calls": 69.3,
-  "ms": 28.6,
-  "objects": 69.3,
-  "tris": 68.5
+  "draw_calls": 69.2,
+  "ms": 22.4,
+  "objects": 68.5,
+  "tris": 68.6
  },
  "views": [
   {
    "off": {
-    "draw_calls": 971,
-    "ms": 718.8,
-    "objects": 973,
-    "tris": 265901
+    "draw_calls": 973,
+    "ms": 1585.3,
+    "objects": 983,
+    "tris": 265921
    },
    "on": {
-    "draw_calls": 180,
-    "ms": 340.4,
-    "objects": 180,
-    "tris": 52637
+    "draw_calls": 182,
+    "ms": 689.3,
+    "objects": 190,
+    "tris": 52657
    },
    "view": "T spawn"
   },
   {
    "off": {
-    "draw_calls": 1228,
-    "ms": 617.3,
-    "objects": 1229,
-    "tris": 338707
+    "draw_calls": 1230,
+    "ms": 1369.4,
+    "objects": 1239,
+    "tris": 338727
    },
    "on": {
-    "draw_calls": 363,
-    "ms": 470.1,
-    "objects": 364,
-    "tris": 100876
+    "draw_calls": 365,
+    "ms": 1221.2,
+    "objects": 374,
+    "tris": 100896
    },
    "view": "Top mid"
   },
   {
    "off": {
-    "draw_calls": 571,
-    "ms": 582.6,
-    "objects": 572,
-    "tris": 169263
+    "draw_calls": 573,
+    "ms": 1253.5,
+    "objects": 582,
+    "tris": 169283
    },
    "on": {
-    "draw_calls": 199,
-    "ms": 430.8,
-    "objects": 200,
-    "tris": 55052
+    "draw_calls": 201,
+    "ms": 945.3,
+    "objects": 210,
+    "tris": 55072
    },
    "view": "Long"
   },
   {
    "off": {
-    "draw_calls": 535,
-    "ms": 450.1,
-    "objects": 536,
-    "tris": 170503
+    "draw_calls": 540,
+    "ms": 983.2,
+    "objects": 549,
+    "tris": 173922
    },
    "on": {
-    "draw_calls": 181,
-    "ms": 350.8,
-    "objects": 182,
-    "tris": 58660
+    "draw_calls": 183,
+    "ms": 822.4,
+    "objects": 192,
+    "tris": 58680
    },
    "view": "A site"
   },
   {
    "off": {
-    "draw_calls": 802,
-    "ms": 579.2,
-    "objects": 803,
-    "tris": 245416
+    "draw_calls": 807,
+    "ms": 1309.3,
+    "objects": 816,
+    "tris": 248835
    },
    "on": {
-    "draw_calls": 297,
-    "ms": 457.5,
-    "objects": 298,
-    "tris": 81791
+    "draw_calls": 302,
+    "ms": 1151.4,
+    "objects": 311,
+    "tris": 85210
    },
    "view": "A ramp"
   },
   {
    "off": {
-    "draw_calls": 620,
-    "ms": 582.3,
-    "objects": 620,
-    "tris": 180933
+    "draw_calls": 622,
+    "ms": 1247.8,
+    "objects": 630,
+    "tris": 180953
    },
    "on": {
-    "draw_calls": 253,
-    "ms": 460.8,
-    "objects": 253,
-    "tris": 74217
+    "draw_calls": 255,
+    "ms": 1075.2,
+    "objects": 263,
+    "tris": 74237
    },
    "view": "Mid doors"
   },
   {
    "off": {
-    "draw_calls": 1289,
-    "ms": 707.6,
-    "objects": 1290,
-    "tris": 361296
+    "draw_calls": 1294,
+    "ms": 1459,
+    "objects": 1303,
+    "tris": 364715
    },
    "on": {
-    "draw_calls": 289,
-    "ms": 460.7,
-    "objects": 289,
-    "tris": 100166
+    "draw_calls": 291,
+    "ms": 1073.6,
+    "objects": 299,
+    "tris": 100186
    },
    "view": "CT mid"
   },
   {
    "off": {
-    "draw_calls": 950,
-    "ms": 743,
-    "objects": 952,
-    "tris": 262697
+    "draw_calls": 955,
+    "ms": 1546.6,
+    "objects": 965,
+    "tris": 266116
    },
    "on": {
-    "draw_calls": 324,
-    "ms": 518.7,
-    "objects": 326,
-    "tris": 88907
+    "draw_calls": 326,
+    "ms": 1192.7,
+    "objects": 336,
+    "tris": 88927
    },
    "view": "CT spawn"
   },
   {
    "off": {
-    "draw_calls": 796,
-    "ms": 469.3,
-    "objects": 797,
-    "tris": 240625
+    "draw_calls": 798,
+    "ms": 1042.6,
+    "objects": 807,
+    "tris": 240645
    },
    "on": {
-    "draw_calls": 215,
-    "ms": 371.9,
-    "objects": 216,
-    "tris": 69590
+    "draw_calls": 217,
+    "ms": 839.9,
+    "objects": 226,
+    "tris": 69610
    },
    "view": "B site"
   },
   {
    "off": {
-    "draw_calls": 671,
-    "ms": 586.4,
-    "objects": 672,
-    "tris": 198315
+    "draw_calls": 673,
+    "ms": 1231.6,
+    "objects": 682,
+    "tris": 198335
    },
    "on": {
-    "draw_calls": 216,
-    "ms": 420.4,
-    "objects": 217,
-    "tris": 68375
+    "draw_calls": 218,
+    "ms": 994.4,
+    "objects": 227,
+    "tris": 68395
    },
    "view": "Lower tunnels"
   },
   {
    "off": {
-    "draw_calls": 652,
-    "ms": 658.2,
-    "objects": 653,
-    "tris": 188888
+    "draw_calls": 654,
+    "ms": 1401.8,
+    "objects": 663,
+    "tris": 188908
    },
    "on": {
-    "draw_calls": 229,
-    "ms": 477.9,
-    "objects": 229,
-    "tris": 66464
+    "draw_calls": 231,
+    "ms": 1090.8,
+    "objects": 239,
+    "tris": 66484
    },
    "view": "Catwalk"
   },
   {
    "off": {
-    "draw_calls": 888,
-    "ms": 596.3,
-    "objects": 889,
-    "tris": 256640
+    "draw_calls": 893,
+    "ms": 1270.2,
+    "objects": 902,
+    "tris": 260059
    },
    "on": {
-    "draw_calls": 311,
-    "ms": 442.9,
-    "objects": 312,
-    "tris": 89409
+    "draw_calls": 313,
+    "ms": 1084.4,
+    "objects": 322,
+    "tris": 89429
    },
    "view": "B platforma"
   }

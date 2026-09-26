@@ -142,18 +142,20 @@ def masonry(name, seed, base, rows, cols_range, mortar, tint_amt=0.08, chip=0.5,
     save(name, col, h, r, nstrength=nstr, height=True)
 
 
-def plaster(name, seed, base, stains=0.25, crack_n=10):
+def plaster(name, seed, base, stains=0.25, crack_n=6):
     n1, n2, n3 = fbm(seed, 3), fbm(seed + 1, 24, 5), fbm(seed + 2, 128, 3)
     trowel = fbm(seed + 3, 10, 3, aniso=(0.4, 3))
     cr = cracks(seed + 4, crack_n, 70)
-    patch = (fbm(seed + 5, 5, 4) > 0.66).astype(float)
-    patch = ndimage.gaussian_filter(patch, 2, mode="wrap")
+    # suvoq ko'chgan joylar: kichik, kam, qirrasi yumshoq; ostidagi loy-g'isht rangi suvoqdan biroz to'qroq
+    patch = (fbm(seed + 5, 7, 5) > 0.74).astype(float)
+    patch = ndimage.gaussian_filter(patch, 3, mode="wrap") * 0.8
     h = 0.35 * n2 + 0.15 * n3 + 0.2 * trowel - 0.4 * cr - 0.25 * patch
     stain = np.clip((fbm(seed + 6, 2, 4) - 0.5) * 3, 0, 1) * stains
     streak = np.clip((fbm(seed + 7, 6, 4, aniso=(0.12, 4)) - 0.55) * 3, 0, 1) * 0.25
     col = np.array(base)[None, None] * (1 + 0.08 * (n1 - 0.5) + 0.05 * (n2 - 0.5) - stain - streak)[..., None]
-    col = col * (1 - 0.45 * cr)[..., None]
-    col = col * (1 - patch[..., None]) + patch[..., None] * np.array([0.72, 0.52, 0.38])[None, None] * (0.9 + 0.2 * n3)[..., None]
+    col = col * (1 - 0.22 * ndimage.gaussian_filter(cr, 0.8))[..., None]
+    under = np.array(base)[None, None] * np.array([0.82, 0.74, 0.66])[None, None] * (0.85 + 0.3 * n3)[..., None]
+    col = col * (1 - patch[..., None]) + patch[..., None] * under
     save(name, col, h, 0.9 + 0.06 * (n2 - 0.5), nstrength=4)
 
 
@@ -358,7 +360,7 @@ if __name__ == "__main__":
     wood("beam", 18, [0.36, 0.23, 0.13], 3)
     wood("wood_light", 19, [0.56, 0.4, 0.24], 5)
     wood("crate", 20, [0.64, 0.46, 0.27], 6)
-    wood("carved_wood", 21, [0.34, 0.21, 0.12], 3, nails=False)
+    wood("carved_wood", 21, [0.42, 0.27, 0.16], 3, nails=False)
     wood("vassa", 22, [0.5, 0.34, 0.19], 32, rough=0.8, nails=False)
     roof("roof", 23)
     dome_tiles("dome", 24)

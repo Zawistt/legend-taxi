@@ -45,7 +45,7 @@ func _ready() -> void:
 	hint_lbl = _label(root, 20, Control.PRESET_CENTER_BOTTOM, Vector2(-400, -110), Vector2(800, 30), HORIZONTAL_ALIGNMENT_CENTER)
 	help_lbl = _label(root, 14, Control.PRESET_BOTTOM_LEFT, Vector2(24, -40), Vector2(700, 24), HORIZONTAL_ALIGNMENT_LEFT)
 	help_lbl.modulate = Color(1, 1, 1, 0.7)
-	help_lbl.text = "E — o'rnatish/zararsizlantirish   G — bombani tashlash   B — sotib olish   F1 — zonalar   F2 — jamoa   F3 — raundni qayta boshlash"
+	help_lbl.text = "E — o'rnatish/zararsizlantirish   G — bombani tashlash   B — sotib olish   F1 — zonalar   F2 — jamoa   F3 — raund   F4 — shom   F9 — FPS   M — xarita\nShift — sekin yurish (jim)   Ctrl/C — o'tirish   Space — sakrash   Sichqoncha — o'q   R — qayta o'qlash"
 	banner_lbl = _label(root, 40, Control.PRESET_CENTER, Vector2(-450, -140), Vector2(900, 110), HORIZONTAL_ALIGNMENT_CENTER)
 	banner_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
 

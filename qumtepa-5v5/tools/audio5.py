@@ -148,6 +148,37 @@ def tunnel(rng):
     return x
 
 
+def gunshot(rng, body_hz, crack_amt, tail):
+    """o'q ovozi: keskin portlash (shovqin zarbasi) + past chastotali "gumburlash" + devorlardan aks-sado dumi"""
+    n = int(tail * SR)
+    tt = np.arange(n) / SR
+    crack = rng.normal(0, 1, n) * np.exp(-tt * 90) * crack_amt
+    boom = bp(rng.normal(0, 1, n), 60, body_hz) * np.exp(-tt * 18) * 2.5
+    thump = np.sin(2 * np.pi * 70 * tt * (1 - tt)) * np.exp(-tt * 30) * 1.2
+    echo = np.zeros(n)
+    for d, g in ((0.07, 0.35), (0.13, 0.22), (0.21, 0.12)):
+        k = int(d * SR)
+        echo[k:] += (boom[: n - k] + crack[: n - k] * 0.3) * g
+    x = crack + boom + thump + lp(echo, 1800)
+    x[: int(0.002 * SR)] *= np.linspace(0, 1, int(0.002 * SR))
+    return norm(x, 0.85)
+
+
+def reload_sound(rng):
+    """qayta o'qlash: magazin chiqishi, yangisi kirishi, zatvor tortilishi (qisqa metall chertishlar)"""
+    n = int(2.6 * SR)
+    x = np.zeros(n)
+    def click(at, f, dur, g):
+        m = int(dur * SR)
+        tt = np.arange(m) / SR
+        c = (bp(rng.normal(0, 1, m), f * 0.6, min(f * 1.6, SR / 2 - 100)) + 0.5 * np.sin(2 * np.pi * f * tt)) * np.exp(-tt * 60) * g
+        place(x, c, at)
+    for at, f, dur, g in ((0.55, 2400, 0.08, 0.8), (0.62, 900, 0.1, 0.6), (1.5, 1800, 0.06, 0.5), (1.95, 2600, 0.09, 1.0),
+                          (2.02, 1100, 0.12, 0.8), (2.25, 3000, 0.05, 0.6), (2.32, 1500, 0.08, 0.7)):
+        click(at, f, dur, g)
+    return norm(x, 0.7)
+
+
 SOUNDS = {"bozor": bozor, "masjid": masjid, "madrasa": madrasa, "karvon": karvon, "qala": qala, "tunnel": tunnel}
 
 if __name__ == "__main__":
@@ -157,3 +188,9 @@ if __name__ == "__main__":
         x = norm(loopable(fn(rng)))
         wavfile.write(os.path.join(OUT, f"amb_{name}.wav"), SR, (x * 32767).astype(np.int16))
     print("fon tovushlari:", ", ".join(f"amb_{n}.wav" for n in SOUNDS))
+    # qurol tovushlari (birinchi shaxs)
+    rng = np.random.default_rng(700)
+    for name, hz, cr, tail in (("akm", 380, 1.3, 0.9), ("m416", 520, 1.0, 0.8)):
+        wavfile.write(os.path.join(OUT, f"shot_{name}.wav"), SR, (gunshot(rng, hz, cr, tail) * 32767).astype(np.int16))
+    wavfile.write(os.path.join(OUT, "reload.wav"), SR, (reload_sound(rng) * 32767).astype(np.int16))
+    print("qurol tovushlari: shot_akm.wav, shot_m416.wav, reload.wav")

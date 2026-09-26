@@ -1,97 +1,112 @@
 {
  "02_t_spawn_top_mid": {
   "lum": 0.376,
-  "dark_frac": 0.001,
+  "dark_frac": 0.005,
   "ok": true
  },
  "03_long_a_site": {
-  "lum": 0.636,
-  "dark_frac": 0.0,
+  "lum": 0.599,
+  "dark_frac": 0.002,
   "ok": true
  },
  "04_tunnels_b_site": {
-  "lum": 0.387,
-  "dark_frac": 0.0,
+  "lum": 0.33,
+  "dark_frac": 0.012,
   "ok": true
  },
  "05_mid_doors": {
-  "lum": 0.499,
+  "lum": 0.471,
   "dark_frac": 0.0,
   "ok": true
  },
  "06_ct_mid": {
-  "lum": 0.432,
-  "dark_frac": 0.075,
+  "lum": 0.413,
+  "dark_frac": 0.085,
   "ok": true
  },
  "07_a_site_ramp": {
-  "lum": 0.525,
-  "dark_frac": 0.01,
+  "lum": 0.507,
+  "dark_frac": 0.018,
   "ok": true
  },
  "08_catwalk": {
-  "lum": 0.522,
-  "dark_frac": 0.0,
+  "lum": 0.486,
+  "dark_frac": 0.002,
   "ok": true
  },
  "09_b_site_karvonsaroy": {
-  "lum": 0.626,
+  "lum": 0.585,
   "dark_frac": 0.001,
   "ok": true
  },
  "10_top_mid_bozor": {
-  "lum": 0.635,
+  "lum": 0.588,
   "dark_frac": 0.0,
   "ok": true
  },
  "11_ct_spawn": {
-  "lum": 0.607,
-  "dark_frac": 0.0,
-  "ok": true
- },
- "12_a_site_minora": {
-  "lum": 0.564,
-  "dark_frac": 0.004,
-  "ok": true
- },
- "13_t_spawn_qala": {
-  "lum": 0.408,
-  "dark_frac": 0.0,
-  "ok": true
- },
- "14_tandir_bozor": {
-  "lum": 0.72,
+  "lum": 0.534,
   "dark_frac": 0.009,
   "ok": true
  },
+ "12_a_site_minora": {
+  "lum": 0.548,
+  "dark_frac": 0.011,
+  "ok": true
+ },
+ "13_t_spawn_qala": {
+  "lum": 0.379,
+  "dark_frac": 0.002,
+  "ok": true
+ },
+ "14_tandir_bozor": {
+  "lum": 0.668,
+  "dark_frac": 0.027,
+  "ok": true
+ },
  "15_sori_b_platforma": {
-  "lum": 0.777,
+  "lum": 0.672,
   "dark_frac": 0.0,
   "ok": true
  },
  "16_kalta_minor": {
-  "lum": 0.581,
-  "dark_frac": 0.0,
+  "lum": 0.513,
+  "dark_frac": 0.002,
   "ok": true
  },
  "17_shom_a_site": {
-  "lum": 0.453,
-  "dark_frac": 0.02,
+  "lum": 0.52,
+  "dark_frac": 0.016,
   "ok": true
  },
  "18_shom_top_mid": {
-  "lum": 0.448,
+  "lum": 0.485,
   "dark_frac": 0.0,
   "ok": true
  },
  "19_hud_minimap": {
-  "lum": 0.721,
-  "dark_frac": 0.0,
+  "lum": 0.544,
+  "dark_frac": 0.043,
   "ok": true
  },
  "20_katta_xarita": {
-  "lum": 0.469,
+  "lum": 0.663,
   "dark_frac": 0.0,
+  "ok": true
+ },
+ "21_fp_m416": {
+  "lum": 0.553,
+  "dark_frac": 0.039,
+  "ok": true
+ },
+ "22_personajlar": {
+  "lum": 0.465,
+  "dark_frac": 0.006,
+  "ok": true
+ },
+ "23_qurol_ushlash": {
+  "lum": 0.326,
+  "dark_frac": 0.034,
   "ok": true
  }
 }

@@ -62,11 +62,6 @@ const ROTATE_SPOT := {
 	"A": [[Vector3(-47.5, 0, 22.5), Vector3(-44, 0, 3)], [Vector3(-19.5, 0, 25), Vector3(-22, 0, 6)], [Vector3(-31.5, 0, 22), Vector3(-40, 0, 4)]],
 	"B": [[Vector3(47.5, 0, 22.5), Vector3(44, 0, 3)], [Vector3(19.5, 0, 25), Vector3(22, 0, 6)], [Vector3(31.5, 0, 22), Vector3(40, 0, 4)]],
 }
-## qaytarib olish oldidan to'planish joylari
-const RETAKE_GATHER := {
-	"A": [Vector3(-27.5, 0, 38), Vector3(-13, 0, 15)],
-	"B": [Vector3(27.5, 0, 38), Vector3(13, 0, 15)],
-}
 ## smoke: nom -> [jamoa, nishon, uchish vaqti (s, fizika bilan topilgan lineup'dan)]
 const SMOKES := {
 	"A CT": ["T", Vector3(-18.5, 0, 15), 3.94],

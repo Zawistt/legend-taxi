@@ -6,8 +6,6 @@ extends Node3D
 ## Space — pauza, +/- — tezlik).
 ## Sinov rejimi: godot --headless --fixed-fps 60 -s res://tests/run_bots.gd  (docs/bots_stage3.json)
 ##
-## CT: mid dagilar 1+ T ko'rilganda, boshqa site dagilar 2+ T ko'rilganda yordamga boradi; bomba o'rnatilsa
-## to'planish joyida yig'ilib (≥ 2 kishi yoki ≤ 18 s qolganda) birga qaytarib oladi.
 ## Jang modeli (soddalashtirilgan): ko'rish maydoni ~140°, masofa ≤ 70 m; smoke ko'rishni to'sadi;
 ## reaksiya 0.20–0.35 s (harakatda +0.12 s, oldindan mo'ljallangan burchakda −0.08 s);
 ## tegish ehtimoli 72% dan masofa bilan kamayadi, harakatda ×0.5, faqat boshi ko'rinsa ×0.55;
@@ -53,7 +51,6 @@ var smokes_thrown := false
 var alert := {"A": 0.0, "B": 0.0}
 var alert_count := {"A": {}, "B": {}}
 var rotated := {}
-var retake_go := false
 var kills: Array = []
 var results: Array = []
 var _frame := 0
@@ -111,7 +108,6 @@ func start_round() -> void:
 	alert = {"A": 0.0, "B": 0.0}
 	alert_count = {"A": {}, "B": {}}
 	rotated = {}
-	retake_go = false
 	kills = []
 	var spawns_t := get_tree().get_nodes_in_group("spawn_T")
 	var spawns_ct := get_tree().get_nodes_in_group("spawn_CT")
@@ -312,34 +308,7 @@ func _plant(b) -> void:
 
 
 # ------------------------------------------------------------------ CT qarorlari
-func _nearest_gather(b) -> Vector3:
-	var best := Vector3.ZERO
-	var bd := INF
-	for p in S.RETAKE_GATHER[bomb_site]:
-		var d: float = b.global_position.distance_to(p)
-		if d < bd:
-			bd = d
-			best = p
-	return best
-
-
-func _update_retake() -> void:
-	if bomb_state != "planted" or retake_go:
-		return
-	var ready := 0
-	var alive := 0
-	for b in ct_bots:
-		if not b.alive:
-			continue
-		alive += 1
-		if b.global_position.distance_to(bomb_pos) <= 12.0 or b.at(_nearest_gather(b), 1.5):
-			ready += 1
-	if ready >= min(2, alive) or R.bomb_timer - (t - plant_t) <= 18.0:
-		retake_go = true
-
-
 func _think_ct() -> void:
-	_update_retake()
 	# ma'lumot: so'nggi 5 s da site hududida ko'rilgan turli T lar soni
 	var seen := {}
 	for reg in ["A", "B"]:
@@ -359,14 +328,6 @@ func _think_ct() -> void:
 		var spot: Array = S.CT_SPOTS[b.role]
 		var home: String = spot[2]
 		if bomb_state == "planted":
-			# qaytarib olish: avval eng yaqin to'planish joyiga, kamida 2 CT yig'ilganda (yoki ≤ 18 s qolganda) birga kiriladi
-			if not retake_go:
-				var gp: Vector3 = _nearest_gather(b)
-				if not b.at(gp, 1.5) and b.global_position.distance_to(bomb_pos) > 12.0:
-					b.mode = "gather"
-					b.set_goal(gp)
-					b.hold_look = bomb_pos
-					continue
 			b.mode = "retake"
 			b.set_goal(bomb_pos)
 			b.hold_look = bomb_pos
@@ -375,11 +336,11 @@ func _think_ct() -> void:
 				b.busy_until = t + (R.defuse_time_kit if b.has_kit else R.defuse_time)
 				b.clear_goal()
 			continue
-		# aylanish: mid dagilar 1+ T ko'rilganda, boshqa site dagilar 2+ T ko'rilganda
+		# aylanish: mid dagilar 2+ T ko'rilganda, boshqa site dagilar 3+ T ko'rilganda
 		for reg in ["A", "B"]:
 			if reg == home:
 				continue
-			var need := 1 if home == "M" else 2
+			var need := 2 if home == "M" else 3
 			if seen[reg] >= need and not rotated.has(b):
 				rotated[b] = reg
 		if rotated.has(b):
@@ -431,6 +392,7 @@ func _combat() -> void:
 		if t < b.react_at or t < b.next_shot:
 			continue
 		b.next_shot = t + 0.12
+		b.on_shot()
 		var dist: float = b.global_position.distance_to(cur.global_position)
 		var p := clampf(0.72 - 0.0075 * dist, 0.15, 0.72)
 		if b.moving():

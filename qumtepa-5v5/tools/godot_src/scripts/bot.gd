@@ -46,6 +46,12 @@ var has_kit := false
 var mode := ""                     ## "route", "stage", "entry", "site", "post", "hold", "rotate", "retake", "pickup"
 
 var _label: Label3D
+var model: Node3D = null            ## personaj modeli (faqat ko'rinadigan rejimda)
+var _steps: AudioStreamPlayer3D
+var _gun: AudioStreamPlayer3D
+var _step_t := 0.0
+const CharacterModel := preload("res://scripts/character_model.gd")
+const STEP_SOUNDS := [preload("res://audio/step_stone.wav")]
 
 
 func setup(t: String, i: int, pos: Vector3, map_rid: RID, visual: bool) -> void:
@@ -62,22 +68,23 @@ func setup(t: String, i: int, pos: Vector3, map_rid: RID, visual: bool) -> void:
 	cs.position = Vector3(0, 0.9, 0)
 	add_child(cs)
 	if visual:
-		var mi := MeshInstance3D.new()
-		var cm := CapsuleMesh.new()
-		cm.radius = 0.35
-		cm.height = 1.8
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = T_COLOR if t == "T" else CT_COLOR
-		cm.material = mat
-		mi.mesh = cm
-		mi.position = Vector3(0, 0.9, 0)
-		add_child(mi)
-		var nose := MeshInstance3D.new()
-		var bm := BoxMesh.new()
-		bm.size = Vector3(0.12, 0.12, 0.4)
-		nose.mesh = bm
-		mi.add_child(nose)
-		nose.position = Vector3(0, 0.65, 0.35)   # qaragan tomonni ko'rsatadi
+		# personaj modeli: skelet, qurol (T — AKM, CT — M416) va animatsiyalar; +Z — oldinga (bot ham shunday buriladi)
+		model = CharacterModel.new()
+		model.team = t
+		add_child(model)
+		_steps = AudioStreamPlayer3D.new()
+		_steps.unit_size = 4.0
+		_steps.volume_db = -8.0
+		_steps.max_distance = 40.0
+		_steps.position = Vector3(0, 0.1, 0)
+		add_child(_steps)
+		_gun = AudioStreamPlayer3D.new()
+		_gun.stream = load("res://audio/shot_%s.wav" % ("akm" if t == "T" else "m416"))
+		_gun.unit_size = 10.0
+		_gun.volume_db = -4.0
+		_gun.max_distance = 90.0
+		_gun.position = Vector3(0, 1.4, 0)
+		add_child(_gun)
 		_label = Label3D.new()
 		_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 		_label.no_depth_test = true
@@ -111,6 +118,10 @@ func reset(pos: Vector3) -> void:
 	mode = ""
 	hold_look = Vector3.ZERO
 	look_dir = Vector3(0, 0, 1) if team == "T" else Vector3(0, 0, -1)
+	if model:
+		model.revive()
+	if _label:
+		_label.visible = true
 	_update_label()
 
 
@@ -185,6 +196,21 @@ func step(delta: float, can_move: bool) -> void:
 			look_dir = Vector3(to2.x, 0, to2.z).normalized()
 	if look_dir != Vector3.ZERO:
 		rotation.y = atan2(look_dir.x, look_dir.z)
+	if model:
+		var v := global_transform.basis.inverse() * velocity
+		model.velocity_local = Vector3(v.x, 0, v.z)
+		model.on_floor = is_on_floor()
+		model.planting = busy != ""
+		# qadam tovushi: botlar doim oddiy tezlikda yuradi — qadamlari eshitiladi (yugurish siklining yarmi)
+		if moving() and is_on_floor():
+			_step_t -= delta
+			if _step_t <= 0.0:
+				_step_t = 0.3
+				_steps.stream = STEP_SOUNDS[0]
+				_steps.pitch_scale = randf_range(0.9, 1.1)
+				_steps.play()
+		else:
+			_step_t = 0.0
 
 
 func damage(amount: float) -> bool:
@@ -196,10 +222,23 @@ func damage(amount: float) -> bool:
 	return false
 
 
+func on_shot() -> void:
+	if model:
+		model.fire()
+		_gun.pitch_scale = randf_range(0.95, 1.05)
+		_gun.play()
+
+
 func die() -> void:
 	alive = false
 	hp = 0.0
-	visible = false
+	# model bo'lsa — o'lim animatsiyasi, jasad raund oxirigacha yotadi; bo'lmasa (sinov rejimi) yashiriladi
+	if model:
+		model.die()
+		if _label:
+			_label.visible = false
+	else:
+		visible = false
 	collision_layer = 0
 	velocity = Vector3.ZERO
 	busy = ""

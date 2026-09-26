@@ -96,14 +96,15 @@ def plat_h(x, z):
 # ------------------------------------------------------------------ papkalar, v2 dan skriptlar va tovushlar
 for d in ("map", "scripts", "scenes", "audio", "tests", "tools"):
     os.makedirs(f"{OUT}/{d}", exist_ok=True)
-for fn in ("player.gd", "game_mode.gd", "hud.gd", "bomb.gd", "input_setup.gd"):
+for fn in ("game_mode.gd", "hud.gd", "bomb.gd", "input_setup.gd"):   # player.gd — godot_src dan (8-bosqich)
     shutil.copy(f"{V2}/scripts/{fn}", f"{OUT}/scripts/{fn}")
 for fn in os.listdir(f"{V2}/audio"):
     shutil.copy(f"{V2}/audio/{fn}", f"{OUT}/audio/{fn}")
 shutil.copy(f"{V2}/scenes/bomb.tscn", f"{OUT}/scenes/bomb.tscn")
 # HUD yordam qatoriga 5v5 dagi yangi tugmalar (M, F4, F9)
 _h = open(f"{OUT}/scripts/hud.gd").read()
-_h = _h.replace("F3 — raundni qayta boshlash\"", "F3 — raund   F4 — shom   F9 — FPS   M — xarita\"")
+_h = _h.replace("F3 — raundni qayta boshlash\"", "F3 — raund   F4 — shom   F9 — FPS   M — xarita\\n"
+                "Shift — sekin yurish (jim)   Ctrl/C — o'tirish   Space — sakrash   Sichqoncha — o'q   R — qayta o'qlash\"")
 assert "F9 — FPS" in _h
 open(f"{OUT}/scripts/hud.gd", "w").write(_h)
 for sub in ("scripts", "tests"):
@@ -238,7 +239,7 @@ def sky_env(s, full=True):
     s.add_sub("PanoramaSkyMaterial", "sky_mat", panorama=sky_tex, energy_multiplier="1.0")
     s.add_sub("Sky", "sky", sky_material='SubResource("sky_mat")', radiance_size="2")
     props = dict(background_mode="2", sky='SubResource("sky")', ambient_light_source="3", ambient_light_color="Color(0.8, 0.74, 0.64, 1)",
-                 ambient_light_sky_contribution="0.75", ambient_light_energy="0.75", reflected_light_source="2",
+                 ambient_light_sky_contribution="0.75", ambient_light_energy="0.85", reflected_light_source="2",
                  tonemap_mode="3", tonemap_exposure="0.92", tonemap_white="6.0")
     if full:
         props.update(ssr_enabled="true", ssr_max_steps="48", ssr_fade_in="0.15", ssr_fade_out="2.0", ssr_depth_tolerance="0.2",
@@ -439,6 +440,9 @@ def main_scene(glb_path, out_name):
   s.node("Camera3D", "Camera3D", "Player", transform=T(0, 1.65, 0), fov="80.0", far="400.0")
   s.node("FloorRay", "RayCast3D", "Player", transform=T(0, 0.2, 0), target_position="Vector3(0, -0.6, 0)", collision_mask="1")
   s.node("Steps", "AudioStreamPlayer3D", "Player", transform=T(0, 0.1, 0), volume_db="-8.0", unit_size="4.0")
+  if "greybox" not in glb_path:
+      fpv = s.add_ext("Script", "res://scripts/fp_view.gd", "12_fp")
+      s.node("FPView", "Node3D", "Player/Camera3D", script=fpv)
   s.node("GameMode", "Node", ".", script=gscr)
   s.node("HUD", "CanvasLayer", ".", script=hscr)
   s.save(f"{OUT}/{out_name}")
@@ -572,10 +576,6 @@ const CT_SETUPS := [
 ## aylanib kelgan CT lar turadigan joylar
 const ROTATE_SPOT := {{
 {chr(10).join(f"	{gdstr(site)}: [" + ", ".join(f"[{V3(p)}, {V3(l)}]" for k, (p, l, r) in L.CT_SPOTS.items() if r == site) + "]," for site in ("A", "B"))}
-}}
-## qaytarib olish oldidan to'planish joylari
-const RETAKE_GATHER := {{
-{chr(10).join(f"	{gdstr(k)}: {gdarr(v)}," for k, v in L.RETAKE_GATHER.items())}
 }}
 ## smoke: nom -> [jamoa, nishon, uchish vaqti (s, fizika bilan topilgan lineup'dan)]
 const SMOKES := {{

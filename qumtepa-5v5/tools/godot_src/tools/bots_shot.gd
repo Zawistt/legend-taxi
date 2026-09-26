@@ -23,4 +23,16 @@ func _run() -> void:
 		root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/%s.png" % v[1]))
 		print("saqlandi ", v[1])
 		m.start_round()
+	# yaqindan: yugurayotgan T botlar (animatsiya, qurol ushlash)
+	while m.t < 9.0:
+		await physics_frame
+	var b = m.t_bots[0]
+	var fwd: Vector3 = b.global_transform.basis.z
+	cam.fov = 55.0
+	cam.global_position = b.global_position + fwd * 4.5 + Vector3(1.2, 1.9, 0)
+	cam.look_at(b.global_position + Vector3(0, 1.0, 0), Vector3.UP)
+	for i in 6:
+		await process_frame
+	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/bots_3_yaqindan.png"))
+	print("saqlandi bots_3_yaqindan")
 	quit()
