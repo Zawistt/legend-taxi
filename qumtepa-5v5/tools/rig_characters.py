@@ -17,6 +17,9 @@ import bpy, bmesh, math, json, os, sys
 import numpy as np
 from mathutils import Vector, Matrix, Quaternion, Euler
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import mocap5 as MC
+
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "..", "assets_src")
 OUT = os.path.join(HERE, "..", "godot", "characters")
@@ -559,6 +562,173 @@ def new_action(ob, name):
     return act
 
 
+
+# ------------------------------------------------------------------ mocap trekini skeletga qo'yish
+TWIST = 32.0          # qurolli turish: ko'krak chapga buralgan (chap yelka oldinda), bosh nishonga qaraydi
+
+
+def _M3(a):
+    return Matrix([list(map(float, r)) for r in a])
+
+
+def set_world_rot(P, name, R3, loc=None):
+    bpy.context.view_layer.update()
+    pb = P.pb[name]
+    t = pb.matrix.translation.copy() if loc is None else Vector(loc)
+    M = R3.to_4x4()
+    M.translation = t
+    pb.matrix = M
+
+
+def pose_track(P, tr, f, hip_dz=0.0, lean=0.0, twist=TWIST, feet_off=None, spine_amt=1.0):
+    """tr trekining f-kadri: son (joy + burilish), umurtqa (mocap + qurolli burilish + egilish), bosh (nishonga),
+    oyoqlar IK nishonlari (to'piq joyi va burilishi, tizza qutbi), oyoq barmog'i."""
+    P.clear()
+    rest = P.rest
+    D = {k: _M3(v[f]) for k, v in tr["rot"].items()}
+    ident = Matrix.Identity(3)
+    def part(M, a):
+        return ident.lerp(M, a) if False else Quaternion().slerp(M.to_quaternion(), a).to_matrix()
+    hp = Vector(tr["hips"][f]) + Vector((0, 0, hip_dz))
+    set_world_rot(P, "hips", D["hips"] @ rest["hips"].to_3x3(), hp)
+    cum = 0.0
+    for name, tw, ln in (("spine", 0.3, 0.35), ("spine1", 0.35, 0.35), ("chest", 0.35, 0.3)):
+        cum += tw
+        R = Matrix.Rotation(math.radians(-twist * cum), 3, "Z") @ Matrix.Rotation(math.radians(lean * ln), 3, "X")
+        Dm = part(D[name], spine_amt) if spine_amt < 1.0 else D[name]
+        set_world_rot(P, name, R @ Dm @ rest[name].to_3x3())
+    # bosh nishonga (oldinga) qaraydi, mocap bosh harakatining yarmi saqlanadi; bo'yin — o'rtada
+    Rh = part(D["head"], 0.5) @ rest["head"].to_3x3()
+    Rc = P.ob.pose.bones["chest"].matrix.to_3x3()
+    a_ = Rc @ (rest["chest"].to_3x3().inverted() @ rest["neck"].to_3x3())
+    b_ = Rh @ (rest["head"].to_3x3().inverted() @ rest["neck"].to_3x3())
+    Rn = a_.to_quaternion().slerp(b_.to_quaternion(), 0.5).to_matrix()
+    set_world_rot(P, "neck", Rn)
+    set_world_rot(P, "head", Rh)
+    # oyoqlar
+    feet_off = feet_off or {}
+    Rhips = P.ob.pose.bones["hips"].matrix.to_3x3()
+    for s, sg in (("L", 1), ("R", -1)):
+        fo = Vector(feet_off.get(s, (0, 0, 0)))
+        fp = Vector(tr[f"foot.{s}"][f]) + fo
+        kn = Vector(tr[f"knee.{s}"][f]) + fo * 0.5 + Vector((0, 0, hip_dz * 0.5))
+        Wf = D[f"foot.{s}"] @ rest[f"ik_foot.{s}"].to_3x3()
+        M = Wf.to_4x4(); M.translation = fp
+        P.set_world(f"ik_foot.{s}", M)
+        hipj = hp + Rhips @ Vector((sg * abs(P.J[f"hip.{s}"].x), 0, 0))
+        d = kn - (hipj + fp) / 2
+        if d.length < 1e-4:
+            d = Vector((0, -1, 0))
+        # tizza qutbi: mocap tizzasi yo'nalishi + son yo'nalishidagi "oldinga" (tizzalar tashqariga ochilmasin)
+        fwd = Rhips @ Vector((0, -1, 0))
+        fwd.z = 0
+        pole = kn + (d.normalized() * 0.4 + fwd.normalized() * 0.6).normalized() * 0.5
+        Mp = Matrix.Translation(pole)
+        P.set_world(f"pole_knee.{s}", Mp)
+        # oyoq barmog'i: mocap'dagi oyoq -> barmoq nisbiy burilishi
+        Wt = D[f"toe.{s}"] @ rest[f"toe.{s}"].to_3x3()
+        Lrest = rest[f"foot.{s}"].to_3x3().inverted() @ rest[f"toe.{s}"].to_3x3()
+        Lnow = Wf.inverted() @ Wt
+        P.pb[f"toe.{s}"].rotation_quaternion = (Lrest.inverted() @ Lnow).to_quaternion()
+
+
+def key_track(P, name, tr, loop=True, weapon=None, **kw):
+    act = new_action(P.ob, name)
+    n = tr["n"]
+    for f in range(n):
+        pose_track(P, tr, f, **({k: (v(f, n) if callable(v) else v) for k, v in kw.items()}))
+        place_weapon(P, weapon(f, n) if weapon else Matrix.Identity(4))
+        P.key(f + 1)
+    return act, n - 1
+
+
+def mocap_actions(P, info):
+    leg = (P.J["hip.L"].z - P.J["ankle.L"].z + P.J["hip.R"].z - P.J["ankle.R"].z) / 2
+    acts = {}
+    info["mocap"] = {}
+    def clip(name):
+        return MC.Clip(name, leg)
+    # turish: CMU 137_41 (kutib turish) — tabiiy nafas va og'irlikni oyoqdan oyoqqa o'tkazish
+    c = clip("137_41")
+    idle = MC.track_from(c, 600, 960, loop=True)
+    P.idle_track = idle
+    acts["idle"] = key_track(P, "idle", idle)
+    info["mocap"]["idle"] = "137_41 [600:960]"
+    # yurish (Shift), yugurish, o'tirib yurish: oldinga sikllar, keyin orqaga (teskari) va yonga (oyoqlar 70°)
+    sources = {"walk": ("07_01", 0, None, 2.3, 0, 0), "run": ("09_01", 0, None, 4.5, 0, 0),
+               "crouch": ("77_30", 420, 660, 1.55, -0.26, 16)}
+    for g, (cn, f0, f1, spd, dz, ln) in sources.items():
+        c = clip(cn)
+        a, b = MC.cycle_bounds(c, f0, f1 or c.n)
+        fw = MC.track_from(c, a, b, speed=spd, loop=True)
+        variants = {"f": fw, "b": MC.reverse(fw), "l": MC.strafe(fw, 1), "r": MC.strafe(fw, -1)}
+        for dn, tr in variants.items():
+            acts[f"{g}_{dn}"] = key_track(P, f"{g}_{dn}", tr, hip_dz=dz, lean=ln + (3 if g != "crouch" else 0))
+        info["gaits"][g] = dict(speed=spd, period=(fw["n"] - 1) / FPS, stride_scale=fw["stride_scale"], time_scale=fw["time_scale"])
+        info["mocap"][g] = f"{cn} [{a}:{b}]"
+    # o'tirib turish: turish trekidan, son pastda, chap oyoq oldinda, o'ng orqada
+    acts["crouch_idle"] = key_track(P, "crouch_idle", idle, hip_dz=-0.34, lean=16,
+                                    feet_off={"L": (0.03, -0.14, 0), "R": (-0.03, 0.2, 0)})
+    # sakrash: CMU 16_01; havodagi ko'tarilish olib tashlanadi (uni o'yin fizikasi qiladi)
+    c = clip("16_01")
+    hz = c.hips_mid()[:, 2] - c.ground
+    stand = float(np.median(hz[1:40]))
+    zfix = np.maximum(0.0, hz - stand)
+    mz = np.minimum(c.joint("LeftFoot")[:, 2], c.joint("RightFoot")[:, 2]) - c.ground
+    air = np.where(mz > 0.14)[0]
+    lift, land = int(air[0]), int(air[-1])
+    face = (1, 60)
+    js = MC.track_from(c, lift - 30, lift + 12, loop=False, keep_drift=True, face=face, zfix=zfix)
+    apex = (lift + land) // 2
+    ja = MC.track_from(c, apex - 14, apex + 14, loop=True, keep_drift=True, face=face, zfix=zfix)
+    jl = MC.track_from(c, land - 4, land + 60, loop=False, keep_drift=True, face=face, zfix=zfix)
+    for nm, tr in (("jump_start", js), ("jump_air", ja), ("jump_land", jl)):
+        base = tr["hips"][0, :2].copy()
+        for kk in ("hips", "foot.L", "foot.R", "knee.L", "knee.R", "toe.L", "toe.R"):
+            tr[kk][:, :2] -= base
+        acts[nm] = key_track(P, nm, tr)
+    info["mocap"]["jump"] = f"16_01 [{lift - 30}:{land + 60}]"
+    # bomba qo'yish / zararsizlantirish: CMU 23_03 — tiz cho'kib turish
+    c = clip("23_03")
+    pl = MC.track_from(c, 250, 400, loop=True, keep_drift=False)
+    acts["plant"] = key_track(P, "plant", pl, lean=20, spine_amt=0.6,
+                              weapon=lambda f, n: Matrix.Translation((0.02, -0.1, -0.06)) @ Matrix.Rotation(math.radians(-45), 4, "X"))
+    info["mocap"]["plant"] = "23_03 [250:400]"
+    # o'lim: tizzalar bukiladi (CMU 23_03, tiz cho'kish 2× tez), keyin tana oldinga yiqiladi
+    kd = MC.track_from(c, 1, 190, loop=False, keep_drift=False, face=(1, 60))
+    idxs = np.linspace(0, kd["n"] - 1, max(2, kd["n"] // 2)).round().astype(int)
+    kd2 = {k: (v[idxs] if isinstance(v, np.ndarray) else v) for k, v in kd.items() if k != "rot"}
+    kd2["rot"] = {k: v[idxs] for k, v in kd["rot"].items()}
+    kd2["n"] = len(idxs)
+    act = new_action(P.ob, "death")
+    fr = 1
+    for f in range(kd2["n"]):
+        pose_track(P, kd2, f, lean=f / kd2["n"] * 15)
+        place_weapon(P, Matrix.Rotation(math.radians(-25 * f / kd2["n"]), 4, "X"))
+        P.key(fr); fr += 1
+    last = kd2["n"] - 1
+    fall = 14
+    for i in range(1, fall + 1):
+        u = i / fall
+        e = u * u * (3 - 2 * u)
+        tr = MC.still(kd2, last)
+        R = MC.Rz(0) @ np.array([[1, 0, 0], [0, math.cos(math.radians(80 * e)), -math.sin(math.radians(80 * e))],
+                                  [0, math.sin(math.radians(80 * e)), math.cos(math.radians(80 * e))]])
+        tr["rot"]["hips"] = np.einsum("ij,fjk->fik", R, tr["rot"]["hips"])
+        tr["hips"] = tr["hips"] + np.array([0, -0.55 * e, -(tr["hips"][0, 2] - 0.17) * e])
+        for s in ("L", "R"):
+            tr[f"foot.{s}"] = tr[f"foot.{s}"] + np.array([0, 0.25 * e, 0.0])
+        pose_track(P, tr, 0, lean=15 + 20 * e)
+        place_weapon(P, Matrix.Rotation(math.radians(-25 - 45 * e), 4, "X"))
+        P.key(fr); fr += 1
+    for i in range(6):
+        P.key(fr); fr += 1
+    acts["death"] = (act, fr - 1)
+    info["mocap"]["death"] = "23_03 [1:190] + yiqilish"
+    info["steps"] = {g: [0.0, 0.5] for g in sources}
+    return acts
+
+
 def make_actions(P, info):
     ob = P.ob
     acts = {}
@@ -567,78 +737,13 @@ def make_actions(P, info):
     def frames_for(T):
         return max(8, int(round(T * FPS)))
 
-    # --- turish (nafas)
-    act = new_action(ob, "idle")
-    n = 60
-    for f in range(n + 1):
-        P.clear()
-        ph = f / n * 2 * math.pi
-        stance_pose(P, hip_drop=-0.02 + 0.004 * math.sin(ph), breathe=1.2 * math.sin(ph))
-        ik_feet_static(P, {"L": (0.02, -0.08, 0, 0), "R": (-0.02, 0.1, 0, 0)})
-        place_weapon(P, Matrix.Rotation(math.radians(0.6 * math.sin(ph)), 4, "X"))
-        P.key(f + 1)
-    acts["idle"] = (act, n)
-    # --- o'tirib turish
-    act = new_action(ob, "crouch_idle")
-    for f in range(n + 1):
-        P.clear()
-        ph = f / n * 2 * math.pi
-        stance_pose(P, hip_drop=-0.36 + 0.004 * math.sin(ph), lean=16, breathe=1.0 * math.sin(ph))
-        ik_feet_static(P, {"L": (0.03, -0.16, 0, 0), "R": (-0.04, 0.2, 0, 0)})
-        place_weapon(P, Matrix.Rotation(math.radians(0.5 * math.sin(ph)), 4, "X"))
-        P.key(f + 1)
-    acts["crouch_idle"] = (act, n)
-    # --- yurish / yugurish / o'tirib yurish, 4 yo'nalish
-    for gname, g in GAITS.items():
-        S = 2 * g["E"] / g["ds"]
-        T = S / g["speed"]
-        nf = frames_for(T)
-        info["gaits"][gname] = dict(speed=g["speed"], period=nf / FPS, stride=S)
-        for dn, d in DIRS.items():
-            name = f"{gname}_{dn}"
-            act = new_action(ob, name)
-            for f in range(nf + 1):
-                P.clear()
-                ph = f / nf
-                F = feet(P, ph, g, d)
-                # son: ikki tayanchda pastroq, bitta oyoqda balandroq; tayanch oyog'i tomonga ozgina og'adi
-                bob = -g["bob"] * math.cos(4 * math.pi * ph)
-                sway = 0.025 * math.sin(2 * math.pi * ph) * (1 if gname != "run" else 0.6)
-                lean_dir = g["lean"] * (1 if dn == "f" else (-0.4 if dn == "b" else 0.3))
-                stance_pose(P, hip_drop=g["hip"] + bob, lean=lean_dir + (0 if gname != "crouch" else 0))
-                P.move("hips", (sway, 0, 0))
-                P.rot("hips", (0, 0, 1), 6 * math.sin(2 * math.pi * ph) * (d[1] != 0))
-                P.rot("spine", (0, 0, 1), -6 * math.sin(2 * math.pi * ph) * (d[1] != 0))
-                apply_feet(P, F)
-                place_weapon(P, Matrix.Rotation(math.radians(1.2 * math.sin(4 * math.pi * ph)), 4, "X"))
-                P.key(f + 1)
-            acts[name] = (act, nf)
-        # qadam fazalari (oyoq yerga tekkan payt): chap 0.0, o'ng 0.5
-        steps[gname] = [0.0, 0.5]
-    info["steps"] = steps
-    # --- sakrash: ko'tarilish, havoda, qo'nish
-    def jump_pose(hd, tuck, lean, spread=0.0):
-        stance_pose(P, hip_drop=hd, lean=lean)
-        ik_feet_static(P, {"L": (0.02, -0.12 - spread, max(0.0, tuck), 12 * (tuck > 0)),
-                           "R": (-0.02, 0.12 + spread, max(0.0, tuck * 0.8), 18 * (tuck > 0))})
-    act = new_action(ob, "jump_start")
-    for f, (hd, tk, ln) in enumerate([(-0.03, 0, 4), (-0.14, 0, 12), (-0.08, 0, 8), (0.02, 0.05, 2), (0.06, 0.18, 2), (0.1, 0.30, 4)]):
-        P.clear(); jump_pose(hd, tk, ln); place_weapon(P, Matrix.Rotation(math.radians(-2 * (f > 3)), 4, "X")); P.key(f * 2 + 1)
-    acts["jump_start"] = (act, 11)
-    act = new_action(ob, "jump_air")
-    for f in range(21):
-        ph = f / 20 * 2 * math.pi
-        P.clear(); jump_pose(0.1 + 0.01 * math.sin(ph), 0.30 + 0.02 * math.sin(ph), 5); place_weapon(P, Matrix.Rotation(math.radians(-2), 4, "X")); P.key(f + 1)
-    acts["jump_air"] = (act, 20)
-    act = new_action(ob, "jump_land")
-    for f, (hd, tk, ln) in enumerate([(0.06, 0.12, 6), (-0.08, 0, 10), (-0.2, 0, 16), (-0.14, 0, 12), (-0.07, 0, 7), (-0.03, 0, 3)]):
-        P.clear(); jump_pose(hd, tk, ln); place_weapon(P, Matrix.Rotation(math.radians(2 * (f in (2, 3))), 4, "X")); P.key(f * 2 + 1)
-    acts["jump_land"] = (act, 11)
+    # --- turish, yurish, yugurish, o'tirish, sakrash, bomba qo'yish, o'lim: haqiqiy odam harakati (CMU mocap)
+    acts.update(mocap_actions(P, info))
+    idle_tr = P.idle_track
     # --- o'q uzish (tepish): qurol orqaga va tepaga, ko'krak biroz orqaga
     act = new_action(ob, "fire")
     for f, (back, up, ch) in enumerate([(0, 0, 0), (0.045, 5, -2.5), (0.02, 2.5, -1.2), (0.006, 0.8, -0.4), (0, 0, 0)]):
-        P.clear(); stance_pose(P, hip_drop=-0.02, lean=3 + ch)
-        ik_feet_static(P, {"L": (0.02, -0.08, 0, 0), "R": (-0.02, 0.1, 0, 0)})
+        pose_track(P, idle_tr, 0, lean=-ch)
         place_weapon(P, Matrix.Translation((0, -back, 0)) @ Matrix.Rotation(math.radians(up), 4, "X"))
         P.key([1, 2, 4, 6, 8][f])
     acts["fire"] = (act, 8)
@@ -658,8 +763,7 @@ def make_actions(P, info):
         (34, 24, 8, "pouch", "hand"), (44, 24, 8, "pouch", "hand"), (54, 28, 10, "mag", "hand"), (60, 28, 12, "mag", "in"),
         (64, 30, 14, "mag", "in"), (72, 18, 6, "fore", "in"), (80, 0, 0, "fore", "in")]
     for fr, roll, pitch, hand, magst in keys:
-        P.clear(); stance_pose(P, hip_drop=-0.03, lean=6)
-        ik_feet_static(P, {"L": (0.02, -0.08, 0, 0), "R": (-0.02, 0.1, 0, 0)})
+        pose_track(P, idle_tr, 0, lean=3)
         place_weapon(P, Matrix.Rotation(math.radians(pitch), 4, "X") @ Matrix.Rotation(math.radians(-roll), 4, "Y"))
         bpy.context.view_layer.update()
         wM = P.ob.pose.bones["weapon"].matrix
@@ -678,27 +782,6 @@ def make_actions(P, info):
         P.key(fr)
     acts["reload"] = (act, 80)
     info["reload_time"] = 80 / FPS
-    # --- bomba qo'yish / zararsizlantirish: tiz cho'kib, qurol pastga
-    act = new_action(ob, "plant")
-    for f in range(41):
-        ph = f / 40 * 2 * math.pi
-        P.clear(); stance_pose(P, hip_drop=-0.42, lean=30 + 3 * math.sin(ph), twist=10)
-        ik_feet_static(P, {"L": (0.04, -0.28, 0, 0), "R": (-0.03, 0.32, 0.0, 60)})
-        place_weapon(P, Matrix.Translation((0.02, -0.1, -0.06)) @ Matrix.Rotation(math.radians(-45), 4, "X"))
-        P.key(f + 1)
-    acts["plant"] = (act, 40)
-    # --- o'lim: tizzalar bukiladi, orqaga yiqiladi
-    act = new_action(ob, "death")
-    seq = [(0, -0.02, 3, 0, 0), (6, -0.1, -6, 0.06, 0), (12, -0.35, -18, 0.12, 0), (18, -0.6, -40, 0.22, 0.2),
-           (24, -0.72, -70, 0.30, 0.45), (30, -0.76, -82, 0.34, 0.55), (36, -0.76, -84, 0.34, 0.55)]
-    for fr, hd, ln, back, legs in seq:
-        P.clear(); stance_pose(P, hip_drop=hd, lean=ln * 0.35)
-        P.move("hips", (0, back, 0))
-        P.rot("hips", (1, 0, 0), ln * 0.65)
-        ik_feet_static(P, {"L": (0.05, -0.1 - legs, 0, -legs * 60), "R": (-0.05, 0.05 - legs * 0.8, 0, -legs * 50)})
-        place_weapon(P, Matrix.Rotation(math.radians(ln * 0.95), 4, "X"), rigid=True)
-        P.key(fr + 1)
-    acts["death"] = (act, 37)
     return acts
 
 
