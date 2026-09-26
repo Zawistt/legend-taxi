@@ -1,7 +1,7 @@
 extends Control
 ## Jang HUD'i (Legend Tactical FPS'dagi CombatHUD g'oyasi asosida):
 ##   - nishon belgisi: 4 chiziq, oradagi bo'shliq hozirgi tarqalishga teng (ekranda o'q qayerga tushishi mumkinligi);
-##     ADS da so'nadi (qurol markazda), pichoqda — nuqta;
+##     ADS da so'nadi (qurol markazda), pichoqda — nuqta; snayperda ADS — optik nishon (qora doira);
 ##   - tegish belgisi (X): tanaga — oq, boshga — qizil, o'ldirganda — kattaroq; 0.25 s ko'rinadi.
 
 var fpv: Node3D
@@ -40,6 +40,13 @@ func _draw() -> void:
 	var cam: Camera3D = fpv.player.cam
 	# tarqalish burchagi -> piksel (vertikal FOV bo'yicha)
 	var px: float = tan(fpv.current_spread()) / tan(deg_to_rad(cam.fov) * 0.5) * vs.y * 0.5
+	if fpv.scoped():
+		# snayper optikasi: doira tashqarisi qora, ichida ingichka nishon chiziqlari
+		var r := vs.y * 0.46
+		draw_arc(c, r + vs.x * 0.5, 0.0, TAU, 96, Color.BLACK, vs.x, true)
+		draw_line(c - Vector2(r, 0), c + Vector2(r, 0), Color(0, 0, 0, 0.85), 1.5)
+		draw_line(c - Vector2(0, r), c + Vector2(0, r), Color(0, 0, 0, 0.85), 1.5)
+		draw_circle(c, 1.5, Color(0.9, 0.1, 0.1))
 	var a: float = 1.0 - fpv.ads_amt
 	var col := Color(0.55, 1.0, 0.6, 0.9 * a)
 	if fpv.is_knife():

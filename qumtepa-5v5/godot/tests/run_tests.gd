@@ -593,8 +593,8 @@ func section_weapons() -> void:
 	var names := []
 	for w in fpv.weapons:
 		names.append("%s (%d)" % [w.weapon_name, w.slot])
-	ok(fpv.weapons.size() == 3 and fpv.current.weapon_name == "LAR-01" and pl.body.weapon_kind == 0,
-		"3 ta qurol ma'lumotdan (weapons/*.tres): %s" % ", ".join(names))
+	ok(fpv.weapons.size() == 7 and fpv.current.weapon_name == "LAR-01" and pl.body.weapon_kind == 0,
+		"7 ta qurol ma'lumotdan (weapons/*.tres, slot): %s" % ", ".join(names))
 	var tg: Array = pr.spawn([6.0, 12.0]) if pr else []
 	await frames(3)
 	ok(tg.size() == 2, "F7 mashq nishonlari: %d ta manekin (o'q tegadigan zonalar bilan)" % tg.size())
@@ -688,7 +688,71 @@ func section_weapons() -> void:
 	await frames(2)
 	fpv.fire()
 	ok(far_miss and t1.hits == h0 + 1 and absf(t1.last_damage - 75.0) < 0.1, "pichoq: 12 m da yetmaydi, 1.6 m da 75 zarar")
+	# sotib olish (B): zonadan tashqarida bo'lmaydi; spawn'da — 5 ta asosiy qurol
+	var bm = fpv.buy_menu
+	gm.buy_time_left = 30.0
+	var outside_ok: bool = not bm.buy_index(3)
+	gm.start_round()          # yangi raund: o'yinchi spawn'da, tayyorgarlik — sotib olish mumkin
+	await frames(4)
+	var names2 := []
+	for w in bm.items:
+		names2.append(w.weapon_name)
+	var bought: bool = bm.buy_index(3)
+	await secs(0.9)
+	ok(outside_ok and bought and fpv.current.weapon_id == "longbow_50" and bm.items.size() == 5,
+		"sotib olish (B, faqat zonada): %s" % ", ".join(names2))
+	# asosiy qurollar sinovi: ochiq joyda nishonlar
+	gm.skip_freeze()
+	gm.time_left = 1.0e6
+	pl.teleport(Transform3D(Basis(), Vector3(0, 0.1, -24)))
+	pl.rotation.y = -PI * 0.5
+	pl.cam.rotation.x = 0.0
+	await frames(4)
+	tg = pr.spawn([6.0, 12.0])
+	await frames(3)
+	t0 = tg[0]
+	t1 = tg[1]
+	fpv.no_spread = true
+	# snayper: tana 95, zatvor 1.1 s, optika
+	fpv._next_shot = 0.0
+	_aim_at(_zone_pos(t1, "body"))
+	await frames(2)
+	var s1: bool = fpv.fire()
+	var dmg_sn: float = t1.last_damage
+	var s2: bool = fpv.fire()
+	await secs(1.4)
+	var s3: bool = fpv.fire()
+	fpv.force_ads = true
+	await secs(0.8)
+	var sc_ok: bool = fpv.scoped() and pl.cam.fov < 80.0 * 0.45 and not fpv.ch.visible
+	fpv.force_ads = false
+	await secs(0.8)
+	ok(s1 and not s2 and s3 and absf(dmg_sn - 95.0) < 0.1 and sc_ok,
+		"Longbow-50: tana %.0f (bosh %.0f), otishlar orasi 1.33 s (45 o'q/daq), ADS — optika (FOV %.0f°)" % [dmg_sn, 95.0 * 3.5, 80.0 * 0.427])
+	# drobovik: 8 sochma
+	fpv.buy("breacher_12")
+	await secs(0.8)
+	t0.hp = 1000.0
+	fpv._next_shot = 0.0
+	_aim_at(_zone_pos(t0, "body"))
+	await frames(2)
+	fpv.fire()
+	ok(fpv.last_shot.pellets == 8 and fpv.last_shot.hits == 8 and absf(fpv.last_shot.damage - 112.0) < 0.1,
+		"Breacher-12: bir otishda %d sochma, %d tasi tegdi, jami %.0f zarar (8 × 14)" % [fpv.last_shot.pellets, fpv.last_shot.hits, fpv.last_shot.damage])
+	# SMG va AR-44
+	fpv.buy("spectre_smg")
+	await secs(0.6)
+	var smg: Resource = fpv.current
+	fpv.buy("rifle_vanguard")
+	await secs(0.8)
+	var van: Resource = fpv.current
+	var p1: float = pl.rotation.y
+	fpv._next_shot = 0.0
+	fpv.fire()
+	var hk: float = rad_to_deg(p1 - pl.rotation.y) / van.recoil_scale
+	ok(absf(smg.shot_interval() - 60.0 / 850.0) < 0.001 and smg.damage_at(10.0, "head") == 44.0 and van.damage_at(10.0, "body") == 36.0
+		and hk >= -0.51 and hk <= 0.76, "Spectre-9: 850 o'q/daq, bosh 44; AR-44: tana 36, gorizontal tepki [−0.5, 0.75] ichida (%.2f)" % hk)
 	fpv.no_spread = false
-	fpv.equip(1)
+	fpv.buy("lar_01")
 	pr.clear()
 	await frames(2)

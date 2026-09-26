@@ -17,10 +17,15 @@ rm -f ../godot/map/navmesh.res
 # Godot GLB dan ajratib olgan eski teksturalarni o'chiramiz (aks holda materiallar aralashib ketadi)
 rm -rf ../godot/.godot ../godot/map/*.png ../godot/map/*.import
 python3 gen_godot5.py
+python3 gen_3v3.py
 (cd ../godot && "$GODOT" --headless --import >/dev/null 2>&1 || true)
 (cd ../godot && "$GODOT" --headless -s res://tools/bake_nav.gd 2>&1 | grep -i "poligon")
 python3 gen_godot5.py
+python3 gen_3v3.py
 (cd ../godot && "$GODOT" --headless --fixed-fps 60 -s res://tests/run_tests.gd 2>&1 | grep -v "^$" | grep -v "mesh_get_surface_count\|Parameter \"m\"\|ObjectDB\|resources still in use\|at: " )
+# 3v3 xaritasi (Qumtepa v2 low-poly, 50 m): o'z testlari va auditi
+(cd ../godot && "$GODOT" --headless --fixed-fps 60 -s res://maps/qumtepa3v3/tests/run_tests.gd 2>&1 | grep "NATIJA\|XATO" | sed 's/^/3v3 /')
+(cd ../godot && "$GODOT" --headless -s res://maps/qumtepa3v3/tests/audit.gd 2>&1 | grep "AUDIT\|XATO" | sed 's/^/3v3 /')
 # smoke lineup'lari (granata fizikasi)
 (cd ../godot && "$GODOT" --headless -s res://tests/run_grenades.gd 2>&1 | grep "NATIJA\|XATO")
 # yakuniy audit: devor tirqishlari, tom teshiklari, yetib bo'lmaydigan va tiqiladigan joylar, chegara
@@ -28,6 +33,7 @@ python3 gen_godot5.py
 # skrinshotlar va ko'rinish tekshiruvi (ekran kerak: xvfb-run bo'lsa ishlatiladi). SHOTS=1 ./make_all.sh
 if [ -n "${SHOTS:-}" ]; then
   (cd ../godot && xvfb-run -a -s "-screen 0 1600x900x24" "$GODOT" --rendering-method gl_compatibility --rendering-driver opengl3 -s res://tools/screenshots.gd 2>&1 | grep -c saqlandi)
+  (cd ../godot && xvfb-run -a -s "-screen 0 1600x900x24" "$GODOT" --rendering-method gl_compatibility --rendering-driver opengl3 -s res://tools/shots_3v3.gd 2>&1 | grep -c saqlandi)
   python3 check_shots.py | tail -1
   (cd ../godot && xvfb-run -a -s "-screen 0 1600x900x24" "$GODOT" --rendering-method gl_compatibility --rendering-driver opengl3 -s res://tools/perf.gd 2>&1 | grep "O'RTACHA")
 fi

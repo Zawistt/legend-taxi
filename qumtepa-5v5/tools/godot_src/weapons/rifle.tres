@@ -8,3 +8,4 @@ weapon_id = "lar_01"
 weapon_name = "LAR-01"
 kind = 0
 slot = 1
+category_name = "Avtomat"

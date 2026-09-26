@@ -1,0 +1,2099 @@
+[gd_scene load_steps=107 format=3]
+
+[ext_resource type="PackedScene" path="res://map/desert_map.glb" id="1_map"]
+
+[ext_resource type="PackedScene" path="res://map/collision.tscn" id="2_col"]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="3_pl"]
+
+[ext_resource type="Script" path="res://scripts/game_mode.gd" id="4_gm"]
+
+[ext_resource type="Script" path="res://scripts/hud.gd" id="5_hud"]
+
+[ext_resource type="Script" path="res://scripts/graphics.gd" id="7_gfx"]
+
+[ext_resource type="Script" path="res://scripts/audio_zones.gd" id="11_aud"]
+
+[ext_resource type="NavigationMesh" path="res://map/navmesh.res" id="6_nav"]
+
+[ext_resource type="AudioStream" path="res://audio/amb_wind.wav" id="8_wind"]
+
+[ext_resource type="AudioStream" path="res://audio/amb_town.wav" id="9_town"]
+
+[ext_resource type="AudioStream" path="res://audio/amb_bird.wav" id="10_bird"]
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
+sky_top_color = Color(0.27, 0.49, 0.78, 1)
+sky_horizon_color = Color(0.86, 0.8, 0.68, 1)
+ground_bottom_color = Color(0.45, 0.36, 0.25, 1)
+ground_horizon_color = Color(0.86, 0.8, 0.68, 1)
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
+
+[sub_resource type="Gradient" id="grade_grad"]
+offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(0.045, 0.038, 0.035, 1, 0.5, 0.487, 0.465, 1, 1, 0.99, 0.965, 1)
+
+[sub_resource type="GradientTexture1D" id="grade_lut"]
+gradient = SubResource("grade_grad")
+width = 256
+
+[sub_resource type="Environment" id="env"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 2
+ambient_light_energy = 2.6
+ambient_light_color = Color(1, 0.90, 0.76, 1)
+ambient_light_sky_contribution = 0.2
+tonemap_mode = 2
+tonemap_exposure = 1.08
+tonemap_white = 1.0
+ssao_enabled = true
+ssao_radius = 0.8
+ssao_intensity = 1.0
+ssao_power = 1.2
+glow_enabled = true
+glow_intensity = 0.35
+glow_bloom = 0.05
+fog_enabled = true
+fog_light_color = Color(0.92, 0.86, 0.73, 1)
+fog_light_energy = 1.0
+fog_density = 0.0005
+fog_sky_affect = 0.0
+fog_aerial_perspective = 0.06
+adjustment_enabled = true
+adjustment_contrast = 1.04
+adjustment_saturation = 1.18
+
+[sub_resource type="StandardMaterial3D" id="dust_mat"]
+transparency = 1
+shading_mode = 0
+vertex_color_use_as_albedo = true
+albedo_color = Color(1, 0.93, 0.78, 0.55)
+billboard_mode = 3
+billboard_keep_scale = true
+disable_receive_shadows = true
+no_depth_test = false
+blend_mode = 1
+
+[sub_resource type="QuadMesh" id="dust_quad"]
+size = Vector2(0.035, 0.035)
+material = SubResource("dust_mat")
+
+[sub_resource type="Curve" id="dust_curve"]
+_data = [Vector2(0, 0), 0.0, 0.0, 0, 0, Vector2(0.15, 1), 0.0, 0.0, 0, 0, Vector2(0.85, 1), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 4
+
+[sub_resource type="CurveTexture" id="dust_alpha"]
+curve = SubResource("dust_curve")
+
+[sub_resource type="CapsuleShape3D" id="capsule"]
+radius = 0.35
+height = 1.8
+
+[sub_resource type="PlaneMesh" id="ground"]
+size = Vector2(400, 400)
+
+[sub_resource type="StandardMaterial3D" id="ground_mat"]
+albedo_color = Color(0.62, 0.5, 0.35, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="vm_site"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+no_depth_test = true
+albedo_color = Color(0.85, 0.25, 0.18, 0.22)
+
+[sub_resource type="StandardMaterial3D" id="vm_buy"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+no_depth_test = true
+albedo_color = Color(0.23, 0.64, 0.35, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="vm_T"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+no_depth_test = true
+albedo_color = Color(0.84, 0.38, 0.12, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="vm_CT"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+no_depth_test = true
+albedo_color = Color(0.16, 0.36, 0.67, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="vm_ai"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+no_depth_test = true
+albedo_color = Color(1, 1, 1, 0.9)
+
+[sub_resource type="CylinderMesh" id="spawn_disc"]
+top_radius = 0.35
+bottom_radius = 0.35
+height = 0.06
+
+[sub_resource type="CylinderMesh" id="ai_pole"]
+top_radius = 0.06
+bottom_radius = 0.06
+height = 1.6
+material = SubResource("vm_ai")
+
+[sub_resource type="BoxShape3D" id="z_BombSiteA"]
+size = Vector3(12, 3.5, 11)
+
+[sub_resource type="BoxMesh" id="zm_BombSiteA"]
+size = Vector3(12, 3.5, 11)
+material = SubResource("vm_site")
+
+[sub_resource type="BoxShape3D" id="z_BombSiteB"]
+size = Vector3(11.5, 3.5, 10.5)
+
+[sub_resource type="BoxMesh" id="zm_BombSiteB"]
+size = Vector3(11.5, 3.5, 10.5)
+material = SubResource("vm_site")
+
+[sub_resource type="BoxShape3D" id="z_BuyZoneT"]
+size = Vector3(14, 5.0, 6)
+
+[sub_resource type="BoxMesh" id="zm_BuyZoneT"]
+size = Vector3(14, 5.0, 6)
+material = SubResource("vm_buy")
+
+[sub_resource type="BoxShape3D" id="z_BuyZoneCT"]
+size = Vector3(18, 5.0, 6)
+
+[sub_resource type="BoxMesh" id="zm_BuyZoneCT"]
+size = Vector3(18, 5.0, 6)
+material = SubResource("vm_buy")
+
+[sub_resource type="ParticleProcessMaterial" id="dustpm_TSpawn"]
+particle_flag_align_y = false
+emission_shape = 3
+emission_box_extents = Vector3(9, 2.5, 3.5)
+direction = Vector3(1, 0.35, 0.2)
+spread = 35.0
+initial_velocity_min = 0.035
+initial_velocity_max = 0.13
+gravity = Vector3(0, -0.012, 0)
+scale_min = 0.5
+scale_max = 1.9
+turbulence_enabled = true
+turbulence_noise_strength = 0.18
+turbulence_noise_scale = 1.6
+turbulence_influence_min = 0.2
+turbulence_influence_max = 0.6
+alpha_curve = SubResource("dust_alpha")
+color = Color(1, 0.95, 0.84, 0.5)
+
+[sub_resource type="ParticleProcessMaterial" id="dustpm_CTSpawn"]
+particle_flag_align_y = false
+emission_shape = 3
+emission_box_extents = Vector3(9, 2.5, 3)
+direction = Vector3(1, 0.35, 0.2)
+spread = 35.0
+initial_velocity_min = 0.035
+initial_velocity_max = 0.13
+gravity = Vector3(0, -0.012, 0)
+scale_min = 0.5
+scale_max = 1.9
+turbulence_enabled = true
+turbulence_noise_strength = 0.18
+turbulence_noise_scale = 1.6
+turbulence_influence_min = 0.2
+turbulence_influence_max = 0.6
+alpha_curve = SubResource("dust_alpha")
+color = Color(1, 0.95, 0.84, 0.5)
+
+[sub_resource type="ParticleProcessMaterial" id="dustpm_Mid"]
+particle_flag_align_y = false
+emission_shape = 3
+emission_box_extents = Vector3(3.5, 2.7, 5.5)
+direction = Vector3(1, 0.35, 0.2)
+spread = 35.0
+initial_velocity_min = 0.035
+initial_velocity_max = 0.13
+gravity = Vector3(0, -0.012, 0)
+scale_min = 0.5
+scale_max = 1.9
+turbulence_enabled = true
+turbulence_noise_strength = 0.18
+turbulence_noise_scale = 1.6
+turbulence_influence_min = 0.2
+turbulence_influence_max = 0.6
+alpha_curve = SubResource("dust_alpha")
+color = Color(1, 0.95, 0.84, 0.5)
+
+[sub_resource type="ParticleProcessMaterial" id="dustpm_TopMid"]
+particle_flag_align_y = false
+emission_shape = 3
+emission_box_extents = Vector3(7.5, 2.5, 4.5)
+direction = Vector3(1, 0.35, 0.2)
+spread = 35.0
+initial_velocity_min = 0.035
+initial_velocity_max = 0.13
+gravity = Vector3(0, -0.012, 0)
+scale_min = 0.5
+scale_max = 1.9
+turbulence_enabled = true
+turbulence_noise_strength = 0.18
+turbulence_noise_scale = 1.6
+turbulence_influence_min = 0.2
+turbulence_influence_max = 0.6
+alpha_curve = SubResource("dust_alpha")
+color = Color(1, 0.95, 0.84, 0.5)
+
+[sub_resource type="ParticleProcessMaterial" id="dustpm_TunnelW"]
+particle_flag_align_y = false
+emission_shape = 3
+emission_box_extents = Vector3(4.5, 2.2, 5.5)
+direction = Vector3(1, 0.35, 0.2)
+spread = 35.0
+initial_velocity_min = 0.035
+initial_velocity_max = 0.13
+gravity = Vector3(0, -0.012, 0)
+scale_min = 0.5
+scale_max = 1.9
+turbulence_enabled = true
+turbulence_noise_strength = 0.18
+turbulence_noise_scale = 1.6
+turbulence_influence_min = 0.2
+turbulence_influence_max = 0.6
+alpha_curve = SubResource("dust_alpha")
+color = Color(1, 0.95, 0.84, 0.5)
+
+[sub_resource type="ParticleProcessMaterial" id="dustpm_TunnelE"]
+particle_flag_align_y = false
+emission_shape = 3
+emission_box_extents = Vector3(4, 2.2, 7.5)
+direction = Vector3(1, 0.35, 0.2)
+spread = 35.0
+initial_velocity_min = 0.035
+initial_velocity_max = 0.13
+gravity = Vector3(0, -0.012, 0)
+scale_min = 0.5
+scale_max = 1.9
+turbulence_enabled = true
+turbulence_noise_strength = 0.18
+turbulence_noise_scale = 1.6
+turbulence_influence_min = 0.2
+turbulence_influence_max = 0.6
+alpha_curve = SubResource("dust_alpha")
+color = Color(1, 0.95, 0.84, 0.5)
+
+[sub_resource type="ParticleProcessMaterial" id="dustpm_CTMid"]
+particle_flag_align_y = false
+emission_shape = 3
+emission_box_extents = Vector3(5.5, 2.3, 4.5)
+direction = Vector3(1, 0.35, 0.2)
+spread = 35.0
+initial_velocity_min = 0.035
+initial_velocity_max = 0.13
+gravity = Vector3(0, -0.012, 0)
+scale_min = 0.5
+scale_max = 1.9
+turbulence_enabled = true
+turbulence_noise_strength = 0.18
+turbulence_noise_scale = 1.6
+turbulence_influence_min = 0.2
+turbulence_influence_max = 0.6
+alpha_curve = SubResource("dust_alpha")
+color = Color(1, 0.95, 0.84, 0.5)
+
+[sub_resource type="BoxShape3D" id="ia_TSpawn"]
+size = Vector3(18, 5, 7)
+
+[sub_resource type="BoxShape3D" id="ia_CTSpawn"]
+size = Vector3(18, 5, 6)
+
+[sub_resource type="BoxShape3D" id="ia_Mid"]
+size = Vector3(7, 5.4, 11)
+
+[sub_resource type="BoxShape3D" id="ia_TopMid"]
+size = Vector3(15, 5, 9)
+
+[sub_resource type="BoxShape3D" id="ia_TunnelW"]
+size = Vector3(9, 4.4, 11)
+
+[sub_resource type="BoxShape3D" id="ia_TunnelE"]
+size = Vector3(8, 4.4, 15)
+
+[sub_resource type="BoxShape3D" id="ia_CTMid"]
+size = Vector3(11, 4.6, 9)
+
+[sub_resource type="BoxOccluder3D" id="occ0"]
+size = Vector3(2, 7.05, 16)
+
+[sub_resource type="BoxOccluder3D" id="occ1"]
+size = Vector3(6, 7.05, 6)
+
+[sub_resource type="BoxOccluder3D" id="occ2"]
+size = Vector3(2, 7.05, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ3"]
+size = Vector3(2, 7.05, 4)
+
+[sub_resource type="BoxOccluder3D" id="occ4"]
+size = Vector3(2, 7.05, 4)
+
+[sub_resource type="BoxOccluder3D" id="occ5"]
+size = Vector3(6, 7.05, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ6"]
+size = Vector3(4, 8.05, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ7"]
+size = Vector3(2, 8.05, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ8"]
+size = Vector3(8, 8.05, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ9"]
+size = Vector3(2, 8.05, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ10"]
+size = Vector3(4, 8.05, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ11"]
+size = Vector3(4, 8.05, 10)
+
+[sub_resource type="BoxOccluder3D" id="occ12"]
+size = Vector3(2, 8.55, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ13"]
+size = Vector3(8, 8.55, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ14"]
+size = Vector3(8, 8.55, 6)
+
+[sub_resource type="BoxOccluder3D" id="occ15"]
+size = Vector3(2, 9.05, 10)
+
+[sub_resource type="BoxOccluder3D" id="occ16"]
+size = Vector3(2, 9.05, 4)
+
+[sub_resource type="BoxOccluder3D" id="occ17"]
+size = Vector3(2, 9.05, 10)
+
+[sub_resource type="BoxOccluder3D" id="occ18"]
+size = Vector3(4, 9.05, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ19"]
+size = Vector3(2, 9.05, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ20"]
+size = Vector3(2, 9.05, 4)
+
+[sub_resource type="BoxOccluder3D" id="occ21"]
+size = Vector3(4, 9.05, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ22"]
+size = Vector3(8, 9.05, 6)
+
+[sub_resource type="BoxOccluder3D" id="occ23"]
+size = Vector3(6, 9.05, 4)
+
+[sub_resource type="BoxOccluder3D" id="occ24"]
+size = Vector3(6, 9.05, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ25"]
+size = Vector3(4, 9.05, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ26"]
+size = Vector3(2, 9.55, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ27"]
+size = Vector3(2, 9.55, 16)
+
+[sub_resource type="BoxOccluder3D" id="occ28"]
+size = Vector3(4, 9.55, 6)
+
+[sub_resource type="BoxOccluder3D" id="occ29"]
+size = Vector3(6, 9.55, 4)
+
+[sub_resource type="BoxOccluder3D" id="occ30"]
+size = Vector3(8, 9.55, 6)
+
+[sub_resource type="BoxOccluder3D" id="occ31"]
+size = Vector3(8, 9.55, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ32"]
+size = Vector3(2, 9.55, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ33"]
+size = Vector3(2, 9.55, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ34"]
+size = Vector3(2, 9.55, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ35"]
+size = Vector3(6, 10.05, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ36"]
+size = Vector3(2, 10.05, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ37"]
+size = Vector3(2, 10.05, 6)
+
+[sub_resource type="BoxOccluder3D" id="occ38"]
+size = Vector3(2, 10.05, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ39"]
+size = Vector3(6, 10.05, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ40"]
+size = Vector3(4, 10.05, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ41"]
+size = Vector3(4, 10.05, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ42"]
+size = Vector3(8, 10.55, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ43"]
+size = Vector3(10, 10.55, 4)
+
+[sub_resource type="BoxOccluder3D" id="occ44"]
+size = Vector3(8, 10.55, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ45"]
+size = Vector3(2, 10.55, 16)
+
+[sub_resource type="BoxOccluder3D" id="occ46"]
+size = Vector3(2, 10.55, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ47"]
+size = Vector3(2, 11.55, 8)
+
+[sub_resource type="BoxOccluder3D" id="occ48"]
+size = Vector3(2, 11.55, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ49"]
+size = Vector3(8, 11.55, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ50"]
+size = Vector3(8, 11.55, 4)
+
+[sub_resource type="BoxOccluder3D" id="occ51"]
+size = Vector3(8, 11.55, 2)
+
+[sub_resource type="BoxOccluder3D" id="occ52"]
+size = Vector3(6, 11.55, 4)
+
+[sub_resource type="BoxOccluder3D" id="occ53"]
+size = Vector3(2, 11.55, 8)
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.49301, 0.00000, 0.87002, 0.72509, 0.55265, 0.41088, -0.48082, 0.83341, -0.27246, 0, 40, 0)
+light_color = Color(1, 0.88, 0.70, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 1.3
+light_angular_distance = 0.2
+shadow_enabled = true
+shadow_blur = 0.6
+shadow_normal_bias = 1.4
+directional_shadow_mode = 2
+directional_shadow_split_1 = 0.06
+directional_shadow_split_2 = 0.18
+directional_shadow_split_3 = 0.45
+directional_shadow_blend_splits = true
+directional_shadow_max_distance = 95.0
+
+[node name="Fill" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.64594, 0.00000, -0.76339, -0.35670, 0.88412, -0.30182, 0.67493, 0.46726, 0.57109, 0, 30, 0)
+light_color = Color(1, 0.84, 0.66, 1)
+light_energy = 1.15
+light_specular = 0.1
+light_volumetric_fog_energy = 0.2
+shadow_enabled = false
+
+[node name="Bounce" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 30, 0)
+light_color = Color(1, 0.86, 0.68, 1)
+light_energy = 0.85
+light_specular = 0.05
+shadow_enabled = false
+
+[node name="Map" parent="." instance=ExtResource("1_map")]
+
+[node name="Navigation" type="NavigationRegion3D" parent="."]
+navigation_mesh = ExtResource("6_nav")
+
+[node name="Collision" parent="Navigation" instance=ExtResource("2_col")]
+
+[node name="OuterGround" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.32, 0)
+mesh = SubResource("ground")
+surface_material_override/0 = SubResource("ground_mat")
+
+[node name="Lamps" type="Node3D" parent="."]
+
+[node name="Lamp0" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp1" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp2" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp3" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp4" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp5" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp6" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp7" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp8" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp9" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp10" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp11" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp12" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp13" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp14" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp15" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp16" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp17" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp18" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 2.55, -22.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp19" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 2.55, -19.39)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp20" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.55, -19.39)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp21" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2.55, -19.39)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp22" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.61, 2.55, -18)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp23" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.55, -19.39)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp24" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.61, 2.55, -18)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp25" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2.55, -19.39)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp26" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.55, -19.39)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp27" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.55, -19.39)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp28" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.39, 2.55, -18)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp29" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 2.55, -19.39)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp30" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.61, 2.55, -18)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp31" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.61, 2.55, -12)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp32" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2.55, -10.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp33" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.55, -10.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp34" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.39, 2.55, -12)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp35" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.55, -10.61)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp36" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.61, 2.55, -12)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp37" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.61, 2.55, -6)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp38" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.39, 2.55, -6)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp39" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, -6)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp40" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.61, 2.55, -6)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp41" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.39, 2.55, -6)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp42" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.61, 2.55, -6)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp43" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, 0)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp44" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.61, 2.55, 0)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp45" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2.55, 1.39)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp46" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2.55, 1.39)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp47" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.61, 2.55, 18)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Lamp48" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.61, 2.55, 18)
+light_color = Color(1, 0.66, 0.34, 1)
+light_energy = 1.5
+light_volumetric_fog_energy = 2.2
+omni_range = 7.0
+omni_attenuation = 1.7
+
+[node name="Zones" type="Node3D" parent="."]
+
+[node name="BombSiteA" type="Area3D" parent="Zones" groups=["bomb_sites"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.5, 1.75, 7)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+metadata/site = "A"
+
+[node name="Shape" type="CollisionShape3D" parent="Zones/BombSiteA"]
+shape = SubResource("z_BombSiteA")
+
+[node name="Viz" type="MeshInstance3D" parent="Zones/BombSiteA" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("zm_BombSiteA")
+
+[node name="BombSiteB" type="Area3D" parent="Zones" groups=["bomb_sites"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.75, 1.75, 6.75)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+metadata/site = "B"
+
+[node name="Shape" type="CollisionShape3D" parent="Zones/BombSiteB"]
+shape = SubResource("z_BombSiteB")
+
+[node name="Viz" type="MeshInstance3D" parent="Zones/BombSiteB" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("zm_BombSiteB")
+
+[node name="BuyZoneT" type="Area3D" parent="Zones" groups=["buy_zones"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -20)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+metadata/team = "T"
+
+[node name="Shape" type="CollisionShape3D" parent="Zones/BuyZoneT"]
+shape = SubResource("z_BuyZoneT")
+
+[node name="Viz" type="MeshInstance3D" parent="Zones/BuyZoneT" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("zm_BuyZoneT")
+
+[node name="BuyZoneCT" type="Area3D" parent="Zones" groups=["buy_zones"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 18)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+metadata/team = "CT"
+
+[node name="Shape" type="CollisionShape3D" parent="Zones/BuyZoneCT"]
+shape = SubResource("z_BuyZoneCT")
+
+[node name="Viz" type="MeshInstance3D" parent="Zones/BuyZoneCT" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("zm_BuyZoneCT")
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="T1" type="Marker3D" parent="Spawns" groups=["spawn_T"]]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -4, 0.05, -20)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/T1" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_T")
+
+[node name="T2" type="Marker3D" parent="Spawns" groups=["spawn_T"]]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -2, 0.05, -20)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/T2" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_T")
+
+[node name="T3" type="Marker3D" parent="Spawns" groups=["spawn_T"]]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.05, -20)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/T3" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_T")
+
+[node name="T4" type="Marker3D" parent="Spawns" groups=["spawn_T"]]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 2, 0.05, -20)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/T4" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_T")
+
+[node name="T5" type="Marker3D" parent="Spawns" groups=["spawn_T"]]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 4, 0.05, -20)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/T5" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_T")
+
+[node name="CT1" type="Marker3D" parent="Spawns" groups=["spawn_CT"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.05, 18)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/CT1" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_CT")
+
+[node name="CT2" type="Marker3D" parent="Spawns" groups=["spawn_CT"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.05, 18)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/CT2" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_CT")
+
+[node name="CT3" type="Marker3D" parent="Spawns" groups=["spawn_CT"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 18)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/CT3" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_CT")
+
+[node name="CT4" type="Marker3D" parent="Spawns" groups=["spawn_CT"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.05, 18)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/CT4" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_CT")
+
+[node name="CT5" type="Marker3D" parent="Spawns" groups=["spawn_CT"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.05, 18)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/CT5" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_CT")
+
+[node name="AIPoints" type="Node3D" parent="."]
+
+[node name="P00" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 8)
+metadata/label = "A plant"
+metadata/kind = "plant"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P00" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P00" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "A plant (plant, T)"
+
+[node name="P01" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.8, 1.3, 10)
+metadata/label = "A back platform"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P01" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P01" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "A back platform (hold, CT)"
+
+[node name="P02" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.6, 0, 6.4)
+metadata/label = "A default box"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P02" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P02" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "A default box (hold, CT)"
+
+[node name="P03" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.6, 0, 12.3)
+metadata/label = "A CT side"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P03" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P03" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "A CT side (hold, CT)"
+
+[node name="P04" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, -2.2)
+metadata/label = "A long exit"
+metadata/kind = "entry"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P04" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P04" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "A long exit (entry, T)"
+
+[node name="P05" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 0, -2.2)
+metadata/label = "A short exit"
+metadata/kind = "entry"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P05" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P05" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "A short exit (entry, T)"
+
+[node name="P06" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 14)
+metadata/label = "A ramp"
+metadata/kind = "retake"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P06" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P06" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "A ramp (retake, CT)"
+
+[node name="P07" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 0, 7)
+metadata/label = "B plant"
+metadata/kind = "plant"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P07" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P07" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "B plant (plant, T)"
+
+[node name="P08" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 1.3, 6.5)
+metadata/label = "B back platform"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P08" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P08" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "B back platform (hold, CT)"
+
+[node name="P09" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.3, 0, 6)
+metadata/label = "B doors"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P09" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P09" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "B doors (hold, CT)"
+
+[node name="P10" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 0, 2.9)
+metadata/label = "B tunnel box"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P10" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P10" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "B tunnel box (hold, CT)"
+
+[node name="P11" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, -2.2)
+metadata/label = "B tunnel exit"
+metadata/kind = "entry"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P11" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P11" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "B tunnel exit (entry, T)"
+
+[node name="P12" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 14)
+metadata/label = "B ramp"
+metadata/kind = "retake"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P12" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P12" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "B ramp (retake, CT)"
+
+[node name="P13" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -11)
+metadata/label = "Top mid"
+metadata/kind = "hold"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P13" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P13" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Top mid (hold, T)"
+
+[node name="P14" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0, -2)
+metadata/label = "Mid corridor"
+metadata/kind = "hold"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P14" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P14" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Mid corridor (hold, T)"
+
+[node name="P15" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8)
+metadata/label = "CT mid"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P15" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P15" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "CT mid (hold, CT)"
+
+[node name="P16" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -8)
+metadata/label = "Catwalk"
+metadata/kind = "rotate"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P16" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P16" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Catwalk (rotate, T)"
+
+[node name="P17" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 0, -7.5)
+metadata/label = "Lower tunnels"
+metadata/kind = "rotate"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P17" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P17" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Lower tunnels (rotate, T)"
+
+[node name="P18" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.2, 0, -14.5)
+metadata/label = "Upper tunnels"
+metadata/kind = "rotate"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P18" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P18" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Upper tunnels (rotate, T)"
+
+[node name="P19" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 0, -10.5)
+metadata/label = "Long corner"
+metadata/kind = "hold"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P19" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P19" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Long corner (hold, T)"
+
+[node name="P20" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, -22)
+metadata/label = "Long doors"
+metadata/kind = "entry"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P20" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P20" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Long doors (entry, T)"
+
+[node name="P21" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 18)
+metadata/label = "CT spawn"
+metadata/kind = "rotate"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P21" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P21" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "CT spawn (rotate, CT)"
+
+[node name="Reflections" type="Node3D" parent="."]
+
+[node name="ProbeTSpawn" type="ReflectionProbe" parent="Reflections" groups=["fx_probes"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, -21)
+size = Vector3(18, 5, 7)
+interior = true
+enable_shadows = true
+ambient_mode = 1
+ambient_color = Color(0.55, 0.45, 0.33, 1)
+ambient_color_energy = 0.5
+max_distance = 45.0
+update_mode = 0
+mesh_lod_threshold = 1.0
+
+[node name="ProbeCTSpawn" type="ReflectionProbe" parent="Reflections" groups=["fx_probes"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 20)
+size = Vector3(18, 5, 6)
+interior = true
+enable_shadows = true
+ambient_mode = 1
+ambient_color = Color(0.55, 0.45, 0.33, 1)
+ambient_color_energy = 0.5
+max_distance = 45.0
+update_mode = 0
+mesh_lod_threshold = 1.0
+
+[node name="ProbeMid" type="ReflectionProbe" parent="Reflections" groups=["fx_probes"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, -2)
+size = Vector3(7, 5.4, 11)
+interior = true
+enable_shadows = true
+ambient_mode = 1
+ambient_color = Color(0.55, 0.45, 0.33, 1)
+ambient_color_energy = 0.5
+max_distance = 45.0
+update_mode = 0
+mesh_lod_threshold = 1.0
+
+[node name="ProbeTopMid" type="ReflectionProbe" parent="Reflections" groups=["fx_probes"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, -11)
+size = Vector3(15, 5, 9)
+interior = true
+enable_shadows = true
+ambient_mode = 1
+ambient_color = Color(0.55, 0.45, 0.33, 1)
+ambient_color_energy = 0.5
+max_distance = 45.0
+update_mode = 0
+mesh_lod_threshold = 1.0
+
+[node name="ProbeTunnelW" type="ReflectionProbe" parent="Reflections" groups=["fx_probes"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 2, -18)
+size = Vector3(9, 4.4, 11)
+interior = true
+enable_shadows = true
+ambient_mode = 1
+ambient_color = Color(0.55, 0.45, 0.33, 1)
+ambient_color_energy = 0.5
+max_distance = 45.0
+update_mode = 0
+mesh_lod_threshold = 1.0
+
+[node name="ProbeTunnelE" type="ReflectionProbe" parent="Reflections" groups=["fx_probes"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 2, -14)
+size = Vector3(8, 4.4, 15)
+interior = true
+enable_shadows = true
+ambient_mode = 1
+ambient_color = Color(0.55, 0.45, 0.33, 1)
+ambient_color_energy = 0.5
+max_distance = 45.0
+update_mode = 0
+mesh_lod_threshold = 1.0
+
+[node name="ProbeCTMid" type="ReflectionProbe" parent="Reflections" groups=["fx_probes"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 9)
+size = Vector3(11, 4.6, 9)
+interior = true
+enable_shadows = true
+ambient_mode = 1
+ambient_color = Color(0.55, 0.45, 0.33, 1)
+ambient_color_energy = 0.5
+max_distance = 45.0
+update_mode = 0
+mesh_lod_threshold = 1.0
+
+[node name="Dust" type="Node3D" parent="." groups=["fx_dust"]]
+visible = false
+
+[node name="DustTSpawn" type="GPUParticles3D" parent="Dust"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, -21)
+amount = 69
+lifetime = 14.0
+preprocess = 8.0
+randomness = 1.0
+fixed_fps = 20
+visibility_aabb = AABB(-9, -2.5, -3.5, 18, 5, 7)
+process_material = SubResource("dustpm_TSpawn")
+draw_pass_1 = SubResource("dust_quad")
+
+[node name="DustCTSpawn" type="GPUParticles3D" parent="Dust"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 20)
+amount = 59
+lifetime = 14.0
+preprocess = 8.0
+randomness = 1.0
+fixed_fps = 20
+visibility_aabb = AABB(-9, -2.5, -3, 18, 5, 6)
+process_material = SubResource("dustpm_CTSpawn")
+draw_pass_1 = SubResource("dust_quad")
+
+[node name="DustMid" type="GPUParticles3D" parent="Dust"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, -2)
+amount = 42
+lifetime = 14.0
+preprocess = 8.0
+randomness = 1.0
+fixed_fps = 20
+visibility_aabb = AABB(-3.5, -2.7, -5.5, 7, 5.4, 11)
+process_material = SubResource("dustpm_Mid")
+draw_pass_1 = SubResource("dust_quad")
+
+[node name="DustTopMid" type="GPUParticles3D" parent="Dust"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, -11)
+amount = 74
+lifetime = 14.0
+preprocess = 8.0
+randomness = 1.0
+fixed_fps = 20
+visibility_aabb = AABB(-7.5, -2.5, -4.5, 15, 5, 9)
+process_material = SubResource("dustpm_TopMid")
+draw_pass_1 = SubResource("dust_quad")
+
+[node name="DustTunnelW" type="GPUParticles3D" parent="Dust"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 2, -18)
+amount = 54
+lifetime = 14.0
+preprocess = 8.0
+randomness = 1.0
+fixed_fps = 20
+visibility_aabb = AABB(-4.5, -2.2, -5.5, 9, 4.4, 11)
+process_material = SubResource("dustpm_TunnelW")
+draw_pass_1 = SubResource("dust_quad")
+
+[node name="DustTunnelE" type="GPUParticles3D" parent="Dust"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 2, -14)
+amount = 66
+lifetime = 14.0
+preprocess = 8.0
+randomness = 1.0
+fixed_fps = 20
+visibility_aabb = AABB(-4, -2.2, -7.5, 8, 4.4, 15)
+process_material = SubResource("dustpm_TunnelE")
+draw_pass_1 = SubResource("dust_quad")
+
+[node name="DustCTMid" type="GPUParticles3D" parent="Dust"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 9)
+amount = 54
+lifetime = 14.0
+preprocess = 8.0
+randomness = 1.0
+fixed_fps = 20
+visibility_aabb = AABB(-5.5, -2.3, -4.5, 11, 4.6, 9)
+process_material = SubResource("dustpm_CTMid")
+draw_pass_1 = SubResource("dust_quad")
+
+[node name="Ambience" type="Node3D" parent="."]
+
+[node name="Wind" type="AudioStreamPlayer" parent="Ambience"]
+stream = ExtResource("8_wind")
+autoplay = true
+volume_db = -14.0
+bus = &"Ambience"
+
+[node name="Town" type="AudioStreamPlayer" parent="Ambience"]
+stream = ExtResource("9_town")
+autoplay = true
+volume_db = -24.0
+bus = &"Ambience"
+
+[node name="Bird0" type="AudioStreamPlayer3D" parent="Ambience"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 9, 9)
+stream = ExtResource("10_bird")
+volume_db = -20.0
+unit_size = 26.0
+max_distance = 60.0
+bus = &"Ambience"
+
+[node name="Bird1" type="AudioStreamPlayer3D" parent="Ambience"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 9, 9)
+stream = ExtResource("10_bird")
+volume_db = -20.0
+unit_size = 26.0
+max_distance = 60.0
+bus = &"Ambience"
+
+[node name="Bird2" type="AudioStreamPlayer3D" parent="Ambience"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9, -22)
+stream = ExtResource("10_bird")
+volume_db = -20.0
+unit_size = 26.0
+max_distance = 60.0
+bus = &"Ambience"
+
+[node name="Bird3" type="AudioStreamPlayer3D" parent="Ambience"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 9, -18)
+stream = ExtResource("10_bird")
+volume_db = -20.0
+unit_size = 26.0
+max_distance = 60.0
+bus = &"Ambience"
+
+[node name="InteriorAreas" type="Node3D" parent="."]
+
+[node name="AreaTSpawn" type="Area3D" parent="InteriorAreas" groups=["interior_audio"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, -21)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+
+[node name="Shape" type="CollisionShape3D" parent="InteriorAreas/AreaTSpawn"]
+shape = SubResource("ia_TSpawn")
+
+[node name="AreaCTSpawn" type="Area3D" parent="InteriorAreas" groups=["interior_audio"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 20)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+
+[node name="Shape" type="CollisionShape3D" parent="InteriorAreas/AreaCTSpawn"]
+shape = SubResource("ia_CTSpawn")
+
+[node name="AreaMid" type="Area3D" parent="InteriorAreas" groups=["interior_audio"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, -2)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+
+[node name="Shape" type="CollisionShape3D" parent="InteriorAreas/AreaMid"]
+shape = SubResource("ia_Mid")
+
+[node name="AreaTopMid" type="Area3D" parent="InteriorAreas" groups=["interior_audio"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, -11)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+
+[node name="Shape" type="CollisionShape3D" parent="InteriorAreas/AreaTopMid"]
+shape = SubResource("ia_TopMid")
+
+[node name="AreaTunnelW" type="Area3D" parent="InteriorAreas" groups=["interior_audio"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 2, -18)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+
+[node name="Shape" type="CollisionShape3D" parent="InteriorAreas/AreaTunnelW"]
+shape = SubResource("ia_TunnelW")
+
+[node name="AreaTunnelE" type="Area3D" parent="InteriorAreas" groups=["interior_audio"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 2, -14)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+
+[node name="Shape" type="CollisionShape3D" parent="InteriorAreas/AreaTunnelE"]
+shape = SubResource("ia_TunnelE")
+
+[node name="AreaCTMid" type="Area3D" parent="InteriorAreas" groups=["interior_audio"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 9)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+
+[node name="Shape" type="CollisionShape3D" parent="InteriorAreas/AreaCTMid"]
+shape = SubResource("ia_CTMid")
+
+[node name="Occluders" type="Node3D" parent="."]
+
+[node name="Occ0" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.525, -13)
+occluder = SubResource("occ0")
+bake_mask = 0
+
+[node name="Occ1" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.525, -16)
+occluder = SubResource("occ1")
+bake_mask = 0
+
+[node name="Occ2" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.525, -3)
+occluder = SubResource("occ2")
+bake_mask = 0
+
+[node name="Occ3" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 3.525, 9)
+occluder = SubResource("occ3")
+bake_mask = 0
+
+[node name="Occ4" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3.525, 13)
+occluder = SubResource("occ4")
+bake_mask = 0
+
+[node name="Occ5" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3.525, -12)
+occluder = SubResource("occ5")
+bake_mask = 0
+
+[node name="Occ6" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 4.025, 14)
+occluder = SubResource("occ6")
+bake_mask = 0
+
+[node name="Occ7" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 4.025, 5)
+occluder = SubResource("occ7")
+bake_mask = 0
+
+[node name="Occ8" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 4.025, 4)
+occluder = SubResource("occ8")
+bake_mask = 0
+
+[node name="Occ9" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4.025, 11)
+occluder = SubResource("occ9")
+bake_mask = 0
+
+[node name="Occ10" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 4.025, -5)
+occluder = SubResource("occ10")
+bake_mask = 0
+
+[node name="Occ11" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 4.025, -6)
+occluder = SubResource("occ11")
+bake_mask = 0
+
+[node name="Occ12" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 4.275, -13)
+occluder = SubResource("occ12")
+bake_mask = 0
+
+[node name="Occ13" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 4.275, -24)
+occluder = SubResource("occ13")
+bake_mask = 0
+
+[node name="Occ14" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 4.275, 22)
+occluder = SubResource("occ14")
+bake_mask = 0
+
+[node name="Occ15" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 4.525, -6)
+occluder = SubResource("occ15")
+bake_mask = 0
+
+[node name="Occ16" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 4.525, -3)
+occluder = SubResource("occ16")
+bake_mask = 0
+
+[node name="Occ17" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 4.525, -6)
+occluder = SubResource("occ17")
+bake_mask = 0
+
+[node name="Occ18" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 4.525, -16)
+occluder = SubResource("occ18")
+bake_mask = 0
+
+[node name="Occ19" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 4.525, 9)
+occluder = SubResource("occ19")
+bake_mask = 0
+
+[node name="Occ20" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4.525, 3)
+occluder = SubResource("occ20")
+bake_mask = 0
+
+[node name="Occ21" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 4.525, 14)
+occluder = SubResource("occ21")
+bake_mask = 0
+
+[node name="Occ22" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 4.525, -16)
+occluder = SubResource("occ22")
+bake_mask = 0
+
+[node name="Occ23" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 4.525, -21)
+occluder = SubResource("occ23")
+bake_mask = 0
+
+[node name="Occ24" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 4.525, 17)
+occluder = SubResource("occ24")
+bake_mask = 0
+
+[node name="Occ25" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 4.525, -15)
+occluder = SubResource("occ25")
+bake_mask = 0
+
+[node name="Occ26" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 4.775, -5)
+occluder = SubResource("occ26")
+bake_mask = 0
+
+[node name="Occ27" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 4.775, 15)
+occluder = SubResource("occ27")
+bake_mask = 0
+
+[node name="Occ28" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23, 4.775, -20)
+occluder = SubResource("occ28")
+bake_mask = 0
+
+[node name="Occ29" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 4.775, 23)
+occluder = SubResource("occ29")
+bake_mask = 0
+
+[node name="Occ30" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 4.775, 22)
+occluder = SubResource("occ30")
+bake_mask = 0
+
+[node name="Occ31" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 4.775, -24)
+occluder = SubResource("occ31")
+bake_mask = 0
+
+[node name="Occ32" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4.775, -5)
+occluder = SubResource("occ32")
+bake_mask = 0
+
+[node name="Occ33" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4.775, 11)
+occluder = SubResource("occ33")
+bake_mask = 0
+
+[node name="Occ34" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4.775, 24)
+occluder = SubResource("occ34")
+bake_mask = 0
+
+[node name="Occ35" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 5.025, 17)
+occluder = SubResource("occ35")
+bake_mask = 0
+
+[node name="Occ36" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 5.025, -15)
+occluder = SubResource("occ36")
+bake_mask = 0
+
+[node name="Occ37" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 5.025, 12)
+occluder = SubResource("occ37")
+bake_mask = 0
+
+[node name="Occ38" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 5.025, 14)
+occluder = SubResource("occ38")
+bake_mask = 0
+
+[node name="Occ39" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 5.025, -3)
+occluder = SubResource("occ39")
+bake_mask = 0
+
+[node name="Occ40" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 5.025, -16)
+occluder = SubResource("occ40")
+bake_mask = 0
+
+[node name="Occ41" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 5.025, -5)
+occluder = SubResource("occ41")
+bake_mask = 0
+
+[node name="Occ42" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 5.275, -24)
+occluder = SubResource("occ42")
+bake_mask = 0
+
+[node name="Occ43" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 5.275, 23)
+occluder = SubResource("occ43")
+bake_mask = 0
+
+[node name="Occ44" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 5.275, -24)
+occluder = SubResource("occ44")
+bake_mask = 0
+
+[node name="Occ45" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 5.275, -17)
+occluder = SubResource("occ45")
+bake_mask = 0
+
+[node name="Occ46" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 5.275, 19)
+occluder = SubResource("occ46")
+bake_mask = 0
+
+[node name="Occ47" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 5.775, 3)
+occluder = SubResource("occ47")
+bake_mask = 0
+
+[node name="Occ48" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 5.775, 24)
+occluder = SubResource("occ48")
+bake_mask = 0
+
+[node name="Occ49" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 5.775, -24)
+occluder = SubResource("occ49")
+bake_mask = 0
+
+[node name="Occ50" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 5.775, 23)
+occluder = SubResource("occ50")
+bake_mask = 0
+
+[node name="Occ51" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 5.775, -24)
+occluder = SubResource("occ51")
+bake_mask = 0
+
+[node name="Occ52" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 5.775, 23)
+occluder = SubResource("occ52")
+bake_mask = 0
+
+[node name="Occ53" type="OccluderInstance3D" parent="Occluders"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 5.775, 3)
+occluder = SubResource("occ53")
+bake_mask = 0
+
+[node name="Player" type="CharacterBody3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.2, -20)
+collision_layer = 8
+collision_mask = 3
+script = ExtResource("3_pl")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("capsule")
+
+[node name="Camera3D" type="Camera3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
+fov = 80.0
+
+[node name="FloorRay" type="RayCast3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+target_position = Vector3(0, -0.6, 0)
+collision_mask = 1
+
+[node name="Steps" type="AudioStreamPlayer3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+volume_db = -8.0
+unit_size = 4.0
+
+[node name="GameMode" type="Node" parent="."]
+script = ExtResource("4_gm")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("5_hud")
+
+[node name="Graphics" type="Node" parent="."]
+script = ExtResource("7_gfx")
+
+[node name="AudioZones" type="Node" parent="."]
+script = ExtResource("11_aud")

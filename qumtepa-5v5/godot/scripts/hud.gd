@@ -45,7 +45,7 @@ func _ready() -> void:
 	hint_lbl = _label(root, 20, Control.PRESET_CENTER_BOTTOM, Vector2(-400, -110), Vector2(800, 30), HORIZONTAL_ALIGNMENT_CENTER)
 	help_lbl = _label(root, 14, Control.PRESET_BOTTOM_LEFT, Vector2(24, -40), Vector2(700, 24), HORIZONTAL_ALIGNMENT_LEFT)
 	help_lbl.modulate = Color(1, 1, 1, 0.7)
-	help_lbl.text = "E — o'rnatish/zararsizlantirish   G — bombani tashlash   B — sotib olish   F1 — zonalar   F2 — jamoa   F3 — raund   F4 — shom   F7 — mashq nishonlari   F9 — FPS   M — xarita\nShift — sekin yurish (jim)   Ctrl/C — o'tirish   Space — sakrash   Sichqoncha — o'q, o'ng tugma — nishonga olish\n1/2/3 — avtomat / to'pponcha / pichoq   R — qayta o'qlash   B — o'q rejimi"
+	help_lbl.text = "E — o'rnatish/zararsizlantirish   G — bombani tashlash   B — sotib olish   F1 — zonalar   F2 — jamoa   F3 — raund   F4 — shom   F7 — mashq nishonlari   F9 — FPS   M — xarita\nShift — sekin yurish (jim)   Ctrl/C — o'tirish   Space — sakrash   Sichqoncha — o'q, o'ng tugma — nishonga olish\n1/2/3 — asosiy qurol / to'pponcha / pichoq   R — qayta o'qlash   X — o'q rejimi   B — sotib olish (5 ta qurol)"
 	banner_lbl = _label(root, 40, Control.PRESET_CENTER, Vector2(-450, -140), Vector2(900, 110), HORIZONTAL_ALIGNMENT_CENTER)
 	banner_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD
 
@@ -134,7 +134,7 @@ func _process(_delta: float) -> void:
 		banner_lbl.modulate = T_COLOR if gm.last_winner == "T" else CT_COLOR
 
 	var can_buy: bool = gm.in_buy_zone()
-	buy_panel.visible = _buy_open and can_buy
+	buy_panel.visible = false   # sotib olish menyusi — scripts/buy_menu.gd
 	if buy_panel.visible:
 		buy_lbl.text = "Sotib olish   (%d s qoldi)\n\nAKM — model tayyor bo'lgach\nPichoq — model tayyor bo'lgach\nGranata — model tayyor bo'lgach\nZararsizlantirish to'plami (CT)\n\nB — yopish" % int(gm.buy_time_left)
 

@@ -6,7 +6,7 @@ extends CharacterBody3D
 ##   sakrash (Space) — qo'nishda tovush bor. O'tirganda bo'y 1.8 -> 1.25 m, ko'z 1.65 -> 1.08 m;
 ##   ustida shift bo'lsa (past tom), turib bo'lmaydi.
 ## Qurol: birinchi shaxsda qo'llar va qurol (fp_view.gd): 1/2/3 — avtomat/to'pponcha/pichoq, chap tugma — o'q,
-##   o'ng tugma — nishonga olish (ADS), R — qayta o'qlash, B — o'q rejimi.
+##   o'ng tugma — nishonga olish (ADS), R — qayta o'qlash, X — o'q rejimi, B — sotib olish.
 ## Ko'rinish ajratilgan:
 ##   o'yinchining O'Z kamerasi — 1-shaxs: faqat qo'llar va qurol (Camera3D/FPView); o'z tanasi ko'rinmaydi, faqat soyasi;
 ##   BOSHQA har qanday kamera (tomoshabin, boshqa o'yinchi, bot kamerasi) — 3-shaxs: to'liq tana (Body), qurol qo'lda,
@@ -122,6 +122,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		rotate_y(-event.relative.x * mouse_sensitivity * look_scale)
 		cam.rotate_x(-event.relative.y * mouse_sensitivity * look_scale)
 		cam.rotation.x = clamp(cam.rotation.x, -1.45, 1.45)
+	elif event is InputEventKey and event.pressed and event.keycode == KEY_F10 and ResourceLoader.exists("res://menu.tscn"):
+		get_tree().change_scene_to_file("res://menu.tscn")      # bosh menyu (xarita tanlash)
 	elif event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	elif event is InputEventMouseButton and event.pressed and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:

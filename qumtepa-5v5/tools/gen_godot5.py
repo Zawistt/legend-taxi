@@ -105,8 +105,12 @@ shutil.copy(f"{V2}/scenes/bomb.tscn", f"{OUT}/scenes/bomb.tscn")
 _h = open(f"{OUT}/scripts/hud.gd").read()
 _h = _h.replace("F3 — raundni qayta boshlash\"", "F3 — raund   F4 — shom   F7 — mashq nishonlari   F9 — FPS   M — xarita\\n"
                 "Shift — sekin yurish (jim)   Ctrl/C — o'tirish   Space — sakrash   Sichqoncha — o'q, o'ng tugma — nishonga olish\\n"
-                "1/2/3 — avtomat / to'pponcha / pichoq   R — qayta o'qlash   B — o'q rejimi\"")
+                "1/2/3 — asosiy qurol / to'pponcha / pichoq   R — qayta o'qlash   X — o'q rejimi   B — sotib olish (5 ta qurol)\"")
 assert "F9 — FPS" in _h
+# eski (v2) sotib olish paneli o'rniga scripts/buy_menu.gd ishlaydi
+_old_buy = "buy_panel.visible = _buy_open and can_buy"
+assert _old_buy in _h
+_h = _h.replace(_old_buy, "buy_panel.visible = false   # sotib olish menyusi — scripts/buy_menu.gd")
 open(f"{OUT}/scripts/hud.gd", "w").write(_h)
 os.makedirs(f"{OUT}/weapons", exist_ok=True)
 for sub in ("scripts", "tests", "weapons"):
@@ -501,6 +505,17 @@ def main_scene(glb_path, out_name):
 
 main_scene("res://map/qumtepa5v5.glb" if ART else "res://map/qumtepa5v5_greybox.glb", "main.tscn")
 main_scene("res://map/qumtepa5v5_greybox.glb", "main_greybox.tscn")
+open(f"{OUT}/menu.tscn", "w").write('''[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/menu.gd" id="1_menu"]
+
+[node name="Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_menu")
+''')
 # ------------------------------------------------------------------ tests/test_data.gd — testlar uchun xarita ma'lumotlari
 def gd_route(wps):
     return "[" + ", ".join(V3(p) for p in wps) + "]"
@@ -737,7 +752,7 @@ config_version=5
 [application]
 
 config/name="Qumtepa 5v5 - greybox (2-bosqich)"
-run/main_scene="res://main.tscn"
+run/main_scene="res://menu.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 
 [display]

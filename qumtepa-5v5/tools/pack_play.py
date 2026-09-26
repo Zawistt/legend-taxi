@@ -17,7 +17,7 @@ SKIP_FILES = {"characters/ct_soldier.glb", "characters/ct_soldier.glb.import", "
 def skip(rel):
     if rel.split("/")[0] in SKIP_DIRS or rel in SKIP_FILES:
         return True
-    if rel.startswith(("map/", "characters/")) and rel.endswith((".png", ".jpg", ".png.import", ".jpg.import")):
+    if rel.startswith(("map/", "characters/", "maps/")) and rel.endswith((".png", ".jpg", ".png.import", ".jpg.import")):
         return True          # Godot GLB dan ajratib oladigan rasmlar — import paytida qayta yaratiladi
     return False
 
@@ -88,7 +88,7 @@ def main(out_zip):
                 shutil.copy(full, dst)
     for f in ("README.md",):
         shutil.copy(os.path.join(HERE, "..", f), os.path.join(tmp, "qumtepa-5v5", f))
-    for f in ("YAKUNIY_HISOBOT.md", "STAGE8.md", "STAGE9.md", "STAGE10.md"):
+    for f in ("YAKUNIY_HISOBOT.md", "STAGE8.md", "STAGE9.md", "STAGE10.md", "STAGE11.md"):
         os.makedirs(os.path.join(tmp, "qumtepa-5v5", "docs"), exist_ok=True)
         shutil.copy(os.path.join(HERE, "..", "docs", f), os.path.join(tmp, "qumtepa-5v5", "docs", f))
     with zipfile.ZipFile(out_zip, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:

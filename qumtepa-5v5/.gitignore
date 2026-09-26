@@ -10,3 +10,5 @@ godot/characters/*.png
 godot/characters/*.png.import
 docs/characters/frames/
 assets_src/ct_hero/report/tekshiruv/
+godot/maps/*/map/*.png
+godot/maps/*/map/*.png.import

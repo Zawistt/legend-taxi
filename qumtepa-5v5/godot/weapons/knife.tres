@@ -8,6 +8,7 @@ weapon_id = "combat_knife"
 weapon_name = "Pichoq"
 kind = 2
 slot = 3
+category_name = "Pichoq"
 base_damage = 75.0
 headshot_multiplier = 1.5
 legshot_multiplier = 0.9

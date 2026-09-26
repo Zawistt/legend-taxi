@@ -1,9 +1,11 @@
 extends Node3D
 ## Birinchi shaxs: qo'llar va qurol (hozircha low-poly o'rinbosar — character_model.gd) va QUROL TIZIMI.
 ## Qurol tizimi Legend Tactical FPS loyihasidan olingan g'oyalar asosida Qumtepa uchun qayta yozilgan:
-##   - ma'lumotga asoslangan qurollar (res://weapons/*.tres, scripts/weapon_data.gd): 1 — LAR-01 avtomat,
+##   - ma'lumotga asoslangan qurollar (res://weapons/*.tres, scripts/weapon_data.gd): 1 — asosiy qurol
+##     (LAR-01; sotib olish menyusida (B) AR-44, Spectre-9 SMG, Longbow-50 snayper, Breacher-12 drobovik),
 ##     2 — Apex-9 to'pponcha, 3 — pichoq. Almashtirish: 1/2/3 yoki sichqoncha g'ildiragi.
-##   - o'q rejimlari (B): avtomat / 3 talik / bittalik; magazin, zaxira, qayta o'qlash (bo'sh magazin — uzoqroq);
+##   - o'q rejimlari (X): avtomat / 3 talik / bittalik; magazin, zaxira, qayta o'qlash (bo'sh magazin — uzoqroq);
+##   - snayper: zatvor (har o'qdan keyin 1.1 s), ADS da optik nishon; drobovik: bir otishda 8 ta sochma;
 ##   - tepki naqshi (har o'q oldindan belgilangan yo'nalishga), otish to'xtaganda nishon joyiga qaytadi;
 ##   - tarqalish: har o'qda kengayadi, harakat / sakrash / o'tirish / ADS ga qarab o'zgaradi;
 ##   - ADS (sichqoncha o'ng tugmasi): FOV kichrayadi, qurol markazga keladi, sezgirlik va tarqalish kamayadi;
@@ -15,7 +17,10 @@ extends Node3D
 const CharacterModel := preload("res://scripts/character_model.gd")
 const CombatHud := preload("res://scripts/combat_hud.gd")
 const WeaponData := preload("res://scripts/weapon_data.gd")
-const WEAPON_FILES := ["res://weapons/rifle.tres", "res://weapons/pistol.tres", "res://weapons/knife.tres"]
+const BuyMenu := preload("res://scripts/buy_menu.gd")
+const WEAPON_FILES := ["res://weapons/rifle.tres", "res://weapons/vanguard.tres", "res://weapons/smg.tres",
+	"res://weapons/sniper.tres", "res://weapons/shotgun.tres", "res://weapons/pistol.tres", "res://weapons/knife.tres"]
+const START_PRIMARY := "lar_01"
 const SCALE := 0.6
 ## qurol ekranda o'ng pastda: kameraga nisbatan siljish (m, kichraytirishdan oldin), og'ish °, ko'tarilish °
 const TUNE := {
@@ -23,7 +28,8 @@ const TUNE := {
 	"CT": [Vector3(0.16, 0.05, -0.2), 3.0, 0.0],
 }
 ## ADS: qurol ekran markaziga (qurol turi bo'yicha)
-const ADS_TUNE := {0: Vector3(-0.13, 0.215, -0.14), 1: Vector3(-0.05, 0.245, -0.1)}
+const ADS_TUNE := {0: Vector3(-0.13, 0.215, -0.14), 1: Vector3(-0.05, 0.245, -0.1), 3: Vector3(-0.13, 0.225, -0.12),
+	4: Vector3(-0.13, 0.2, -0.14), 5: Vector3(-0.13, 0.215, -0.14)}
 const MODE_NAMES := ["BITTALIK", "3 TALIK", "AVTOMAT"]
 const RAY_MASK := 1 | CharacterModel.LAYER_HITBOX
 
@@ -32,7 +38,9 @@ signal hit_confirmed(zone: String, damage: float, killed: bool)
 var player: CharacterBody3D
 var ch: Node3D
 var hud: Control
-var weapons: Array = []                ## WeaponData (slot tartibida)
+var weapons: Array = []                ## hamma WeaponData (weapons/*.tres)
+var owned := {}                        ## slot -> WeaponData (o'yinchi qo'lidagi qurollar)
+var buy_menu: Control
 var current: Resource                  ## hozirgi qurol
 var ammo := 0
 var reserve := 0
@@ -44,6 +52,7 @@ var force_ads := false                 ## testlar uchun
 var no_spread := false                 ## testlar uchun: aniq otish
 var bloom := 0.0
 var last_hit := {}
+var last_shot := {}                    ## oxirgi otish: sochmalar soni, tekkanlari, jami zarar
 var _ammo_of := {}                     ## weapon_id -> [magazin, zaxira]
 var _next_shot := 0.0
 var _equip_end := 0.0
@@ -75,6 +84,8 @@ func _ready() -> void:
 		var w: Resource = load(f)
 		weapons.append(w)
 		_ammo_of[w.weapon_id] = [w.magazine_size, w.reserve_ammo]
+		if w.slot != 1 or w.weapon_id == START_PRIMARY:
+			owned[w.slot] = w
 	ch = CharacterModel.new()
 	ch.first_person = true
 	ch.team = player.team
@@ -100,6 +111,9 @@ func _ready() -> void:
 	hud = CombatHud.new()
 	hud.fpv = self
 	layer.add_child(hud)
+	buy_menu = BuyMenu.new()
+	buy_menu.fpv = self
+	layer.add_child(buy_menu)
 	_label = Label.new()
 	_label.anchor_left = 1.0
 	_label.anchor_top = 1.0
@@ -117,7 +131,7 @@ func _ready() -> void:
 
 
 static func _ensure_input() -> void:
-	var keys := {"weapon_1": KEY_1, "weapon_2": KEY_2, "weapon_3": KEY_3, "fire_mode": KEY_B}
+	var keys := {"weapon_1": KEY_1, "weapon_2": KEY_2, "weapon_3": KEY_3, "fire_mode": KEY_X}
 	for a in keys:
 		if not InputMap.has_action(a):
 			InputMap.add_action(a)
@@ -133,10 +147,7 @@ static func _ensure_input() -> void:
 
 # ------------------------------------------------------------------ qurollar
 func equip(slot: int, instant := false) -> void:
-	var w: Resource = null
-	for x in weapons:
-		if x.slot == slot:
-			w = x
+	var w: Resource = owned.get(slot)
 	if w == null or (w == current and not instant):
 		return
 	if current:
@@ -154,6 +165,30 @@ func equip(slot: int, instant := false) -> void:
 	if player.body and player.body.has_method("set_weapon"):
 		player.body.set_weapon(w.kind)
 	_update_sound()
+
+
+## asosiy qurolni sotib olish (sotib olish zonasi va vaqti buy_menu.gd da tekshiriladi): to'liq magazin bilan qo'lga
+func buy(weapon_id: String) -> bool:
+	for w in weapons:
+		if w.weapon_id == weapon_id and w.slot == 1:
+			owned[1] = w
+			_ammo_of[w.weapon_id] = [w.magazine_size, w.reserve_ammo]
+			if current and current.slot == 1:
+				current = null
+			equip(1)
+			return true
+	return false
+
+
+func weapon_by_id(weapon_id: String) -> Resource:
+	for w in weapons:
+		if w.weapon_id == weapon_id:
+			return w
+	return null
+
+
+func scoped() -> bool:
+	return current != null and current.scope and ads_amt > 0.6
 
 
 func _update_sound() -> void:
@@ -218,7 +253,13 @@ func fire() -> bool:
 	_shot.pitch_scale = randf_range(0.96, 1.04) * (1.3 if current.kind == WeaponData.Kind.PISTOL else 1.0)
 	_shot.play()
 	_flash.light_energy = 3.0
-	_hitscan(current.max_range, 0.0 if no_spread else current_spread())
+	var spread := 0.0 if no_spread else current_spread()
+	last_shot = {"pellets": current.projectile_count, "hits": 0, "damage": 0.0}
+	for i in current.projectile_count:
+		var r := _hitscan(current.max_range, spread)
+		if r.has("damage"):
+			last_shot.hits += 1
+			last_shot.damage += r.damage
 	_apply_recoil()
 	bloom = minf(bloom + current.spread_bloom_per_shot, current.max_spread)
 	_shot_idx += 1
@@ -231,7 +272,9 @@ func _apply_recoil() -> void:
 		return
 	var i := mini(_shot_idx, n - 1)
 	var k: float = current.recoil_scale * lerpf(1.0, current.ads_recoil_multiplier, ads_amt)
-	var kick := Vector2(deg_to_rad(current.recoil_pattern_v[i] * k), deg_to_rad(current.recoil_pattern_h[i] * k))
+	var h: float = current.recoil_pattern_h[mini(i, current.recoil_pattern_h.size() - 1)] if current.recoil_pattern_h.size() else \
+		randf_range(current.recoil_random_h.x, current.recoil_random_h.y)
+	var kick := Vector2(deg_to_rad(current.recoil_pattern_v[i] * k), deg_to_rad(h * k))
 	player.cam.rotation.x = clampf(player.cam.rotation.x + kick.x, -1.45, 1.45)
 	player.rotation.y -= kick.y
 	_recoil += kick
@@ -349,7 +392,7 @@ func _process(delta: float) -> void:
 		reserve -= need
 		_reload_end = -1.0
 	var captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
-	if captured:
+	if captured and not buy_menu.visible:
 		for i in 3:
 			if Input.is_action_just_pressed("weapon_%d" % (i + 1)):
 				equip(i + 1)
@@ -419,9 +462,9 @@ func _process(delta: float) -> void:
 		if is_knife():
 			_label.text = current.weapon_name
 		else:
-			var mode: String = MODE_NAMES[fire_mode] if current.fire_modes.size() > 1 else ""
+			var mode: String = MODE_NAMES[fire_mode] if current.fire_modes.size() > 1 else current.category_name
 			_label.text = "%s  %s   %d / %d" % [current.weapon_name, mode, ammo, reserve]
 	# 1-shaxs faqat o'yinchining o'z kamerasi faol bo'lganda (boshqa kamerada o'yinchi 3-shaxs tana bo'lib ko'rinadi)
 	_label.visible = player.cam.current
 	hud.visible = player.cam.current
-	ch.visible = player.cam.current
+	ch.visible = player.cam.current and not scoped()

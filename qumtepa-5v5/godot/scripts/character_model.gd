@@ -26,6 +26,9 @@ const LAYER_HITBOX := 1 << 9
 const WEAPON_RIFLE := 0
 const WEAPON_PISTOL := 1
 const WEAPON_KNIFE := 2
+const WEAPON_SMG := 3
+const WEAPON_SNIPER := 4
+const WEAPON_SHOTGUN := 5
 
 ## jamoa ranglari: ko'ylak, jilet, shim, bosh kiyim, qurol yog'ochi
 const COLORS := {
@@ -225,6 +228,33 @@ func _build_arms_gun(chest: Node3D, c: Dictionary) -> void:
 			_box(_gun, Vector3(0.008, 0.035, 0.17), Vector3(0, 0.005, 0.12), Color(0.72, 0.74, 0.76))   # tig'
 			grip = _gun.position + Vector3(0, 0, -0.03)
 			fore = Vector3(0.22, 1.1, 0.12) - o
+		WEAPON_SMG:
+			_gun.position = Vector3(-0.13, 1.37, 0.16) - o
+			_box(_gun, Vector3(0.055, 0.08, 0.32), Vector3(0, 0, 0.2), METAL)                             # quti
+			_box(_gun, Vector3(0.03, 0.03, 0.12), Vector3(0, 0.01, 0.42), METAL)                          # stvol
+			_box(_gun, Vector3(0.035, 0.18, 0.045), Vector3(0, -0.13, 0.26), METAL)                       # uzun magazin
+			_box(_gun, Vector3(0.04, 0.1, 0.05), Vector3(0, -0.08, 0.1), METAL).rotation.x = -0.3        # dasta
+			_box(_gun, Vector3(0.02, 0.05, 0.18), Vector3(0, -0.01, -0.05), METAL)                        # sim qo'ndoq
+			grip = _gun.position + Vector3(0, -0.07, 0.11)
+			fore = _gun.position + Vector3(0, -0.12, 0.26)
+		WEAPON_SNIPER:
+			_gun.position = Vector3(-0.13, 1.37, 0.1) - o
+			_box(_gun, Vector3(0.06, 0.09, 0.5), Vector3(0, 0, 0.26), c.wood)                             # quti
+			_box(_gun, Vector3(0.035, 0.035, 0.6), Vector3(0, 0.02, 0.8), METAL)                          # uzun stvol
+			_box(_gun, Vector3(0.055, 0.055, 0.3), Vector3(0, 0.1, 0.3), METAL)                           # optika
+			_box(_gun, Vector3(0.055, 0.12, 0.26), Vector3(0, -0.03, -0.1), c.wood)                       # qo'ndoq
+			_box(_gun, Vector3(0.04, 0.06, 0.04), Vector3(0.05, 0.03, 0.2), METAL)                        # zatvor dastasi
+			grip = _gun.position + Vector3(0, -0.07, 0.14)
+			fore = _gun.position + Vector3(0, -0.05, 0.46)
+		WEAPON_SHOTGUN:
+			_gun.position = Vector3(-0.13, 1.37, 0.12) - o
+			_box(_gun, Vector3(0.065, 0.1, 0.36), Vector3(0, 0, 0.22), METAL)                             # quti
+			_box(_gun, Vector3(0.045, 0.045, 0.42), Vector3(0, 0.025, 0.6), METAL)                        # yo'g'on stvol
+			_box(_gun, Vector3(0.05, 0.05, 0.3), Vector3(0, -0.035, 0.55), METAL)                         # naycha magazin
+			_box(_gun, Vector3(0.07, 0.07, 0.14), Vector3(0, -0.035, 0.52), c.wood)                       # pompa
+			_box(_gun, Vector3(0.055, 0.11, 0.26), Vector3(0, -0.03, -0.08), c.wood)                      # qo'ndoq
+			grip = _gun.position + Vector3(0, -0.07, 0.14)
+			fore = _gun.position + Vector3(0, -0.05, 0.52)
 		_:
 			_gun.position = Vector3(-0.13, 1.37, 0.12) - o
 			var long_gun := team == "T"                   # T — yog'och qo'ndoqli, CT — qora (M416 ko'rinishida)
@@ -240,7 +270,8 @@ func _build_arms_gun(chest: Node3D, c: Dictionary) -> void:
 			fore = _gun.position + Vector3(0, -0.04, 0.5)
 	var muzzle := Node3D.new()
 	muzzle.name = "Muzzle"
-	muzzle.position = Vector3(0, 0.02, {WEAPON_PISTOL: 0.16, WEAPON_KNIFE: 0.2}.get(weapon_kind, 0.82))
+	muzzle.position = Vector3(0, 0.02, {WEAPON_PISTOL: 0.16, WEAPON_KNIFE: 0.2, WEAPON_SMG: 0.48, WEAPON_SNIPER: 1.1,
+		WEAPON_SHOTGUN: 0.81}.get(weapon_kind, 0.82))
 	_gun.add_child(muzzle)
 	# qo'llar: yelka -> tirsak -> musht (ko'krak fazosida)
 	for arm in [[Vector3(-0.22, 1.42, 0) - o, Vector3(-0.3, 1.2, 0.02) - o, grip], [Vector3(0.22, 1.42, 0) - o, Vector3(0.1, 1.22, 0.28) - o, fore]]:

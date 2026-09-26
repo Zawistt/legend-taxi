@@ -3,7 +3,7 @@ extends Resource
 ## Hamma ko'rsatkichlar shu yerda — o'yin kodida qurol raqamlari yozilmaydi. Godot inspektorida tahrirlash mumkin.
 ## Birliklar: tarqalish — radian; tepki naqshi — gradus (har o'q uchun: v — tepaga, h — o'ngga).
 
-enum Kind { RIFLE, PISTOL, KNIFE }
+enum Kind { RIFLE, PISTOL, KNIFE, SMG, SNIPER, SHOTGUN }
 enum FireMode { SEMI, BURST, AUTO }
 
 @export_group("Nomi")
@@ -11,6 +11,7 @@ enum FireMode { SEMI, BURST, AUTO }
 @export var weapon_name := "LAR-01"
 @export var kind: Kind = Kind.RIFLE
 @export var slot := 1                             ## 1 — asosiy, 2 — to'pponcha, 3 — pichoq
+@export var category_name := "Avtomat"           ## sotib olish menyusida
 
 @export_group("Zarar")
 @export var base_damage := 34.0
@@ -20,6 +21,7 @@ enum FireMode { SEMI, BURST, AUTO }
 @export var effective_range := 55.0               ## shundan uzoqda zarar kamayadi (o'q baribir uchadi)
 @export var damage_falloff_multiplier := 0.65     ## effective_range dan uzoqda zarar shu songa ko'paytiriladi
 @export var max_range := 200.0
+@export var projectile_count := 1                 ## bir otishdagi o'qlar (drobovik — 8 ta sochma)
 
 @export_group("Otish")
 @export var fire_rate := 600.0                    ## o'q/daqiqa
@@ -31,11 +33,13 @@ enum FireMode { SEMI, BURST, AUTO }
 @export var reload_time := 2.2
 @export var empty_reload_time := 2.85
 @export var melee_swing_time := 0.35              ## pichoq: zarbalar orasidagi vaqt
+@export var bolt_cycle_time := 0.0                ## snayper/drobovik: har o'qdan keyin zatvor (o'q oralig'idan uzun bo'lsa)
 
 @export_group("Tepki")
 @export var recoil_pattern_v := PackedFloat32Array([1.2, 1.35, 1.45, 1.55, 1.6, 1.65, 1.7, 1.75, 1.8, 1.85, 1.8, 1.75])
 @export var recoil_pattern_h := PackedFloat32Array([0, 0.2, -0.25, 0.35, -0.4, 0.45, -0.5, 0.55, -0.6, 0.6, -0.55, 0.5])
 @export var recoil_scale := 0.4                   ## naqsh qiymati × shu = gradus
+@export var recoil_random_h := Vector2.ZERO       ## naqsh o'rniga: gorizontal tepki [min, max] oralig'ida tasodifiy (AR-44)
 @export var recoil_reset_time := 0.22             ## shuncha vaqt otilmasa, naqsh boshidan boshlanadi
 @export var recoil_recovery_speed := 8.5          ## otish to'xtaganda nishon joyiga qaytish tezligi
 
@@ -56,13 +60,14 @@ enum FireMode { SEMI, BURST, AUTO }
 @export var ads_spread_multiplier := 0.35
 @export var ads_recoil_multiplier := 0.75
 @export var ads_transition_speed := 11.0
+@export var scope := false                        ## snayper: ADS da optik nishon (qurol ko'rinmaydi, qora ramka)
 
 @export_group("Almashtirish")
 @export var equip_time := 0.55
 
 
 func shot_interval() -> float:
-	return 60.0 / maxf(fire_rate, 1.0)
+	return maxf(60.0 / maxf(fire_rate, 1.0), bolt_cycle_time)
 
 
 func zone_multiplier(zone: String) -> float:

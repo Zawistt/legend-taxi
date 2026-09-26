@@ -19,6 +19,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		yaw -= event.relative.x * 0.004
 		pitch = clamp(pitch - event.relative.y * 0.004, -1.5, 1.5)
 		rotation = Vector3(pitch, yaw, 0)
+	elif event is InputEventKey and event.pressed and event.keycode == KEY_F10 and ResourceLoader.exists("res://menu.tscn"):
+		get_tree().change_scene_to_file("res://menu.tscn")
 	elif event is InputEventKey and event.pressed:
 		var m: Node = get_node("../BotMatch")
 		if event.keycode >= KEY_1 and event.keycode <= KEY_9 or event.keycode == KEY_0:

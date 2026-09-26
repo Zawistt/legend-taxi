@@ -1,0 +1,43 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+weapon_id = "longbow_50"
+weapon_name = "Longbow-50"
+kind = 4
+slot = 1
+category_name = "Snayper"
+base_damage = 95.0
+headshot_multiplier = 3.5
+legshot_multiplier = 0.7
+arm_multiplier = 0.85
+effective_range = 120.0
+damage_falloff_multiplier = 0.85
+fire_rate = 45.0
+bolt_cycle_time = 1.1
+fire_modes = Array[int]([0])
+magazine_size = 5
+reserve_ammo = 20
+reload_time = 3.2
+empty_reload_time = 4.0
+recoil_pattern_v = PackedFloat32Array(4.5, 4.8, 5)
+recoil_pattern_h = PackedFloat32Array(0, 0.6, -0.6)
+recoil_reset_time = 0.5
+recoil_recovery_speed = 5.0
+base_spread = 0.08
+spread_bloom_per_shot = 0.05
+max_spread = 0.15
+spread_recovery_speed = 6.0
+spread_walk_mult = 3.0
+spread_slow_mult = 2.0
+spread_crouch_mult = 0.5
+spread_air_mult = 6.0
+ads_fov_ratio = 0.427
+ads_sensitivity_multiplier = 0.35
+ads_spread_multiplier = 0.01
+ads_recoil_multiplier = 0.7
+ads_transition_speed = 7.0
+scope = true
+equip_time = 0.75

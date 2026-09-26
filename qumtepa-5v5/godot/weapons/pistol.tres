@@ -8,6 +8,7 @@ weapon_id = "apex_09"
 weapon_name = "Apex-9"
 kind = 1
 slot = 2
+category_name = "To'pponcha"
 base_damage = 26.0
 headshot_multiplier = 2.4
 legshot_multiplier = 0.8

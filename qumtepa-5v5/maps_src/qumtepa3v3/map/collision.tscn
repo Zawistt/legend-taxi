@@ -1,0 +1,3478 @@
+[gd_scene load_steps=482 format=3]
+
+[sub_resource type="StandardMaterial3D" id="m_pclip"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+albedo_color = Color(0.6, 0.2, 0.9, 0.18)
+
+[sub_resource type="StandardMaterial3D" id="m_gclip"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+albedo_color = Color(0.95, 0.8, 0.1, 0.12)
+
+[sub_resource type="BoxShape3D" id="b1"]
+size = Vector3(50, 0.3, 50)
+
+[sub_resource type="BoxShape3D" id="b2"]
+size = Vector3(0.252, 0.42, 0.252)
+
+[sub_resource type="BoxShape3D" id="b3"]
+size = Vector3(0.252, 0.42, 0.252)
+
+[sub_resource type="BoxShape3D" id="b4"]
+size = Vector3(0.252, 0.42, 0.252)
+
+[sub_resource type="BoxShape3D" id="b5"]
+size = Vector3(0.252, 0.42, 0.252)
+
+[sub_resource type="BoxShape3D" id="b6"]
+size = Vector3(0.252, 0.42, 0.252)
+
+[sub_resource type="BoxShape3D" id="b7"]
+size = Vector3(0.252, 0.42, 0.252)
+
+[sub_resource type="BoxShape3D" id="b8"]
+size = Vector3(0.288, 0.48, 0.288)
+
+[sub_resource type="BoxShape3D" id="b9"]
+size = Vector3(0.288, 0.48, 0.288)
+
+[sub_resource type="BoxShape3D" id="b10"]
+size = Vector3(0.288, 0.48, 0.288)
+
+[sub_resource type="BoxShape3D" id="b11"]
+size = Vector3(0.51, 0.51, 0.51)
+
+[sub_resource type="BoxShape3D" id="b12"]
+size = Vector3(0.51, 0.51, 0.51)
+
+[sub_resource type="BoxShape3D" id="b13"]
+size = Vector3(0.54, 0.54, 0.54)
+
+[sub_resource type="BoxShape3D" id="b14"]
+size = Vector3(0.54, 0.54, 0.54)
+
+[sub_resource type="BoxShape3D" id="b15"]
+size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="BoxShape3D" id="b16"]
+size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="BoxShape3D" id="b17"]
+size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="BoxShape3D" id="b18"]
+size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="BoxShape3D" id="b19"]
+size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="BoxShape3D" id="b20"]
+size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="BoxShape3D" id="b21"]
+size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="BoxShape3D" id="b22"]
+size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="BoxShape3D" id="b23"]
+size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="BoxShape3D" id="b24"]
+size = Vector3(0.6, 0.6, 0.6)
+
+[sub_resource type="BoxShape3D" id="b25"]
+size = Vector3(1.5, 0.62, 0.5)
+
+[sub_resource type="BoxShape3D" id="b26"]
+size = Vector3(1.6, 0.62, 0.5)
+
+[sub_resource type="BoxShape3D" id="b27"]
+size = Vector3(1.6, 0.62, 0.5)
+
+[sub_resource type="BoxShape3D" id="b28"]
+size = Vector3(1.4, 0.62, 0.5)
+
+[sub_resource type="BoxShape3D" id="b29"]
+size = Vector3(1.5, 0.62, 0.5)
+
+[sub_resource type="BoxShape3D" id="b30"]
+size = Vector3(0.6, 1, 0.6)
+
+[sub_resource type="BoxShape3D" id="b31"]
+size = Vector3(0.6, 1, 0.6)
+
+[sub_resource type="BoxShape3D" id="b32"]
+size = Vector3(0.6, 1, 0.6)
+
+[sub_resource type="BoxShape3D" id="b33"]
+size = Vector3(0.6, 1, 0.6)
+
+[sub_resource type="BoxShape3D" id="b34"]
+size = Vector3(0.6, 1, 0.6)
+
+[sub_resource type="BoxShape3D" id="b35"]
+size = Vector3(0.6, 1, 0.6)
+
+[sub_resource type="BoxShape3D" id="b36"]
+size = Vector3(0.6, 1, 0.6)
+
+[sub_resource type="BoxShape3D" id="b37"]
+size = Vector3(0.66, 1.1, 0.66)
+
+[sub_resource type="BoxShape3D" id="b38"]
+size = Vector3(0.72, 1.2, 0.72)
+
+[sub_resource type="BoxShape3D" id="b39"]
+size = Vector3(2.5, 1.3, 5.3)
+
+[sub_resource type="BoxShape3D" id="b40"]
+size = Vector3(2.2, 1.3, 6)
+
+[sub_resource type="BoxShape3D" id="b41"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b42"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b43"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b44"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b45"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b46"]
+size = Vector3(0.9, 2.18, 0.16)
+
+[sub_resource type="BoxShape3D" id="b47"]
+size = Vector3(0.9, 2.18, 0.16)
+
+[sub_resource type="BoxShape3D" id="b48"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b49"]
+size = Vector3(0.9, 2.18, 0.16)
+
+[sub_resource type="BoxShape3D" id="b50"]
+size = Vector3(0.9, 2.18, 0.16)
+
+[sub_resource type="BoxShape3D" id="b51"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b52"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b53"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b54"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b55"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b56"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b57"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b58"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b59"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b60"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b61"]
+size = Vector3(0.9, 2.18, 0.16)
+
+[sub_resource type="BoxShape3D" id="b62"]
+size = Vector3(0.9, 2.18, 0.16)
+
+[sub_resource type="BoxShape3D" id="b63"]
+size = Vector3(0.9, 2.18, 0.16)
+
+[sub_resource type="BoxShape3D" id="b64"]
+size = Vector3(0.9, 2.18, 0.16)
+
+[sub_resource type="BoxShape3D" id="b65"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b66"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b67"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b68"]
+size = Vector3(0.16, 2.18, 0.9)
+
+[sub_resource type="BoxShape3D" id="b69"]
+size = Vector3(0.9, 2.63, 0.16)
+
+[sub_resource type="BoxShape3D" id="b70"]
+size = Vector3(0.9, 2.63, 0.16)
+
+[sub_resource type="BoxShape3D" id="b71"]
+size = Vector3(0.9, 2.63, 0.16)
+
+[sub_resource type="BoxShape3D" id="b72"]
+size = Vector3(0.9, 2.63, 0.16)
+
+[sub_resource type="BoxShape3D" id="b73"]
+size = Vector3(0.16, 3.63, 0.9)
+
+[sub_resource type="BoxShape3D" id="b74"]
+size = Vector3(0.16, 3.63, 0.9)
+
+[sub_resource type="BoxShape3D" id="b75"]
+size = Vector3(2, 7.05, 16)
+
+[sub_resource type="BoxShape3D" id="b76"]
+size = Vector3(6, 7.05, 6)
+
+[sub_resource type="BoxShape3D" id="b77"]
+size = Vector3(2, 7.05, 8)
+
+[sub_resource type="BoxShape3D" id="b78"]
+size = Vector3(2, 7.05, 4)
+
+[sub_resource type="BoxShape3D" id="b79"]
+size = Vector3(2, 7.05, 4)
+
+[sub_resource type="BoxShape3D" id="b80"]
+size = Vector3(6, 7.05, 2)
+
+[sub_resource type="BoxShape3D" id="b81"]
+size = Vector3(4, 8.05, 2)
+
+[sub_resource type="BoxShape3D" id="b82"]
+size = Vector3(2, 8.05, 8)
+
+[sub_resource type="BoxShape3D" id="b83"]
+size = Vector3(8, 8.05, 2)
+
+[sub_resource type="BoxShape3D" id="b84"]
+size = Vector3(2, 8.05, 8)
+
+[sub_resource type="BoxShape3D" id="b85"]
+size = Vector3(4, 8.05, 8)
+
+[sub_resource type="BoxShape3D" id="b86"]
+size = Vector3(4, 8.05, 10)
+
+[sub_resource type="BoxShape3D" id="b87"]
+size = Vector3(2, 8.55, 8)
+
+[sub_resource type="BoxShape3D" id="b88"]
+size = Vector3(8, 8.55, 2)
+
+[sub_resource type="BoxShape3D" id="b89"]
+size = Vector3(8, 8.55, 6)
+
+[sub_resource type="BoxShape3D" id="b90"]
+size = Vector3(2, 9.05, 10)
+
+[sub_resource type="BoxShape3D" id="b91"]
+size = Vector3(2, 9.05, 4)
+
+[sub_resource type="BoxShape3D" id="b92"]
+size = Vector3(2, 9.05, 10)
+
+[sub_resource type="BoxShape3D" id="b93"]
+size = Vector3(4, 9.05, 2)
+
+[sub_resource type="BoxShape3D" id="b94"]
+size = Vector3(2, 9.05, 8)
+
+[sub_resource type="BoxShape3D" id="b95"]
+size = Vector3(2, 9.05, 4)
+
+[sub_resource type="BoxShape3D" id="b96"]
+size = Vector3(4, 9.05, 2)
+
+[sub_resource type="BoxShape3D" id="b97"]
+size = Vector3(8, 9.05, 6)
+
+[sub_resource type="BoxShape3D" id="b98"]
+size = Vector3(6, 9.05, 4)
+
+[sub_resource type="BoxShape3D" id="b99"]
+size = Vector3(6, 9.05, 8)
+
+[sub_resource type="BoxShape3D" id="b100"]
+size = Vector3(4, 9.05, 8)
+
+[sub_resource type="BoxShape3D" id="b101"]
+size = Vector3(2, 9.55, 8)
+
+[sub_resource type="BoxShape3D" id="b102"]
+size = Vector3(2, 9.55, 16)
+
+[sub_resource type="BoxShape3D" id="b103"]
+size = Vector3(4, 9.55, 6)
+
+[sub_resource type="BoxShape3D" id="b104"]
+size = Vector3(6, 9.55, 4)
+
+[sub_resource type="BoxShape3D" id="b105"]
+size = Vector3(8, 9.55, 6)
+
+[sub_resource type="BoxShape3D" id="b106"]
+size = Vector3(8, 9.55, 2)
+
+[sub_resource type="BoxShape3D" id="b107"]
+size = Vector3(2, 9.55, 8)
+
+[sub_resource type="BoxShape3D" id="b108"]
+size = Vector3(2, 9.55, 8)
+
+[sub_resource type="BoxShape3D" id="b109"]
+size = Vector3(2, 9.55, 2)
+
+[sub_resource type="BoxShape3D" id="b110"]
+size = Vector3(6, 10.05, 8)
+
+[sub_resource type="BoxShape3D" id="b111"]
+size = Vector3(2, 10.05, 8)
+
+[sub_resource type="BoxShape3D" id="b112"]
+size = Vector3(2, 10.05, 6)
+
+[sub_resource type="BoxShape3D" id="b113"]
+size = Vector3(2, 10.05, 2)
+
+[sub_resource type="BoxShape3D" id="b114"]
+size = Vector3(6, 10.05, 8)
+
+[sub_resource type="BoxShape3D" id="b115"]
+size = Vector3(4, 10.05, 2)
+
+[sub_resource type="BoxShape3D" id="b116"]
+size = Vector3(4, 10.05, 8)
+
+[sub_resource type="BoxShape3D" id="b117"]
+size = Vector3(8, 10.55, 2)
+
+[sub_resource type="BoxShape3D" id="b118"]
+size = Vector3(10, 10.55, 4)
+
+[sub_resource type="BoxShape3D" id="b119"]
+size = Vector3(8, 10.55, 2)
+
+[sub_resource type="BoxShape3D" id="b120"]
+size = Vector3(2, 10.55, 16)
+
+[sub_resource type="BoxShape3D" id="b121"]
+size = Vector3(2, 10.55, 8)
+
+[sub_resource type="BoxShape3D" id="b122"]
+size = Vector3(2, 11.55, 8)
+
+[sub_resource type="BoxShape3D" id="b123"]
+size = Vector3(2, 11.55, 2)
+
+[sub_resource type="BoxShape3D" id="b124"]
+size = Vector3(8, 11.55, 2)
+
+[sub_resource type="BoxShape3D" id="b125"]
+size = Vector3(8, 11.55, 4)
+
+[sub_resource type="BoxShape3D" id="b126"]
+size = Vector3(8, 11.55, 2)
+
+[sub_resource type="BoxShape3D" id="b127"]
+size = Vector3(6, 11.55, 4)
+
+[sub_resource type="BoxShape3D" id="b128"]
+size = Vector3(2, 11.55, 8)
+
+[sub_resource type="BoxShape3D" id="b129"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b130"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b131"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b132"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b133"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b134"]
+size = Vector3(1.04, 0.22, 0.26)
+
+[sub_resource type="BoxShape3D" id="b135"]
+size = Vector3(1.04, 0.22, 0.26)
+
+[sub_resource type="BoxShape3D" id="b136"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b137"]
+size = Vector3(1.04, 0.22, 0.26)
+
+[sub_resource type="BoxShape3D" id="b138"]
+size = Vector3(1.04, 0.22, 0.26)
+
+[sub_resource type="BoxShape3D" id="b139"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b140"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b141"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b142"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b143"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b144"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b145"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b146"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b147"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b148"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b149"]
+size = Vector3(1.04, 0.22, 0.26)
+
+[sub_resource type="BoxShape3D" id="b150"]
+size = Vector3(1.04, 0.22, 0.26)
+
+[sub_resource type="BoxShape3D" id="b151"]
+size = Vector3(1.04, 0.22, 0.26)
+
+[sub_resource type="BoxShape3D" id="b152"]
+size = Vector3(1.04, 0.22, 0.26)
+
+[sub_resource type="BoxShape3D" id="b153"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b154"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b155"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b156"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b157"]
+size = Vector3(1.04, 0.22, 0.26)
+
+[sub_resource type="BoxShape3D" id="b158"]
+size = Vector3(1.04, 0.22, 0.26)
+
+[sub_resource type="BoxShape3D" id="b159"]
+size = Vector3(1.04, 0.22, 0.26)
+
+[sub_resource type="BoxShape3D" id="b160"]
+size = Vector3(1.04, 0.22, 0.26)
+
+[sub_resource type="BoxShape3D" id="b161"]
+size = Vector3(0.8, 1.88, 0.7)
+
+[sub_resource type="BoxShape3D" id="b162"]
+size = Vector3(0.8, 1.88, 0.7)
+
+[sub_resource type="BoxShape3D" id="b163"]
+size = Vector3(1.2, 1.88, 0.7)
+
+[sub_resource type="BoxShape3D" id="b164"]
+size = Vector3(0.8, 1.88, 0.7)
+
+[sub_resource type="BoxShape3D" id="b165"]
+size = Vector3(1.2, 1.88, 0.7)
+
+[sub_resource type="BoxShape3D" id="b166"]
+size = Vector3(0.8, 1.88, 0.7)
+
+[sub_resource type="BoxShape3D" id="b167"]
+size = Vector3(1.2, 1.88, 0.7)
+
+[sub_resource type="BoxShape3D" id="b168"]
+size = Vector3(1.2, 1.88, 0.7)
+
+[sub_resource type="BoxShape3D" id="b169"]
+size = Vector3(1.2, 1.88, 0.7)
+
+[sub_resource type="BoxShape3D" id="b170"]
+size = Vector3(1.2, 1.88, 0.7)
+
+[sub_resource type="BoxShape3D" id="b171"]
+size = Vector3(0.8, 1.88, 0.7)
+
+[sub_resource type="BoxShape3D" id="b172"]
+size = Vector3(1.2, 1.88, 0.7)
+
+[sub_resource type="BoxShape3D" id="b173"]
+size = Vector3(0.8, 1.88, 0.7)
+
+[sub_resource type="BoxShape3D" id="b174"]
+size = Vector3(1.2, 1.88, 0.7)
+
+[sub_resource type="BoxShape3D" id="b175"]
+size = Vector3(0.7, 2.18, 0.8)
+
+[sub_resource type="BoxShape3D" id="b176"]
+size = Vector3(0.7, 2.18, 0.8)
+
+[sub_resource type="BoxShape3D" id="b177"]
+size = Vector3(0.7, 2.18, 0.8)
+
+[sub_resource type="BoxShape3D" id="b178"]
+size = Vector3(0.7, 2.18, 0.8)
+
+[sub_resource type="BoxShape3D" id="b179"]
+size = Vector3(1.2, 2.18, 0.7)
+
+[sub_resource type="BoxShape3D" id="b180"]
+size = Vector3(1.2, 2.18, 0.7)
+
+[sub_resource type="BoxShape3D" id="b181"]
+size = Vector3(1.2, 2.18, 0.7)
+
+[sub_resource type="BoxShape3D" id="b182"]
+size = Vector3(1.2, 2.18, 0.7)
+
+[sub_resource type="BoxShape3D" id="b183"]
+size = Vector3(0.7, 2.18, 0.8)
+
+[sub_resource type="BoxShape3D" id="b184"]
+size = Vector3(0.7, 2.18, 0.8)
+
+[sub_resource type="BoxShape3D" id="b185"]
+size = Vector3(0.7, 2.18, 0.8)
+
+[sub_resource type="BoxShape3D" id="b186"]
+size = Vector3(0.7, 2.18, 0.8)
+
+[sub_resource type="BoxShape3D" id="b187"]
+size = Vector3(0.8, 0.87, 0.45)
+
+[sub_resource type="BoxShape3D" id="b188"]
+size = Vector3(0.8, 0.87, 0.45)
+
+[sub_resource type="BoxShape3D" id="b189"]
+size = Vector3(0.8, 0.87, 0.45)
+
+[sub_resource type="BoxShape3D" id="b190"]
+size = Vector3(0.8, 0.87, 0.45)
+
+[sub_resource type="BoxShape3D" id="b191"]
+size = Vector3(0.8, 0.87, 0.45)
+
+[sub_resource type="BoxShape3D" id="b192"]
+size = Vector3(0.8, 0.87, 0.45)
+
+[sub_resource type="BoxShape3D" id="b193"]
+size = Vector3(0.45, 0.87, 0.8)
+
+[sub_resource type="BoxShape3D" id="b194"]
+size = Vector3(0.45, 0.87, 0.8)
+
+[sub_resource type="BoxShape3D" id="b195"]
+size = Vector3(0.8, 0.87, 0.45)
+
+[sub_resource type="BoxShape3D" id="b196"]
+size = Vector3(0.8, 0.87, 0.45)
+
+[sub_resource type="BoxShape3D" id="b197"]
+size = Vector3(0.8, 0.87, 0.45)
+
+[sub_resource type="BoxShape3D" id="b198"]
+size = Vector3(0.8, 0.87, 0.45)
+
+[sub_resource type="BoxShape3D" id="b199"]
+size = Vector3(0.7, 1.7, 0.4)
+
+[sub_resource type="BoxShape3D" id="b200"]
+size = Vector3(0.7, 1.7, 0.4)
+
+[sub_resource type="BoxShape3D" id="b201"]
+size = Vector3(0.7, 1.7, 0.4)
+
+[sub_resource type="BoxShape3D" id="b202"]
+size = Vector3(0.7, 1.7, 0.4)
+
+[sub_resource type="BoxShape3D" id="b203"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b204"]
+size = Vector3(0.26, 0.22, 1.04)
+
+[sub_resource type="BoxShape3D" id="b205"]
+size = Vector3(0.8, 1.421, 0.7)
+
+[sub_resource type="BoxShape3D" id="b206"]
+size = Vector3(0.8, 1.421, 0.7)
+
+[sub_resource type="BoxShape3D" id="b207"]
+size = Vector3(1.2, 1.421, 0.7)
+
+[sub_resource type="BoxShape3D" id="b208"]
+size = Vector3(1.2, 1.421, 0.7)
+
+[sub_resource type="BoxShape3D" id="b209"]
+size = Vector3(0.8, 1.421, 0.7)
+
+[sub_resource type="BoxShape3D" id="b210"]
+size = Vector3(0.8, 1.421, 0.7)
+
+[sub_resource type="BoxShape3D" id="b211"]
+size = Vector3(1.2, 1.421, 0.7)
+
+[sub_resource type="BoxShape3D" id="b212"]
+size = Vector3(1.2, 1.421, 0.7)
+
+[sub_resource type="BoxShape3D" id="b213"]
+size = Vector3(1.2, 1.421, 0.7)
+
+[sub_resource type="BoxShape3D" id="b214"]
+size = Vector3(1.2, 1.421, 0.7)
+
+[sub_resource type="BoxShape3D" id="b215"]
+size = Vector3(0.8, 1.421, 0.7)
+
+[sub_resource type="BoxShape3D" id="b216"]
+size = Vector3(1.2, 1.421, 0.7)
+
+[sub_resource type="BoxShape3D" id="b217"]
+size = Vector3(0.8, 1.421, 0.7)
+
+[sub_resource type="BoxShape3D" id="b218"]
+size = Vector3(1.2, 1.421, 0.7)
+
+[sub_resource type="BoxShape3D" id="b219"]
+size = Vector3(0.7, 1.721, 0.8)
+
+[sub_resource type="BoxShape3D" id="b220"]
+size = Vector3(0.7, 1.721, 0.8)
+
+[sub_resource type="BoxShape3D" id="b221"]
+size = Vector3(0.7, 1.721, 0.8)
+
+[sub_resource type="BoxShape3D" id="b222"]
+size = Vector3(0.7, 1.721, 0.8)
+
+[sub_resource type="BoxShape3D" id="b223"]
+size = Vector3(1.2, 1.721, 0.7)
+
+[sub_resource type="BoxShape3D" id="b224"]
+size = Vector3(1.2, 1.721, 0.7)
+
+[sub_resource type="BoxShape3D" id="b225"]
+size = Vector3(1.2, 1.721, 0.7)
+
+[sub_resource type="BoxShape3D" id="b226"]
+size = Vector3(1.2, 1.721, 0.7)
+
+[sub_resource type="BoxShape3D" id="b227"]
+size = Vector3(0.7, 1.721, 0.8)
+
+[sub_resource type="BoxShape3D" id="b228"]
+size = Vector3(0.7, 1.721, 0.8)
+
+[sub_resource type="BoxShape3D" id="b229"]
+size = Vector3(0.7, 1.721, 0.8)
+
+[sub_resource type="BoxShape3D" id="b230"]
+size = Vector3(0.7, 1.721, 0.8)
+
+[sub_resource type="BoxShape3D" id="b231"]
+size = Vector3(0.7, 1.383, 0.4)
+
+[sub_resource type="BoxShape3D" id="b232"]
+size = Vector3(0.7, 1.383, 0.4)
+
+[sub_resource type="BoxShape3D" id="b233"]
+size = Vector3(0.7, 1.383, 0.4)
+
+[sub_resource type="BoxShape3D" id="b234"]
+size = Vector3(0.7, 1.383, 0.4)
+
+[sub_resource type="BoxShape3D" id="b235"]
+size = Vector3(0.8, 0.379, 0.45)
+
+[sub_resource type="BoxShape3D" id="b236"]
+size = Vector3(0.8, 0.379, 0.45)
+
+[sub_resource type="BoxShape3D" id="b237"]
+size = Vector3(0.8, 0.379, 0.45)
+
+[sub_resource type="BoxShape3D" id="b238"]
+size = Vector3(0.8, 0.379, 0.45)
+
+[sub_resource type="BoxShape3D" id="b239"]
+size = Vector3(0.45, 0.379, 0.8)
+
+[sub_resource type="BoxShape3D" id="b240"]
+size = Vector3(0.45, 0.379, 0.8)
+
+[sub_resource type="BoxShape3D" id="b241"]
+size = Vector3(0.8, 0.379, 0.45)
+
+[sub_resource type="BoxShape3D" id="b242"]
+size = Vector3(0.8, 0.379, 0.45)
+
+[sub_resource type="BoxShape3D" id="b243"]
+size = Vector3(0.8, 0.379, 0.45)
+
+[sub_resource type="BoxShape3D" id="b244"]
+size = Vector3(0.8, 0.379, 0.45)
+
+[sub_resource type="BoxShape3D" id="b245"]
+size = Vector3(0.8, 0.379, 0.45)
+
+[sub_resource type="BoxShape3D" id="b246"]
+size = Vector3(0.8, 0.379, 0.45)
+
+[sub_resource type="BoxShape3D" id="b247"]
+size = Vector3(0.8, 1.3, 0.7)
+
+[sub_resource type="BoxShape3D" id="b248"]
+size = Vector3(1.2, 1.3, 0.7)
+
+[sub_resource type="BoxShape3D" id="b249"]
+size = Vector3(0.8, 1.3, 0.7)
+
+[sub_resource type="BoxShape3D" id="b250"]
+size = Vector3(0.7, 1.3, 0.4)
+
+[sub_resource type="BoxShape3D" id="b251"]
+size = Vector3(1.2, 1.3, 0.7)
+
+[sub_resource type="BoxShape3D" id="b252"]
+size = Vector3(1.2, 1.3, 0.7)
+
+[sub_resource type="BoxShape3D" id="b253"]
+size = Vector3(0.7, 1.3, 0.4)
+
+[sub_resource type="BoxShape3D" id="b254"]
+size = Vector3(0.8, 1.3, 0.7)
+
+[sub_resource type="BoxShape3D" id="b255"]
+size = Vector3(1.2, 1.3, 0.7)
+
+[sub_resource type="BoxShape3D" id="b256"]
+size = Vector3(0.7, 1.6, 0.8)
+
+[sub_resource type="BoxShape3D" id="b257"]
+size = Vector3(0.7, 1.6, 0.8)
+
+[sub_resource type="BoxShape3D" id="b258"]
+size = Vector3(1.2, 1.6, 0.7)
+
+[sub_resource type="BoxShape3D" id="b259"]
+size = Vector3(1.2, 1.6, 0.7)
+
+[sub_resource type="BoxShape3D" id="b260"]
+size = Vector3(0.7, 1.6, 0.8)
+
+[sub_resource type="BoxShape3D" id="b261"]
+size = Vector3(0.7, 1.6, 0.8)
+
+[sub_resource type="BoxShape3D" id="b262"]
+size = Vector3(1.2, 2.28, 0.7)
+
+[sub_resource type="BoxShape3D" id="b263"]
+size = Vector3(1.2, 2.28, 0.7)
+
+[sub_resource type="BoxShape3D" id="b264"]
+size = Vector3(1.2, 1.27, 0.45)
+
+[sub_resource type="BoxShape3D" id="b265"]
+size = Vector3(1.2, 1.27, 0.45)
+
+[sub_resource type="BoxShape3D" id="b266"]
+size = Vector3(1.2, 1.27, 0.45)
+
+[sub_resource type="BoxShape3D" id="b267"]
+size = Vector3(1.2, 1.27, 0.45)
+
+[sub_resource type="BoxShape3D" id="b268"]
+size = Vector3(0.8, 0.25, 0.45)
+
+[sub_resource type="BoxShape3D" id="b269"]
+size = Vector3(0.8, 0.25, 0.45)
+
+[sub_resource type="BoxShape3D" id="b270"]
+size = Vector3(0.45, 0.25, 0.8)
+
+[sub_resource type="BoxShape3D" id="b271"]
+size = Vector3(0.8, 0.25, 0.45)
+
+[sub_resource type="BoxShape3D" id="b272"]
+size = Vector3(0.8, 0.25, 0.45)
+
+[sub_resource type="BoxShape3D" id="b273"]
+size = Vector3(0.8, 0.25, 0.45)
+
+[sub_resource type="BoxShape3D" id="b274"]
+size = Vector3(6, 0.5, 2)
+
+[sub_resource type="BoxShape3D" id="b275"]
+size = Vector3(14, 0.5, 2)
+
+[sub_resource type="BoxShape3D" id="b276"]
+size = Vector3(8, 0.5, 4)
+
+[sub_resource type="BoxShape3D" id="b277"]
+size = Vector3(4, 0.5, 10)
+
+[sub_resource type="BoxShape3D" id="b278"]
+size = Vector3(6, 0.5, 2)
+
+[sub_resource type="BoxShape3D" id="b279"]
+size = Vector3(6, 0.5, 2)
+
+[sub_resource type="BoxShape3D" id="b280"]
+size = Vector3(6, 0.5, 2)
+
+[sub_resource type="BoxShape3D" id="b281"]
+size = Vector3(6, 0.5, 2)
+
+[sub_resource type="BoxShape3D" id="b282"]
+size = Vector3(10, 0.5, 4)
+
+[sub_resource type="BoxShape3D" id="b283"]
+size = Vector3(12, 0.5, 2)
+
+[sub_resource type="BoxShape3D" id="b284"]
+size = Vector3(8, 0.5, 4)
+
+[sub_resource type="BoxShape3D" id="b285"]
+size = Vector3(4, 0.5, 8)
+
+[sub_resource type="BoxShape3D" id="b286"]
+size = Vector3(6, 0.5, 2)
+
+[sub_resource type="BoxShape3D" id="b287"]
+size = Vector3(4, 0.5, 6)
+
+[sub_resource type="BoxShape3D" id="b288"]
+size = Vector3(0.4, 1.7, 0.7)
+
+[sub_resource type="BoxShape3D" id="b289"]
+size = Vector3(0.4, 1.7, 0.7)
+
+[sub_resource type="BoxShape3D" id="b290"]
+size = Vector3(1.2, 1.505, 0.7)
+
+[sub_resource type="BoxShape3D" id="b291"]
+size = Vector3(1.2, 1.505, 0.7)
+
+[sub_resource type="BoxShape3D" id="b292"]
+size = Vector3(1.2, 0.463, 0.45)
+
+[sub_resource type="BoxShape3D" id="b293"]
+size = Vector3(1.2, 0.463, 0.45)
+
+[sub_resource type="BoxShape3D" id="b294"]
+size = Vector3(1.2, 0.463, 0.45)
+
+[sub_resource type="BoxShape3D" id="b295"]
+size = Vector3(1.2, 0.463, 0.45)
+
+[sub_resource type="BoxShape3D" id="b296"]
+size = Vector3(0.4, 1.383, 0.7)
+
+[sub_resource type="BoxShape3D" id="b297"]
+size = Vector3(0.4, 1.383, 0.7)
+
+[sub_resource type="BoxShape3D" id="b298"]
+size = Vector3(1.2, 1.3, 0.7)
+
+[sub_resource type="BoxShape3D" id="b299"]
+size = Vector3(0.4, 1.3, 0.7)
+
+[sub_resource type="BoxShape3D" id="b300"]
+size = Vector3(1.2, 0.25, 0.45)
+
+[sub_resource type="BoxShape3D" id="b301"]
+size = Vector3(1.2, 0.25, 0.45)
+
+[sub_resource type="BoxShape3D" id="b302"]
+size = Vector3(18, 0.5, 6)
+
+[sub_resource type="BoxShape3D" id="b303"]
+size = Vector3(14, 0.5, 6)
+
+[sub_resource type="BoxShape3D" id="b304"]
+size = Vector3(6, 0.5, 8)
+
+[sub_resource type="BoxShape3D" id="b305"]
+size = Vector3(10, 0.5, 2)
+
+[sub_resource type="BoxShape3D" id="b306"]
+size = Vector3(2, 0.5, 2)
+
+[sub_resource type="ConvexPolygonShape3D" id="r307"]
+points = PackedVector3Array(-20.5, 1.3, 7.8, -20.5, 1.3, 12.5, -18.75, 0, 12.5, -18.75, 0, 7.8, -20.5, 0, 7.8, -20.5, 0, 12.5)
+
+[sub_resource type="ConvexPolygonShape3D" id="r308"]
+points = PackedVector3Array(20.8, 1.3, 3.8, 20.8, 1.3, 9.2, 19.05, 0, 9.2, 19.05, 0, 3.8, 20.8, 0, 3.8, 20.8, 0, 9.2)
+
+[sub_resource type="BoxShape3D" id="b309"]
+size = Vector3(1.206, 0.78, 1.34)
+
+[sub_resource type="BoxShape3D" id="b310"]
+size = Vector3(0.998, 0.78, 1.5)
+
+[sub_resource type="BoxShape3D" id="b311"]
+size = Vector3(1.392, 0.78, 1.144)
+
+[sub_resource type="BoxShape3D" id="b312"]
+size = Vector3(1.37, 0.78, 1.172)
+
+[sub_resource type="BoxShape3D" id="b313"]
+size = Vector3(0.998, 0.78, 1.5)
+
+[sub_resource type="BoxShape3D" id="b314"]
+size = Vector3(2.2, 0.88, 1)
+
+[sub_resource type="BoxShape3D" id="b315"]
+size = Vector3(2.2, 0.88, 1)
+
+[sub_resource type="BoxShape3D" id="b316"]
+size = Vector3(0.9, 0.88, 1.8)
+
+[sub_resource type="BoxShape3D" id="b317"]
+size = Vector3(0.9, 0.9, 0.9)
+
+[sub_resource type="BoxShape3D" id="b318"]
+size = Vector3(0.8, 0.9, 0.8)
+
+[sub_resource type="BoxShape3D" id="b319"]
+size = Vector3(0.8, 0.9, 0.8)
+
+[sub_resource type="BoxShape3D" id="b320"]
+size = Vector3(0.8, 0.9, 0.8)
+
+[sub_resource type="BoxShape3D" id="b321"]
+size = Vector3(0.9, 0.9, 0.9)
+
+[sub_resource type="BoxShape3D" id="b322"]
+size = Vector3(0.8, 0.9, 0.8)
+
+[sub_resource type="BoxShape3D" id="b323"]
+size = Vector3(0.8, 0.9, 0.8)
+
+[sub_resource type="BoxShape3D" id="b324"]
+size = Vector3(0.8, 0.9, 0.8)
+
+[sub_resource type="BoxShape3D" id="b325"]
+size = Vector3(0.8, 0.9, 0.8)
+
+[sub_resource type="BoxShape3D" id="b326"]
+size = Vector3(0.8, 0.9, 0.8)
+
+[sub_resource type="BoxShape3D" id="b327"]
+size = Vector3(0.8, 0.9, 0.8)
+
+[sub_resource type="BoxShape3D" id="b328"]
+size = Vector3(0.9, 0.9, 0.9)
+
+[sub_resource type="BoxShape3D" id="b329"]
+size = Vector3(0.8, 0.9, 0.8)
+
+[sub_resource type="BoxShape3D" id="b330"]
+size = Vector3(0.9, 0.9, 0.9)
+
+[sub_resource type="BoxShape3D" id="b331"]
+size = Vector3(0.8, 0.9, 0.8)
+
+[sub_resource type="BoxShape3D" id="b332"]
+size = Vector3(0.9, 0.9, 0.9)
+
+[sub_resource type="BoxShape3D" id="b333"]
+size = Vector3(1, 1, 1)
+
+[sub_resource type="BoxShape3D" id="b334"]
+size = Vector3(1, 1, 1)
+
+[sub_resource type="BoxShape3D" id="b335"]
+size = Vector3(1.1, 1.1, 1.1)
+
+[sub_resource type="BoxShape3D" id="b336"]
+size = Vector3(1.1, 1.1, 1.1)
+
+[sub_resource type="BoxShape3D" id="b337"]
+size = Vector3(2.2, 1.1, 1.1)
+
+[sub_resource type="BoxShape3D" id="b338"]
+size = Vector3(1.1, 1.1, 1.1)
+
+[sub_resource type="BoxShape3D" id="b339"]
+size = Vector3(1.1, 1.1, 2.2)
+
+[sub_resource type="BoxShape3D" id="b340"]
+size = Vector3(2.2, 1.1, 1.1)
+
+[sub_resource type="BoxShape3D" id="b341"]
+size = Vector3(2.4, 1.2, 1.2)
+
+[sub_resource type="BoxShape3D" id="b342"]
+size = Vector3(1.2, 1.2, 1.2)
+
+[sub_resource type="BoxShape3D" id="b343"]
+size = Vector3(1.2, 1.2, 1.2)
+
+[sub_resource type="BoxShape3D" id="b344"]
+size = Vector3(1.2, 1.2, 1.2)
+
+[sub_resource type="BoxShape3D" id="b345"]
+size = Vector3(1.2, 1.2, 1.2)
+
+[sub_resource type="BoxShape3D" id="b346"]
+size = Vector3(0.14, 2.25, 0.14)
+
+[sub_resource type="BoxShape3D" id="b347"]
+size = Vector3(0.14, 2.25, 0.14)
+
+[sub_resource type="BoxShape3D" id="b348"]
+size = Vector3(0.14, 2.25, 0.14)
+
+[sub_resource type="BoxShape3D" id="b349"]
+size = Vector3(0.14, 2.25, 0.14)
+
+[sub_resource type="BoxShape3D" id="b350"]
+size = Vector3(0.14, 2.25, 0.14)
+
+[sub_resource type="BoxShape3D" id="b351"]
+size = Vector3(0.14, 2.25, 0.14)
+
+[sub_resource type="BoxShape3D" id="b352"]
+size = Vector3(0.14, 2.25, 0.14)
+
+[sub_resource type="BoxShape3D" id="b353"]
+size = Vector3(0.14, 2.25, 0.14)
+
+[sub_resource type="BoxShape3D" id="b354"]
+size = Vector3(0.14, 2.25, 0.14)
+
+[sub_resource type="BoxShape3D" id="b355"]
+size = Vector3(0.14, 2.25, 0.14)
+
+[sub_resource type="BoxShape3D" id="b356"]
+size = Vector3(0.14, 2.25, 0.14)
+
+[sub_resource type="BoxShape3D" id="b357"]
+size = Vector3(0.14, 2.25, 0.14)
+
+[sub_resource type="BoxShape3D" id="b358"]
+size = Vector3(0.44, 6.3, 0.44)
+
+[sub_resource type="BoxShape3D" id="b359"]
+size = Vector3(0.44, 6.48, 0.44)
+
+[sub_resource type="BoxShape3D" id="b360"]
+size = Vector3(0.44, 6.75, 0.44)
+
+[sub_resource type="BoxShape3D" id="b361"]
+size = Vector3(0.44, 6.75, 0.44)
+
+[sub_resource type="BoxShape3D" id="b362"]
+size = Vector3(0.44, 7.2, 0.44)
+
+[sub_resource type="BoxShape3D" id="b363"]
+size = Vector3(0.44, 7.65, 0.44)
+
+[sub_resource type="BoxShape3D" id="b364"]
+size = Vector3(0.44, 7.65, 0.44)
+
+[sub_resource type="BoxShape3D" id="b365"]
+size = Vector3(0.55, 0.55, 0.55)
+
+[sub_resource type="BoxShape3D" id="b366"]
+size = Vector3(0.55, 0.55, 0.55)
+
+[sub_resource type="BoxShape3D" id="b367"]
+size = Vector3(0.55, 0.55, 0.55)
+
+[sub_resource type="BoxShape3D" id="b368"]
+size = Vector3(0.55, 0.55, 0.55)
+
+[sub_resource type="BoxShape3D" id="b369"]
+size = Vector3(0.55, 0.55, 0.55)
+
+[sub_resource type="BoxShape3D" id="b370"]
+size = Vector3(1, 1, 1)
+
+[sub_resource type="BoxShape3D" id="b371"]
+size = Vector3(1.2, 1.2, 1.2)
+
+[sub_resource type="BoxShape3D" id="b372"]
+size = Vector3(1.2, 1.2, 1.2)
+
+[sub_resource type="BoxShape3D" id="b373"]
+size = Vector3(1, 0.14, 1.7)
+
+[sub_resource type="BoxShape3D" id="b374"]
+size = Vector3(1, 0.14, 1.7)
+
+[sub_resource type="BoxShape3D" id="b375"]
+size = Vector3(1.7, 0.14, 1)
+
+[sub_resource type="BoxShape3D" id="b376"]
+size = Vector3(1, 0.14, 1.7)
+
+[sub_resource type="BoxShape3D" id="b377"]
+size = Vector3(1.7, 0.14, 1)
+
+[sub_resource type="BoxShape3D" id="b378"]
+size = Vector3(1.7, 0.14, 1)
+
+[sub_resource type="BoxShape3D" id="b379"]
+size = Vector3(1, 0.14, 1.7)
+
+[sub_resource type="BoxShape3D" id="b380"]
+size = Vector3(1, 0.14, 1.7)
+
+[sub_resource type="BoxShape3D" id="b381"]
+size = Vector3(1, 0.14, 1.7)
+
+[sub_resource type="BoxShape3D" id="b382"]
+size = Vector3(1, 0.14, 1.7)
+
+[sub_resource type="BoxShape3D" id="b383"]
+size = Vector3(1, 0.14, 1.7)
+
+[sub_resource type="BoxShape3D" id="b384"]
+size = Vector3(1.7, 0.14, 1)
+
+[sub_resource type="BoxShape3D" id="b385"]
+size = Vector3(1, 0.14, 1.7)
+
+[sub_resource type="BoxShape3D" id="b386"]
+size = Vector3(0.8, 0.9, 0.8)
+
+[sub_resource type="BoxShape3D" id="b387"]
+size = Vector3(1.1, 1.1, 1.1)
+
+[sub_resource type="BoxShape3D" id="b388"]
+size = Vector3(1.2, 1.2, 1.2)
+
+[sub_resource type="BoxShape3D" id="b389"]
+size = Vector3(1.2, 1.2, 1.2)
+
+[sub_resource type="BoxShape3D" id="b390"]
+size = Vector3(1.2, 1.2, 1.2)
+
+[sub_resource type="BoxShape3D" id="b391"]
+size = Vector3(1.2, 1.2, 1.2)
+
+[sub_resource type="BoxShape3D" id="b392"]
+size = Vector3(1.3, 1.3, 1.3)
+
+[sub_resource type="BoxShape3D" id="b393"]
+size = Vector3(0.9, 0.9, 0.9)
+
+[sub_resource type="BoxShape3D" id="b394"]
+size = Vector3(3.2, 0.78, 0.44)
+
+[sub_resource type="BoxShape3D" id="b395"]
+size = Vector3(3.6, 0.78, 0.44)
+
+[sub_resource type="BoxShape3D" id="b396"]
+size = Vector3(1, 12, 52)
+
+[sub_resource type="BoxMesh" id="bm396"]
+size = Vector3(1, 12, 52)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b397"]
+size = Vector3(52, 12, 1)
+
+[sub_resource type="BoxMesh" id="bm397"]
+size = Vector3(52, 12, 1)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b398"]
+size = Vector3(52, 12, 1)
+
+[sub_resource type="BoxMesh" id="bm398"]
+size = Vector3(52, 12, 1)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b399"]
+size = Vector3(1, 12, 52)
+
+[sub_resource type="BoxMesh" id="bm399"]
+size = Vector3(1, 12, 52)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b400"]
+size = Vector3(1, 8.1, 1.7)
+
+[sub_resource type="BoxMesh" id="bm400"]
+size = Vector3(1, 8.1, 1.7)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b401"]
+size = Vector3(1, 8.1, 1.7)
+
+[sub_resource type="BoxMesh" id="bm401"]
+size = Vector3(1, 8.1, 1.7)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b402"]
+size = Vector3(1.7, 8.1, 1)
+
+[sub_resource type="BoxMesh" id="bm402"]
+size = Vector3(1.7, 8.1, 1)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b403"]
+size = Vector3(1, 8.1, 1.7)
+
+[sub_resource type="BoxMesh" id="bm403"]
+size = Vector3(1, 8.1, 1.7)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b404"]
+size = Vector3(1.7, 8.1, 1)
+
+[sub_resource type="BoxMesh" id="bm404"]
+size = Vector3(1.7, 8.1, 1)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b405"]
+size = Vector3(1.7, 8.1, 1)
+
+[sub_resource type="BoxMesh" id="bm405"]
+size = Vector3(1.7, 8.1, 1)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b406"]
+size = Vector3(1, 8.1, 1.7)
+
+[sub_resource type="BoxMesh" id="bm406"]
+size = Vector3(1, 8.1, 1.7)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b407"]
+size = Vector3(1, 8.1, 1.7)
+
+[sub_resource type="BoxMesh" id="bm407"]
+size = Vector3(1, 8.1, 1.7)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b408"]
+size = Vector3(1, 8.1, 1.7)
+
+[sub_resource type="BoxMesh" id="bm408"]
+size = Vector3(1, 8.1, 1.7)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b409"]
+size = Vector3(1, 8.1, 1.7)
+
+[sub_resource type="BoxMesh" id="bm409"]
+size = Vector3(1, 8.1, 1.7)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b410"]
+size = Vector3(1, 8.1, 1.7)
+
+[sub_resource type="BoxMesh" id="bm410"]
+size = Vector3(1, 8.1, 1.7)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b411"]
+size = Vector3(1.7, 8.1, 1)
+
+[sub_resource type="BoxMesh" id="bm411"]
+size = Vector3(1.7, 8.1, 1)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b412"]
+size = Vector3(1, 8.1, 1.7)
+
+[sub_resource type="BoxMesh" id="bm412"]
+size = Vector3(1, 8.1, 1.7)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b413"]
+size = Vector3(6, 7.3, 2)
+
+[sub_resource type="BoxMesh" id="bm413"]
+size = Vector3(6, 7.3, 2)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b414"]
+size = Vector3(14, 7.3, 2)
+
+[sub_resource type="BoxMesh" id="bm414"]
+size = Vector3(14, 7.3, 2)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b415"]
+size = Vector3(8, 7.3, 4)
+
+[sub_resource type="BoxMesh" id="bm415"]
+size = Vector3(8, 7.3, 4)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b416"]
+size = Vector3(4, 7.3, 10)
+
+[sub_resource type="BoxMesh" id="bm416"]
+size = Vector3(4, 7.3, 10)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b417"]
+size = Vector3(6, 7.3, 2)
+
+[sub_resource type="BoxMesh" id="bm417"]
+size = Vector3(6, 7.3, 2)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b418"]
+size = Vector3(6, 7.3, 2)
+
+[sub_resource type="BoxMesh" id="bm418"]
+size = Vector3(6, 7.3, 2)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b419"]
+size = Vector3(6, 7.3, 2)
+
+[sub_resource type="BoxMesh" id="bm419"]
+size = Vector3(6, 7.3, 2)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b420"]
+size = Vector3(6, 7.3, 2)
+
+[sub_resource type="BoxMesh" id="bm420"]
+size = Vector3(6, 7.3, 2)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b421"]
+size = Vector3(10, 7.3, 4)
+
+[sub_resource type="BoxMesh" id="bm421"]
+size = Vector3(10, 7.3, 4)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b422"]
+size = Vector3(12, 7.3, 2)
+
+[sub_resource type="BoxMesh" id="bm422"]
+size = Vector3(12, 7.3, 2)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b423"]
+size = Vector3(8, 7.3, 4)
+
+[sub_resource type="BoxMesh" id="bm423"]
+size = Vector3(8, 7.3, 4)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b424"]
+size = Vector3(4, 7.3, 8)
+
+[sub_resource type="BoxMesh" id="bm424"]
+size = Vector3(4, 7.3, 8)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b425"]
+size = Vector3(6, 7.3, 2)
+
+[sub_resource type="BoxMesh" id="bm425"]
+size = Vector3(6, 7.3, 2)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b426"]
+size = Vector3(4, 7.3, 6)
+
+[sub_resource type="BoxMesh" id="bm426"]
+size = Vector3(4, 7.3, 6)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b427"]
+size = Vector3(18, 6.5, 6)
+
+[sub_resource type="BoxMesh" id="bm427"]
+size = Vector3(18, 6.5, 6)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b428"]
+size = Vector3(14, 6.5, 6)
+
+[sub_resource type="BoxMesh" id="bm428"]
+size = Vector3(14, 6.5, 6)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b429"]
+size = Vector3(6, 6.3, 8)
+
+[sub_resource type="BoxMesh" id="bm429"]
+size = Vector3(6, 6.3, 8)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b430"]
+size = Vector3(10, 6.3, 2)
+
+[sub_resource type="BoxMesh" id="bm430"]
+size = Vector3(10, 6.3, 2)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b431"]
+size = Vector3(2, 6.3, 2)
+
+[sub_resource type="BoxMesh" id="bm431"]
+size = Vector3(2, 6.3, 2)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b432"]
+size = Vector3(50, 0.5, 50)
+
+[sub_resource type="BoxMesh" id="bm432"]
+size = Vector3(50, 0.5, 50)
+material = SubResource("m_pclip")
+
+[sub_resource type="BoxShape3D" id="b433"]
+size = Vector3(1, 30, 52)
+
+[sub_resource type="BoxMesh" id="bm433"]
+size = Vector3(1, 30, 52)
+material = SubResource("m_gclip")
+
+[sub_resource type="BoxShape3D" id="b434"]
+size = Vector3(52, 30, 1)
+
+[sub_resource type="BoxMesh" id="bm434"]
+size = Vector3(52, 30, 1)
+material = SubResource("m_gclip")
+
+[sub_resource type="BoxShape3D" id="b435"]
+size = Vector3(52, 30, 1)
+
+[sub_resource type="BoxMesh" id="bm435"]
+size = Vector3(52, 30, 1)
+material = SubResource("m_gclip")
+
+[sub_resource type="BoxShape3D" id="b436"]
+size = Vector3(1, 30, 52)
+
+[sub_resource type="BoxMesh" id="bm436"]
+size = Vector3(1, 30, 52)
+material = SubResource("m_gclip")
+
+[sub_resource type="BoxShape3D" id="b437"]
+size = Vector3(50, 0.5, 50)
+
+[sub_resource type="BoxMesh" id="bm437"]
+size = Vector3(50, 0.5, 50)
+material = SubResource("m_gclip")
+
+[node name="Collision" type="Node3D"]
+
+[node name="World_stone" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+metadata/surface = "stone"
+
+[node name="S1" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.15, 0)
+shape = SubResource("b1")
+
+[node name="S2" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.35, 0.21, -23)
+shape = SubResource("b2")
+
+[node name="S3" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.85, 0.21, -23)
+shape = SubResource("b3")
+
+[node name="S4" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.85, 0.21, 22.9)
+shape = SubResource("b4")
+
+[node name="S5" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.35, 0.21, 22.9)
+shape = SubResource("b5")
+
+[node name="S6" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.6, 0.21, 11.55)
+shape = SubResource("b6")
+
+[node name="S7" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.6, 0.21, 12.65)
+shape = SubResource("b7")
+
+[node name="S8" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.6, 0.24, -23)
+shape = SubResource("b8")
+
+[node name="S9" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.6, 0.24, 22.9)
+shape = SubResource("b9")
+
+[node name="S10" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.6, 0.24, 12.1)
+shape = SubResource("b10")
+
+[node name="S11" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.6, 0.255, 11.6)
+shape = SubResource("b11")
+
+[node name="S12" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.6, 0.255, 11.4)
+shape = SubResource("b12")
+
+[node name="S13" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.6, 0.27, -20.4)
+shape = SubResource("b13")
+
+[node name="S14" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.6, 0.27, -20.4)
+shape = SubResource("b14")
+
+[node name="S15" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.6, 0.3, -12.4)
+shape = SubResource("b15")
+
+[node name="S16" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.6, 0.3, 4.2)
+shape = SubResource("b16")
+
+[node name="S17" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.7, 0.3, 22.9)
+shape = SubResource("b17")
+
+[node name="S18" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.6, 0.3, -23.1)
+shape = SubResource("b18")
+
+[node name="S19" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.4, 0.3, -14.4)
+shape = SubResource("b19")
+
+[node name="S20" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.4, 0.3, -14.4)
+shape = SubResource("b20")
+
+[node name="S21" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.6, 0.3, -23.1)
+shape = SubResource("b21")
+
+[node name="S22" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.7, 0.3, 22.9)
+shape = SubResource("b22")
+
+[node name="S23" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.6, 0.3, -8.4)
+shape = SubResource("b23")
+
+[node name="S24" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.6, 0.3, 2.3)
+shape = SubResource("b24")
+
+[node name="S25" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.6, 0.31, 11.8)
+shape = SubResource("b25")
+
+[node name="S26" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0.31, 22.9)
+shape = SubResource("b26")
+
+[node name="S27" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 0.31, -23.1)
+shape = SubResource("b27")
+
+[node name="S28" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.4, 0.31, -8.6)
+shape = SubResource("b28")
+
+[node name="S29" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.6, 0.31, 11.8)
+shape = SubResource("b29")
+
+[node name="S30" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.3, 0.5, -14)
+shape = SubResource("b30")
+
+[node name="S31" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.3, 0.5, 18.3)
+shape = SubResource("b31")
+
+[node name="S32" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3, 0.5, -14.3)
+shape = SubResource("b32")
+
+[node name="S33" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.4, 0.5, 2.3)
+shape = SubResource("b33")
+
+[node name="S34" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3, 0.5, 5.8)
+shape = SubResource("b34")
+
+[node name="S35" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.9, 0.5, 20.4)
+shape = SubResource("b35")
+
+[node name="S36" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.7, 0.5, -5.5)
+shape = SubResource("b36")
+
+[node name="S37" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.3, 0.55, 8.4)
+shape = SubResource("b37")
+
+[node name="S38" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -22.4)
+shape = SubResource("b38")
+
+[node name="S39" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.75, 0.65, 10.15)
+shape = SubResource("b39")
+
+[node name="S40" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.9, 0.65, 6.5)
+shape = SubResource("b40")
+
+[node name="S41" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.92, 1.09, -19)
+shape = SubResource("b41")
+
+[node name="S42" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.08, 1.09, -19)
+shape = SubResource("b42")
+
+[node name="S43" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.92, 1.09, 15)
+shape = SubResource("b43")
+
+[node name="S44" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.92, 1.09, -1)
+shape = SubResource("b44")
+
+[node name="S45" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.08, 1.09, 15)
+shape = SubResource("b45")
+
+[node name="S46" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 1.09, 15.08)
+shape = SubResource("b46")
+
+[node name="S47" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 1.09, 18.92)
+shape = SubResource("b47")
+
+[node name="S48" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.08, 1.09, -1)
+shape = SubResource("b48")
+
+[node name="S49" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 1.09, -22.92)
+shape = SubResource("b49")
+
+[node name="S50" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 1.09, -19.08)
+shape = SubResource("b50")
+
+[node name="S51" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.92, 1.09, -7)
+shape = SubResource("b51")
+
+[node name="S52" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.92, 1.09, -17)
+shape = SubResource("b52")
+
+[node name="S53" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.92, 1.09, -15)
+shape = SubResource("b53")
+
+[node name="S54" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.92, 1.09, 13)
+shape = SubResource("b54")
+
+[node name="S55" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.92, 1.09, 15)
+shape = SubResource("b55")
+
+[node name="S56" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.92, 1.09, -7)
+shape = SubResource("b56")
+
+[node name="S57" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.92, 1.09, -17)
+shape = SubResource("b57")
+
+[node name="S58" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.92, 1.09, -15)
+shape = SubResource("b58")
+
+[node name="S59" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.92, 1.09, 13)
+shape = SubResource("b59")
+
+[node name="S60" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.92, 1.09, 15)
+shape = SubResource("b60")
+
+[node name="S61" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.09, -22.92)
+shape = SubResource("b61")
+
+[node name="S62" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.09, -19.08)
+shape = SubResource("b62")
+
+[node name="S63" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 1.09, 15.08)
+shape = SubResource("b63")
+
+[node name="S64" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 1.09, 18.92)
+shape = SubResource("b64")
+
+[node name="S65" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.08, 1.09, -1)
+shape = SubResource("b65")
+
+[node name="S66" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.08, 1.09, 15)
+shape = SubResource("b66")
+
+[node name="S67" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.92, 1.09, -1)
+shape = SubResource("b67")
+
+[node name="S68" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.92, 1.09, 15)
+shape = SubResource("b68")
+
+[node name="S69" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 1.315, -12.92)
+shape = SubResource("b69")
+
+[node name="S70" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 1.315, -11.08)
+shape = SubResource("b70")
+
+[node name="S71" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.315, -10.92)
+shape = SubResource("b71")
+
+[node name="S72" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 1.315, -9.08)
+shape = SubResource("b72")
+
+[node name="S73" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.08, 1.815, 5)
+shape = SubResource("b73")
+
+[node name="S74" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.92, 1.815, 5)
+shape = SubResource("b74")
+
+[node name="S75" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.525, -13)
+shape = SubResource("b75")
+
+[node name="S76" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 3.525, -16)
+shape = SubResource("b76")
+
+[node name="S77" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 3.525, -3)
+shape = SubResource("b77")
+
+[node name="S78" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 3.525, 9)
+shape = SubResource("b78")
+
+[node name="S79" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 3.525, 13)
+shape = SubResource("b79")
+
+[node name="S80" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3.525, -12)
+shape = SubResource("b80")
+
+[node name="S81" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 4.025, 14)
+shape = SubResource("b81")
+
+[node name="S82" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 4.025, 5)
+shape = SubResource("b82")
+
+[node name="S83" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 4.025, 4)
+shape = SubResource("b83")
+
+[node name="S84" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4.025, 11)
+shape = SubResource("b84")
+
+[node name="S85" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 4.025, -5)
+shape = SubResource("b85")
+
+[node name="S86" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 4.025, -6)
+shape = SubResource("b86")
+
+[node name="S87" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 4.275, -13)
+shape = SubResource("b87")
+
+[node name="S88" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21, 4.275, -24)
+shape = SubResource("b88")
+
+[node name="S89" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 4.275, 22)
+shape = SubResource("b89")
+
+[node name="S90" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 4.525, -6)
+shape = SubResource("b90")
+
+[node name="S91" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 4.525, -3)
+shape = SubResource("b91")
+
+[node name="S92" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 4.525, -6)
+shape = SubResource("b92")
+
+[node name="S93" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 4.525, -16)
+shape = SubResource("b93")
+
+[node name="S94" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 4.525, 9)
+shape = SubResource("b94")
+
+[node name="S95" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 4.525, 3)
+shape = SubResource("b95")
+
+[node name="S96" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 4.525, 14)
+shape = SubResource("b96")
+
+[node name="S97" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 4.525, -16)
+shape = SubResource("b97")
+
+[node name="S98" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 4.525, -21)
+shape = SubResource("b98")
+
+[node name="S99" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 4.525, 17)
+shape = SubResource("b99")
+
+[node name="S100" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 4.525, -15)
+shape = SubResource("b100")
+
+[node name="S101" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 4.775, -5)
+shape = SubResource("b101")
+
+[node name="S102" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 4.775, 15)
+shape = SubResource("b102")
+
+[node name="S103" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23, 4.775, -20)
+shape = SubResource("b103")
+
+[node name="S104" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 4.775, 23)
+shape = SubResource("b104")
+
+[node name="S105" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 4.775, 22)
+shape = SubResource("b105")
+
+[node name="S106" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 4.775, -24)
+shape = SubResource("b106")
+
+[node name="S107" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4.775, -5)
+shape = SubResource("b107")
+
+[node name="S108" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4.775, 11)
+shape = SubResource("b108")
+
+[node name="S109" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 4.775, 24)
+shape = SubResource("b109")
+
+[node name="S110" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 5.025, 17)
+shape = SubResource("b110")
+
+[node name="S111" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 5.025, -15)
+shape = SubResource("b111")
+
+[node name="S112" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 5.025, 12)
+shape = SubResource("b112")
+
+[node name="S113" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 5.025, 14)
+shape = SubResource("b113")
+
+[node name="S114" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 5.025, -3)
+shape = SubResource("b114")
+
+[node name="S115" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 5.025, -16)
+shape = SubResource("b115")
+
+[node name="S116" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 5.025, -5)
+shape = SubResource("b116")
+
+[node name="S117" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 5.275, -24)
+shape = SubResource("b117")
+
+[node name="S118" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 5.275, 23)
+shape = SubResource("b118")
+
+[node name="S119" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 5.275, -24)
+shape = SubResource("b119")
+
+[node name="S120" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 5.275, -17)
+shape = SubResource("b120")
+
+[node name="S121" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 5.275, 19)
+shape = SubResource("b121")
+
+[node name="S122" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 5.775, 3)
+shape = SubResource("b122")
+
+[node name="S123" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24, 5.775, 24)
+shape = SubResource("b123")
+
+[node name="S124" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 5.775, -24)
+shape = SubResource("b124")
+
+[node name="S125" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 5.775, 23)
+shape = SubResource("b125")
+
+[node name="S126" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 5.775, -24)
+shape = SubResource("b126")
+
+[node name="S127" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 5.775, 23)
+shape = SubResource("b127")
+
+[node name="S128" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 5.775, 3)
+shape = SubResource("b128")
+
+[node name="S129" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.87, 2.29, -19)
+shape = SubResource("b129")
+
+[node name="S130" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.13, 2.29, -19)
+shape = SubResource("b130")
+
+[node name="S131" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.87, 2.29, 15)
+shape = SubResource("b131")
+
+[node name="S132" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.87, 2.29, -1)
+shape = SubResource("b132")
+
+[node name="S133" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.13, 2.29, 15)
+shape = SubResource("b133")
+
+[node name="S134" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 2.29, 15.13)
+shape = SubResource("b134")
+
+[node name="S135" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 2.29, 18.87)
+shape = SubResource("b135")
+
+[node name="S136" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.13, 2.29, -1)
+shape = SubResource("b136")
+
+[node name="S137" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 2.29, -22.87)
+shape = SubResource("b137")
+
+[node name="S138" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 2.29, -19.13)
+shape = SubResource("b138")
+
+[node name="S139" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.87, 2.29, -7)
+shape = SubResource("b139")
+
+[node name="S140" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.87, 2.29, -17)
+shape = SubResource("b140")
+
+[node name="S141" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.87, 2.29, -15)
+shape = SubResource("b141")
+
+[node name="S142" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.87, 2.29, 13)
+shape = SubResource("b142")
+
+[node name="S143" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.87, 2.29, 15)
+shape = SubResource("b143")
+
+[node name="S144" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.87, 2.29, -7)
+shape = SubResource("b144")
+
+[node name="S145" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.87, 2.29, -17)
+shape = SubResource("b145")
+
+[node name="S146" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.87, 2.29, -15)
+shape = SubResource("b146")
+
+[node name="S147" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.87, 2.29, 13)
+shape = SubResource("b147")
+
+[node name="S148" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.87, 2.29, 15)
+shape = SubResource("b148")
+
+[node name="S149" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 2.29, -22.87)
+shape = SubResource("b149")
+
+[node name="S150" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 2.29, -19.13)
+shape = SubResource("b150")
+
+[node name="S151" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 2.29, 15.13)
+shape = SubResource("b151")
+
+[node name="S152" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 2.29, 18.87)
+shape = SubResource("b152")
+
+[node name="S153" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.13, 2.29, -1)
+shape = SubResource("b153")
+
+[node name="S154" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.13, 2.29, 15)
+shape = SubResource("b154")
+
+[node name="S155" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.87, 2.29, -1)
+shape = SubResource("b155")
+
+[node name="S156" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.87, 2.29, 15)
+shape = SubResource("b156")
+
+[node name="S157" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 2.74, -12.87)
+shape = SubResource("b157")
+
+[node name="S158" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 2.74, -11.13)
+shape = SubResource("b158")
+
+[node name="S159" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 2.74, -10.87)
+shape = SubResource("b159")
+
+[node name="S160" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 2.74, -9.13)
+shape = SubResource("b160")
+
+[node name="S161" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.6, 4.21, -19)
+shape = SubResource("b161")
+
+[node name="S162" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.4, 4.21, -19)
+shape = SubResource("b162")
+
+[node name="S163" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.4, 4.21, 15)
+shape = SubResource("b163")
+
+[node name="S164" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.6, 4.21, -1)
+shape = SubResource("b164")
+
+[node name="S165" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.6, 4.21, 15)
+shape = SubResource("b165")
+
+[node name="S166" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.4, 4.21, -1)
+shape = SubResource("b166")
+
+[node name="S167" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 4.21, -15)
+shape = SubResource("b167")
+
+[node name="S168" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 4.21, 13)
+shape = SubResource("b168")
+
+[node name="S169" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 4.21, -15)
+shape = SubResource("b169")
+
+[node name="S170" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 4.21, 13)
+shape = SubResource("b170")
+
+[node name="S171" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.4, 4.21, -1)
+shape = SubResource("b171")
+
+[node name="S172" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.6, 4.21, 15)
+shape = SubResource("b172")
+
+[node name="S173" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.6, 4.21, -1)
+shape = SubResource("b173")
+
+[node name="S174" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.4, 4.21, 15)
+shape = SubResource("b174")
+
+[node name="S175" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 4.36, 15.4)
+shape = SubResource("b175")
+
+[node name="S176" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 4.36, 18.6)
+shape = SubResource("b176")
+
+[node name="S177" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 4.36, -22.6)
+shape = SubResource("b177")
+
+[node name="S178" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 4.36, -19.4)
+shape = SubResource("b178")
+
+[node name="S179" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 4.36, -17)
+shape = SubResource("b179")
+
+[node name="S180" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.4, 4.36, 15)
+shape = SubResource("b180")
+
+[node name="S181" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 4.36, -17)
+shape = SubResource("b181")
+
+[node name="S182" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.4, 4.36, 15)
+shape = SubResource("b182")
+
+[node name="S183" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 4.36, -22.6)
+shape = SubResource("b183")
+
+[node name="S184" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 4.36, -19.4)
+shape = SubResource("b184")
+
+[node name="S185" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 4.36, 15.4)
+shape = SubResource("b185")
+
+[node name="S186" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 4.36, 18.6)
+shape = SubResource("b186")
+
+[node name="S187" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.6, 3.765, -8)
+shape = SubResource("b187")
+
+[node name="S188" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.6, 3.765, -4)
+shape = SubResource("b188")
+
+[node name="S189" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.4, 3.765, -8)
+shape = SubResource("b189")
+
+[node name="S190" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.4, 3.765, -4)
+shape = SubResource("b190")
+
+[node name="S191" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.4, 3.765, -8)
+shape = SubResource("b191")
+
+[node name="S192" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.4, 3.765, -4)
+shape = SubResource("b192")
+
+[node name="S193" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 3.765, -22.6)
+shape = SubResource("b193")
+
+[node name="S194" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 3.765, -19.4)
+shape = SubResource("b194")
+
+[node name="S195" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.6, 3.765, -8)
+shape = SubResource("b195")
+
+[node name="S196" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.6, 3.765, -4)
+shape = SubResource("b196")
+
+[node name="S197" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.4, 3.765, -16)
+shape = SubResource("b197")
+
+[node name="S198" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.6, 3.765, -16)
+shape = SubResource("b198")
+
+[node name="S199" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 4.3, -12.8)
+shape = SubResource("b199")
+
+[node name="S200" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 4.3, -11.2)
+shape = SubResource("b200")
+
+[node name="S201" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 4.3, -10.8)
+shape = SubResource("b201")
+
+[node name="S202" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 4.3, -9.2)
+shape = SubResource("b202")
+
+[node name="S203" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.13, 3.74, 5)
+shape = SubResource("b203")
+
+[node name="S204" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.87, 3.74, 5)
+shape = SubResource("b204")
+
+[node name="S205" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.8, 4.44, -19)
+shape = SubResource("b205")
+
+[node name="S206" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.2, 4.44, -19)
+shape = SubResource("b206")
+
+[node name="S207" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.2, 4.44, 15)
+shape = SubResource("b207")
+
+[node name="S208" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.8, 4.44, 15)
+shape = SubResource("b208")
+
+[node name="S209" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.8, 4.44, -1)
+shape = SubResource("b209")
+
+[node name="S210" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.2, 4.44, -1)
+shape = SubResource("b210")
+
+[node name="S211" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 4.44, -15)
+shape = SubResource("b211")
+
+[node name="S212" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 4.44, 13)
+shape = SubResource("b212")
+
+[node name="S213" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 4.44, -15)
+shape = SubResource("b213")
+
+[node name="S214" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 4.44, 13)
+shape = SubResource("b214")
+
+[node name="S215" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.2, 4.44, -1)
+shape = SubResource("b215")
+
+[node name="S216" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.8, 4.44, 15)
+shape = SubResource("b216")
+
+[node name="S217" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.8, 4.44, -1)
+shape = SubResource("b217")
+
+[node name="S218" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.2, 4.44, 15)
+shape = SubResource("b218")
+
+[node name="S219" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 4.59, 16.2)
+shape = SubResource("b219")
+
+[node name="S220" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 4.59, 17.8)
+shape = SubResource("b220")
+
+[node name="S221" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 4.59, -21.8)
+shape = SubResource("b221")
+
+[node name="S222" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 4.59, -20.2)
+shape = SubResource("b222")
+
+[node name="S223" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 4.59, -17)
+shape = SubResource("b223")
+
+[node name="S224" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2, 4.59, 15)
+shape = SubResource("b224")
+
+[node name="S225" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 4.59, -17)
+shape = SubResource("b225")
+
+[node name="S226" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.2, 4.59, 15)
+shape = SubResource("b226")
+
+[node name="S227" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 4.59, -21.8)
+shape = SubResource("b227")
+
+[node name="S228" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 4.59, -20.2)
+shape = SubResource("b228")
+
+[node name="S229" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 4.59, 16.2)
+shape = SubResource("b229")
+
+[node name="S230" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 4.59, 17.8)
+shape = SubResource("b230")
+
+[node name="S231" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 4.458, -12.4)
+shape = SubResource("b231")
+
+[node name="S232" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 4.458, -11.6)
+shape = SubResource("b232")
+
+[node name="S233" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 4.458, -10.4)
+shape = SubResource("b233")
+
+[node name="S234" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 4.458, -9.6)
+shape = SubResource("b234")
+
+[node name="S235" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.8, 4.011, -8)
+shape = SubResource("b235")
+
+[node name="S236" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.8, 4.011, -4)
+shape = SubResource("b236")
+
+[node name="S237" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.2, 4.011, -8)
+shape = SubResource("b237")
+
+[node name="S238" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.2, 4.011, -4)
+shape = SubResource("b238")
+
+[node name="S239" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 4.011, -21.8)
+shape = SubResource("b239")
+
+[node name="S240" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 4.011, -20.2)
+shape = SubResource("b240")
+
+[node name="S241" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.2, 4.011, -8)
+shape = SubResource("b241")
+
+[node name="S242" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.2, 4.011, -4)
+shape = SubResource("b242")
+
+[node name="S243" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.8, 4.011, -8)
+shape = SubResource("b243")
+
+[node name="S244" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.8, 4.011, -4)
+shape = SubResource("b244")
+
+[node name="S245" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.2, 4.011, -16)
+shape = SubResource("b245")
+
+[node name="S246" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.8, 4.011, -16)
+shape = SubResource("b246")
+
+[node name="S247" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19, 4.5, -19)
+shape = SubResource("b247")
+
+[node name="S248" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 4.5, 15)
+shape = SubResource("b248")
+
+[node name="S249" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 4.5, -1)
+shape = SubResource("b249")
+
+[node name="S250" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 4.5, -12)
+shape = SubResource("b250")
+
+[node name="S251" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, -15)
+shape = SubResource("b251")
+
+[node name="S252" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 13)
+shape = SubResource("b252")
+
+[node name="S253" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 4.5, -10)
+shape = SubResource("b253")
+
+[node name="S254" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 4.5, -1)
+shape = SubResource("b254")
+
+[node name="S255" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 4.5, 15)
+shape = SubResource("b255")
+
+[node name="S256" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 4.65, 17)
+shape = SubResource("b256")
+
+[node name="S257" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7, 4.65, -21)
+shape = SubResource("b257")
+
+[node name="S258" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.65, -17)
+shape = SubResource("b258")
+
+[node name="S259" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.65, 15)
+shape = SubResource("b259")
+
+[node name="S260" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 4.65, -21)
+shape = SubResource("b260")
+
+[node name="S261" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 4.65, 17)
+shape = SubResource("b261")
+
+[node name="S262" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.4, 5.01, -7)
+shape = SubResource("b262")
+
+[node name="S263" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 5.01, -7)
+shape = SubResource("b263")
+
+[node name="S264" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.4, 4.565, -4)
+shape = SubResource("b264")
+
+[node name="S265" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.4, 4.565, 0)
+shape = SubResource("b265")
+
+[node name="S266" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 4.565, -4)
+shape = SubResource("b266")
+
+[node name="S267" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.4, 4.565, 0)
+shape = SubResource("b267")
+
+[node name="S268" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 4.075, -8)
+shape = SubResource("b268")
+
+[node name="S269" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 4.075, -4)
+shape = SubResource("b269")
+
+[node name="S270" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 4.075, -21)
+shape = SubResource("b270")
+
+[node name="S271" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 4.075, -8)
+shape = SubResource("b271")
+
+[node name="S272" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 4.075, -4)
+shape = SubResource("b272")
+
+[node name="S273" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 4.075, -16)
+shape = SubResource("b273")
+
+[node name="S274" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 4.45, -20)
+shape = SubResource("b274")
+
+[node name="S275" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 4.45, -22)
+shape = SubResource("b275")
+
+[node name="S276" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 4.45, 17)
+shape = SubResource("b276")
+
+[node name="S277" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 4.45, -6)
+shape = SubResource("b277")
+
+[node name="S278" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 4.45, -20)
+shape = SubResource("b278")
+
+[node name="S279" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 4.45, -12)
+shape = SubResource("b279")
+
+[node name="S280" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.45, -16)
+shape = SubResource("b280")
+
+[node name="S281" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.45, 14)
+shape = SubResource("b281")
+
+[node name="S282" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 4.45, -21)
+shape = SubResource("b282")
+
+[node name="S283" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 4.45, -10)
+shape = SubResource("b283")
+
+[node name="S284" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 4.45, 17)
+shape = SubResource("b284")
+
+[node name="S285" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 4.45, -5)
+shape = SubResource("b285")
+
+[node name="S286" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 4.45, -12)
+shape = SubResource("b286")
+
+[node name="S287" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 4.45, -16)
+shape = SubResource("b287")
+
+[node name="S288" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2, 5.3, 5)
+shape = SubResource("b288")
+
+[node name="S289" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.8, 5.3, 5)
+shape = SubResource("b289")
+
+[node name="S290" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 5.397, -7)
+shape = SubResource("b290")
+
+[node name="S291" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 5.397, -7)
+shape = SubResource("b291")
+
+[node name="S292" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 4.969, -4)
+shape = SubResource("b292")
+
+[node name="S293" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2, 4.969, 0)
+shape = SubResource("b293")
+
+[node name="S294" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 4.969, -4)
+shape = SubResource("b294")
+
+[node name="S295" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.8, 4.969, 0)
+shape = SubResource("b295")
+
+[node name="S296" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.6, 5.459, 5)
+shape = SubResource("b296")
+
+[node name="S297" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.4, 5.459, 5)
+shape = SubResource("b297")
+
+[node name="S298" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 5.5, -7)
+shape = SubResource("b298")
+
+[node name="S299" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 5.5, 5)
+shape = SubResource("b299")
+
+[node name="S300" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 5.075, -4)
+shape = SubResource("b300")
+
+[node name="S301" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 5.075, 0)
+shape = SubResource("b301")
+
+[node name="S302" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.25, 18)
+shape = SubResource("b302")
+
+[node name="S303" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.25, -20)
+shape = SubResource("b303")
+
+[node name="S304" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 5.45, -3)
+shape = SubResource("b304")
+
+[node name="S305" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.45, 2)
+shape = SubResource("b305")
+
+[node name="S306" type="CollisionShape3D" parent="World_stone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 5.45, 4)
+shape = SubResource("b306")
+
+[node name="Ramp0" type="CollisionShape3D" parent="World_stone"]
+shape = SubResource("r307")
+
+[node name="Ramp1" type="CollisionShape3D" parent="World_stone"]
+shape = SubResource("r308")
+
+[node name="World_wood" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+metadata/surface = "wood"
+
+[node name="S309" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.4, 0.39, -0.3)
+shape = SubResource("b309")
+
+[node name="S310" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.9, 0.39, -16.4)
+shape = SubResource("b310")
+
+[node name="S311" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.4, 0.39, 22.9)
+shape = SubResource("b311")
+
+[node name="S312" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.6, 0.39, -23)
+shape = SubResource("b312")
+
+[node name="S313" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.9, 0.39, -18.4)
+shape = SubResource("b313")
+
+[node name="S314" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.6, 0.44, -23)
+shape = SubResource("b314")
+
+[node name="S315" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.6, 0.44, 22.9)
+shape = SubResource("b315")
+
+[node name="S316" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.6, 0.44, 12.1)
+shape = SubResource("b316")
+
+[node name="S317" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.45, 18.4)
+shape = SubResource("b317")
+
+[node name="S318" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.3, 0.45, -22.3)
+shape = SubResource("b318")
+
+[node name="S319" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.45, 0.4)
+shape = SubResource("b319")
+
+[node name="S320" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3, 0.45, -17.8)
+shape = SubResource("b320")
+
+[node name="S321" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.2, 0.45, -4)
+shape = SubResource("b321")
+
+[node name="S322" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.9, 0.45, 20.3)
+shape = SubResource("b322")
+
+[node name="S323" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.3, 0.45, 12.3)
+shape = SubResource("b323")
+
+[node name="S324" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.2, 0.45, -8.2)
+shape = SubResource("b324")
+
+[node name="S325" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.3, 0.45, -17.8)
+shape = SubResource("b325")
+
+[node name="S326" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.3, 0.45, 3.8)
+shape = SubResource("b326")
+
+[node name="S327" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.4, 0.45, -22.3)
+shape = SubResource("b327")
+
+[node name="S328" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0.45, 18.4)
+shape = SubResource("b328")
+
+[node name="S329" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.3, 0.45, -3.2)
+shape = SubResource("b329")
+
+[node name="S330" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.6, 0.45, -22.2)
+shape = SubResource("b330")
+
+[node name="S331" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.3, 0.45, 18.3)
+shape = SubResource("b331")
+
+[node name="S332" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.2, 0.45, -16)
+shape = SubResource("b332")
+
+[node name="S333" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.4, 0.5, 11)
+shape = SubResource("b333")
+
+[node name="S334" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.35, 0.5, 11)
+shape = SubResource("b334")
+
+[node name="S335" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.3, 0.55, -22.2)
+shape = SubResource("b335")
+
+[node name="S336" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.6, 0.55, 1.3)
+shape = SubResource("b336")
+
+[node name="S337" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.25, 0.55, -21.9)
+shape = SubResource("b337")
+
+[node name="S338" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 0.55, 9.9)
+shape = SubResource("b338")
+
+[node name="S339" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.4, 0.55, 19.45)
+shape = SubResource("b339")
+
+[node name="S340" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.75, 0.55, 1.4)
+shape = SubResource("b340")
+
+[node name="S341" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 0.6, 4.6)
+shape = SubResource("b341")
+
+[node name="S342" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.6, 0.6, 10.85)
+shape = SubResource("b342")
+
+[node name="S343" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 0.6, -9.2)
+shape = SubResource("b343")
+
+[node name="S344" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.2, 0.6, 4.6)
+shape = SubResource("b344")
+
+[node name="S345" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.2, 0.6, 5.85)
+shape = SubResource("b345")
+
+[node name="S346" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.72, 1.125, -23.57)
+shape = SubResource("b346")
+
+[node name="S347" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.72, 1.125, -22.43)
+shape = SubResource("b347")
+
+[node name="S348" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.48, 1.125, -23.57)
+shape = SubResource("b348")
+
+[node name="S349" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.48, 1.125, -22.43)
+shape = SubResource("b349")
+
+[node name="S350" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.48, 1.125, 22.33)
+shape = SubResource("b350")
+
+[node name="S351" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.48, 1.125, 23.47)
+shape = SubResource("b351")
+
+[node name="S352" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.72, 1.125, 22.33)
+shape = SubResource("b352")
+
+[node name="S353" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.72, 1.125, 23.47)
+shape = SubResource("b353")
+
+[node name="S354" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.08, 1.125, 11.18)
+shape = SubResource("b354")
+
+[node name="S355" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.08, 1.125, 13.02)
+shape = SubResource("b355")
+
+[node name="S356" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.12, 1.125, 11.18)
+shape = SubResource("b356")
+
+[node name="S357" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.12, 1.125, 13.02)
+shape = SubResource("b357")
+
+[node name="S358" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.9, 3.15, 12.3)
+shape = SubResource("b358")
+
+[node name="S359" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.2, 3.24, 12.2)
+shape = SubResource("b359")
+
+[node name="S360" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.1, 3.375, -7.9)
+shape = SubResource("b360")
+
+[node name="S361" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.2, 3.375, 6)
+shape = SubResource("b361")
+
+[node name="S362" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.3, 3.6, -6.5)
+shape = SubResource("b362")
+
+[node name="S363" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.4, 3.825, 0.3)
+shape = SubResource("b363")
+
+[node name="S364" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 3.825, 0)
+shape = SubResource("b364")
+
+[node name="S365" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.3, 1.055, -0.275)
+shape = SubResource("b365")
+
+[node name="S366" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.9, 1.055, -16.3)
+shape = SubResource("b366")
+
+[node name="S367" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5, 1.055, 22.89)
+shape = SubResource("b367")
+
+[node name="S368" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.699, 1.055, -22.99)
+shape = SubResource("b368")
+
+[node name="S369" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.9, 1.055, -18.3)
+shape = SubResource("b369")
+
+[node name="S370" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2, 1.7, -9.2)
+shape = SubResource("b370")
+
+[node name="S371" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17, 1.8, 4.6)
+shape = SubResource("b371")
+
+[node name="S372" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.2, 1.8, 5.2)
+shape = SubResource("b372")
+
+[node name="S373" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, 3.83, -8)
+shape = SubResource("b373")
+
+[node name="S374" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, 3.83, -6)
+shape = SubResource("b374")
+
+[node name="S375" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 3.83, -16.5)
+shape = SubResource("b375")
+
+[node name="S376" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.5, 3.83, -14)
+shape = SubResource("b376")
+
+[node name="S377" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 3.83, -0.5)
+shape = SubResource("b377")
+
+[node name="S378" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 3.83, -0.5)
+shape = SubResource("b378")
+
+[node name="S379" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 3.83, 8)
+shape = SubResource("b379")
+
+[node name="S380" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 3.83, 10)
+shape = SubResource("b380")
+
+[node name="S381" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 3.83, 10)
+shape = SubResource("b381")
+
+[node name="S382" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 3.83, 8)
+shape = SubResource("b382")
+
+[node name="S383" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 3.83, 0)
+shape = SubResource("b383")
+
+[node name="S384" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 3.83, -0.5)
+shape = SubResource("b384")
+
+[node name="S385" type="CollisionShape3D" parent="World_wood"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.5, 3.83, 2)
+shape = SubResource("b385")
+
+[node name="World_metal" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+metadata/surface = "metal"
+
+[node name="S386" type="CollisionShape3D" parent="World_metal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.3, 0.45, 0.3)
+shape = SubResource("b386")
+
+[node name="S387" type="CollisionShape3D" parent="World_metal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.2, 0.55, -9)
+shape = SubResource("b387")
+
+[node name="S388" type="CollisionShape3D" parent="World_metal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.6, 0.6, 9.6)
+shape = SubResource("b388")
+
+[node name="S389" type="CollisionShape3D" parent="World_metal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.6, 0.6, 19.9)
+shape = SubResource("b389")
+
+[node name="S390" type="CollisionShape3D" parent="World_metal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.4, 0.6, -13.2)
+shape = SubResource("b390")
+
+[node name="S391" type="CollisionShape3D" parent="World_metal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.9, 0.6, -21.8)
+shape = SubResource("b391")
+
+[node name="S392" type="CollisionShape3D" parent="World_metal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17.8, 0.65, 9.6)
+shape = SubResource("b392")
+
+[node name="S393" type="CollisionShape3D" parent="World_metal"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.2, 1.55, 9.9)
+shape = SubResource("b393")
+
+[node name="World_cloth" type="StaticBody3D" parent="."]
+collision_layer = 1
+collision_mask = 0
+metadata/surface = "cloth"
+
+[node name="S394" type="CollisionShape3D" parent="World_cloth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5, 0.39, 2.8)
+shape = SubResource("b394")
+
+[node name="S395" type="CollisionShape3D" parent="World_cloth"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21, 0.39, 11.9)
+shape = SubResource("b395")
+
+[node name="PlayerClip" type="StaticBody3D" parent="."]
+collision_layer = 2
+collision_mask = 0
+
+[node name="S396" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.5, 6, 0)
+shape = SubResource("b396")
+
+[node name="V396" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.5, 6, 0)
+mesh = SubResource("bm396")
+
+[node name="S397" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -25.5)
+shape = SubResource("b397")
+
+[node name="V397" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, -25.5)
+mesh = SubResource("bm397")
+
+[node name="S398" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 25.5)
+shape = SubResource("b398")
+
+[node name="V398" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6, 25.5)
+mesh = SubResource("bm398")
+
+[node name="S399" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.5, 6, 0)
+shape = SubResource("b399")
+
+[node name="V399" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.5, 6, 0)
+mesh = SubResource("bm399")
+
+[node name="S400" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, 7.95, -8)
+shape = SubResource("b400")
+
+[node name="V400" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, 7.95, -8)
+mesh = SubResource("bm400")
+
+[node name="S401" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, 7.95, -6)
+shape = SubResource("b401")
+
+[node name="V401" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.5, 7.95, -6)
+mesh = SubResource("bm401")
+
+[node name="S402" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 7.95, -16.5)
+shape = SubResource("b402")
+
+[node name="V402" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 7.95, -16.5)
+mesh = SubResource("bm402")
+
+[node name="S403" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.5, 7.95, -14)
+shape = SubResource("b403")
+
+[node name="V403" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.5, 7.95, -14)
+mesh = SubResource("bm403")
+
+[node name="S404" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 7.95, -0.5)
+shape = SubResource("b404")
+
+[node name="V404" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 7.95, -0.5)
+mesh = SubResource("bm404")
+
+[node name="S405" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 7.95, -0.5)
+shape = SubResource("b405")
+
+[node name="V405" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 7.95, -0.5)
+mesh = SubResource("bm405")
+
+[node name="S406" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 7.95, 8)
+shape = SubResource("b406")
+
+[node name="V406" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 7.95, 8)
+mesh = SubResource("bm406")
+
+[node name="S407" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 7.95, 10)
+shape = SubResource("b407")
+
+[node name="V407" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 7.95, 10)
+mesh = SubResource("bm407")
+
+[node name="S408" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 7.95, 10)
+shape = SubResource("b408")
+
+[node name="V408" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.5, 7.95, 10)
+mesh = SubResource("bm408")
+
+[node name="S409" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 7.95, 8)
+shape = SubResource("b409")
+
+[node name="V409" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.5, 7.95, 8)
+mesh = SubResource("bm409")
+
+[node name="S410" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 7.95, 0)
+shape = SubResource("b410")
+
+[node name="V410" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.5, 7.95, 0)
+mesh = SubResource("bm410")
+
+[node name="S411" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 7.95, -0.5)
+shape = SubResource("b411")
+
+[node name="V411" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 7.95, -0.5)
+mesh = SubResource("bm411")
+
+[node name="S412" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.5, 7.95, 2)
+shape = SubResource("b412")
+
+[node name="V412" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22.5, 7.95, 2)
+mesh = SubResource("bm412")
+
+[node name="S413" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 8.35, -20)
+shape = SubResource("b413")
+
+[node name="V413" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 8.35, -20)
+mesh = SubResource("bm413")
+
+[node name="S414" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 8.35, -22)
+shape = SubResource("b414")
+
+[node name="V414" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 8.35, -22)
+mesh = SubResource("bm414")
+
+[node name="S415" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 8.35, 17)
+shape = SubResource("b415")
+
+[node name="V415" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13, 8.35, 17)
+mesh = SubResource("bm415")
+
+[node name="S416" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 8.35, -6)
+shape = SubResource("b416")
+
+[node name="V416" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11, 8.35, -6)
+mesh = SubResource("bm416")
+
+[node name="S417" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 8.35, -20)
+shape = SubResource("b417")
+
+[node name="V417" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 8.35, -20)
+mesh = SubResource("bm417")
+
+[node name="S418" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 8.35, -12)
+shape = SubResource("b418")
+
+[node name="V418" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 8.35, -12)
+mesh = SubResource("bm418")
+
+[node name="S419" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.35, -16)
+shape = SubResource("b419")
+
+[node name="V419" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.35, -16)
+mesh = SubResource("bm419")
+
+[node name="S420" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.35, 14)
+shape = SubResource("b420")
+
+[node name="V420" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.35, 14)
+mesh = SubResource("bm420")
+
+[node name="S421" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 8.35, -21)
+shape = SubResource("b421")
+
+[node name="V421" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 8.35, -21)
+mesh = SubResource("bm421")
+
+[node name="S422" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 8.35, -10)
+shape = SubResource("b422")
+
+[node name="V422" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 8.35, -10)
+mesh = SubResource("bm422")
+
+[node name="S423" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 8.35, 17)
+shape = SubResource("b423")
+
+[node name="V423" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 8.35, 17)
+mesh = SubResource("bm423")
+
+[node name="S424" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 8.35, -5)
+shape = SubResource("b424")
+
+[node name="V424" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13, 8.35, -5)
+mesh = SubResource("bm424")
+
+[node name="S425" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 8.35, -12)
+shape = SubResource("b425")
+
+[node name="V425" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 8.35, -12)
+mesh = SubResource("bm425")
+
+[node name="S426" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 8.35, -16)
+shape = SubResource("b426")
+
+[node name="V426" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 17, 8.35, -16)
+mesh = SubResource("bm426")
+
+[node name="S427" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.75, 18)
+shape = SubResource("b427")
+
+[node name="V427" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.75, 18)
+mesh = SubResource("bm427")
+
+[node name="S428" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.75, -20)
+shape = SubResource("b428")
+
+[node name="V428" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.75, -20)
+mesh = SubResource("bm428")
+
+[node name="S429" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8.85, -3)
+shape = SubResource("b429")
+
+[node name="V429" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 8.85, -3)
+mesh = SubResource("bm429")
+
+[node name="S430" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.85, 2)
+shape = SubResource("b430")
+
+[node name="V430" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.85, 2)
+mesh = SubResource("bm430")
+
+[node name="S431" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 8.85, 4)
+shape = SubResource("b431")
+
+[node name="V431" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 8.85, 4)
+mesh = SubResource("bm431")
+
+[node name="S432" type="CollisionShape3D" parent="PlayerClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12.25, 0)
+shape = SubResource("b432")
+
+[node name="V432" type="MeshInstance3D" parent="PlayerClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12.25, 0)
+mesh = SubResource("bm432")
+
+[node name="GrenadeClip" type="StaticBody3D" parent="."]
+collision_layer = 4
+collision_mask = 0
+
+[node name="S433" type="CollisionShape3D" parent="GrenadeClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.5, 15, 0)
+shape = SubResource("b433")
+
+[node name="V433" type="MeshInstance3D" parent="GrenadeClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.5, 15, 0)
+mesh = SubResource("bm433")
+
+[node name="S434" type="CollisionShape3D" parent="GrenadeClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, -25.5)
+shape = SubResource("b434")
+
+[node name="V434" type="MeshInstance3D" parent="GrenadeClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, -25.5)
+mesh = SubResource("bm434")
+
+[node name="S435" type="CollisionShape3D" parent="GrenadeClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 25.5)
+shape = SubResource("b435")
+
+[node name="V435" type="MeshInstance3D" parent="GrenadeClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 15, 25.5)
+mesh = SubResource("bm435")
+
+[node name="S436" type="CollisionShape3D" parent="GrenadeClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.5, 15, 0)
+shape = SubResource("b436")
+
+[node name="V436" type="MeshInstance3D" parent="GrenadeClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.5, 15, 0)
+mesh = SubResource("bm436")
+
+[node name="S437" type="CollisionShape3D" parent="GrenadeClip"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30.25, 0)
+shape = SubResource("b437")
+
+[node name="V437" type="MeshInstance3D" parent="GrenadeClip" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 30.25, 0)
+mesh = SubResource("bm437")

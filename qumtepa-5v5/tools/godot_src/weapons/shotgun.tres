@@ -1,0 +1,43 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+weapon_id = "breacher_12"
+weapon_name = "Breacher-12"
+kind = 5
+slot = 1
+category_name = "Drobovik"
+base_damage = 14.0
+headshot_multiplier = 1.5
+legshot_multiplier = 0.75
+arm_multiplier = 0.85
+effective_range = 18.0
+damage_falloff_multiplier = 0.35
+max_range = 60.0
+projectile_count = 8
+fire_rate = 80.0
+bolt_cycle_time = 0.65
+fire_modes = Array[int]([0])
+magazine_size = 6
+reserve_ammo = 24
+reload_time = 2.8
+empty_reload_time = 3.4
+recoil_pattern_v = PackedFloat32Array(3.2, 3.5, 3.8, 4)
+recoil_pattern_h = PackedFloat32Array(0, 0.4, -0.4, 0.5)
+recoil_reset_time = 0.35
+recoil_recovery_speed = 7.0
+base_spread = 0.045
+spread_bloom_per_shot = 0.02
+max_spread = 0.095
+spread_recovery_speed = 8.0
+spread_walk_mult = 1.2
+spread_crouch_mult = 0.85
+spread_air_mult = 2.0
+ads_fov_ratio = 0.867
+ads_sensitivity_multiplier = 0.7
+ads_spread_multiplier = 0.65
+ads_recoil_multiplier = 0.85
+ads_transition_speed = 9.0
+equip_time = 0.6
