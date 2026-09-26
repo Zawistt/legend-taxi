@@ -36,8 +36,8 @@
  "routes": {
   "T → A (Long)": {
    "team": "T",
-   "dist": 91.7,
-   "time": 20.4
+   "dist": 92.2,
+   "time": 20.5
   },
   "T → A (Short)": {
    "team": "T",
@@ -46,7 +46,7 @@
   },
   "T → B (Tunnels)": {
    "team": "T",
-   "dist": 91.1,
+   "dist": 91.5,
    "time": 20.3
   },
   "T → B (Window)": {
@@ -95,86 +95,92 @@
    "time": 24.5
   }
  },
+ "shortest": {
+  "T→A": 17.99,
+  "T→B": 18.02,
+  "CT→A": 12.27,
+  "CT→B": 12.45
+ },
  "spawns": {
   "T": {
    "slots": [
     {
      "pos": [
       -4.0,
-      -46.0
+      -47.0
      ],
      "exits": {
-      "Long doors": 3.92,
-      "T ramp g'arb": 2.86,
-      "T ramp sharq": 3.34,
-      "Upper tunnels": 5.7
+      "Long doors": 4.02,
+      "T ramp g'arb": 3.25,
+      "T ramp sharq": 3.43,
+      "Upper tunnels": 5.79
      },
-     "nearest_exit_s": 2.86,
-     "A_s": 17.95,
-     "B_s": 18.46
+     "nearest_exit_s": 3.25,
+     "A_s": 18.34,
+     "B_s": 18.55
     },
     {
      "pos": [
       -2.0,
-      -46.0
+      -47.0
      ],
      "exits": {
-      "Long doors": 4.37,
-      "T ramp g'arb": 2.72,
-      "T ramp sharq": 3.09,
-      "Upper tunnels": 5.26
+      "Long doors": 4.46,
+      "T ramp g'arb": 2.9,
+      "T ramp sharq": 3.08,
+      "Upper tunnels": 5.35
      },
-     "nearest_exit_s": 2.72,
-     "A_s": 17.81,
+     "nearest_exit_s": 2.9,
+     "A_s": 17.99,
      "B_s": 18.21
     },
     {
      "pos": [
       0.0,
-      -46.0
+      -47.0
      ],
      "exits": {
-      "Long doors": 4.81,
+      "Long doors": 4.9,
       "T ramp g'arb": 2.9,
       "T ramp sharq": 2.9,
-      "Upper tunnels": 4.81
+      "Upper tunnels": 4.9
      },
      "nearest_exit_s": 2.9,
-     "A_s": 18.0,
-     "B_s": 18.03
+     "A_s": 17.99,
+     "B_s": 18.02
     },
     {
      "pos": [
       2.0,
-      -46.0
+      -47.0
      ],
      "exits": {
-      "Long doors": 5.26,
-      "T ramp g'arb": 3.09,
-      "T ramp sharq": 2.72,
-      "Upper tunnels": 4.37
+      "Long doors": 5.35,
+      "T ramp g'arb": 3.08,
+      "T ramp sharq": 2.95,
+      "Upper tunnels": 4.46
      },
-     "nearest_exit_s": 2.72,
+     "nearest_exit_s": 2.95,
      "A_s": 18.18,
-     "B_s": 17.85
+     "B_s": 18.07
     },
     {
      "pos": [
       4.0,
-      -46.0
+      -47.0
      ],
      "exits": {
-      "Long doors": 5.7,
-      "T ramp g'arb": 3.37,
-      "T ramp sharq": 2.9,
-      "Upper tunnels": 3.92
+      "Long doors": 5.79,
+      "T ramp g'arb": 3.46,
+      "T ramp sharq": 3.32,
+      "Upper tunnels": 4.02
      },
-     "nearest_exit_s": 2.9,
-     "A_s": 18.46,
-     "B_s": 18.03
+     "nearest_exit_s": 3.32,
+     "A_s": 18.55,
+     "B_s": 18.45
     }
    ],
-   "nearest_exit_spread_s": 0.18
+   "nearest_exit_spread_s": 0.42
   },
   "CT": {
    "slots": [
@@ -191,7 +197,7 @@
      },
      "nearest_exit_s": 2.96,
      "A_s": 11.39,
-     "B_s": 13.39
+     "B_s": 13.34
     },
     {
      "pos": [
@@ -206,7 +212,7 @@
      },
      "nearest_exit_s": 3.15,
      "A_s": 11.83,
-     "B_s": 12.95
+     "B_s": 12.89
     },
     {
      "pos": [
@@ -221,7 +227,7 @@
      },
      "nearest_exit_s": 3.33,
      "A_s": 12.27,
-     "B_s": 12.5
+     "B_s": 12.45
     },
     {
      "pos": [
@@ -236,7 +242,7 @@
      },
      "nearest_exit_s": 3.18,
      "A_s": 12.72,
-     "B_s": 12.06
+     "B_s": 12.01
     },
     {
      "pos": [
@@ -251,7 +257,7 @@
      },
      "nearest_exit_s": 2.99,
      "A_s": 13.16,
-     "B_s": 11.61
+     "B_s": 11.56
     }
    ],
    "nearest_exit_spread_s": 0.37
@@ -339,7 +345,7 @@
     3.0
    ],
    "reachable": true,
-   "from_spawn_s": 17.2,
+   "from_spawn_s": 17.1,
    "callout": "Long"
   },
   {
@@ -387,7 +393,7 @@
     -38.0
    ],
    "reachable": true,
-   "from_spawn_s": 7.6,
+   "from_spawn_s": 7.7,
    "callout": "Outside long"
   },
   {
@@ -399,7 +405,7 @@
     -42.0
    ],
    "reachable": true,
-   "from_spawn_s": 4.8,
+   "from_spawn_s": 4.9,
    "callout": "Long doors"
   },
   {
@@ -527,11 +533,11 @@
    "kind": "lurk",
    "team": "T",
    "pos": [
-    32.0,
-    -10.0
+    29.5,
+    -12.0
    ],
    "reachable": true,
-   "from_spawn_s": 12.6,
+   "from_spawn_s": 12.0,
    "callout": "Tunnel cho'ntagi"
   },
   {
@@ -543,7 +549,7 @@
     -38.0
    ],
    "reachable": true,
-   "from_spawn_s": 7.6,
+   "from_spawn_s": 7.7,
    "callout": "Upper tunnels"
   },
   {
@@ -660,7 +666,7 @@
    "team": "T",
    "pos": [
     0.0,
-    -46.0
+    -47.0
    ],
    "reachable": true,
    "from_spawn_s": 0.0,
@@ -786,7 +792,7 @@
     true,
     true
    ],
-   "throw_from_s": 14.9
+   "throw_from_s": 14.8
   },
   {
    "name": "Mid doors",
@@ -883,14 +889,14 @@
  },
  "spawn_safety": {
   "T": {
-   "s": 19.1,
+   "s": 17.8,
    "own": [
-    13.5,
-    -44.5
+    5.5,
+    -50.5
    ],
    "enemy": [
-    3.5,
-    -32.5
+    -16.5,
+    -26.5
    ],
    "enemy_callout": "Top mid"
   },
@@ -4197,7 +4203,7 @@
  "checks": [
   {
    "ok": true,
-   "msg": "T → A (Long): 20.4 s (maqsad 16.0–20.5 s)"
+   "msg": "T → A (Long): 20.5 s (maqsad 16.0–20.5 s)"
   },
   {
    "ok": true,
@@ -4213,7 +4219,7 @@
   },
   {
    "ok": true,
-   "msg": "T yo'llari farqi 2.4 s (≤ 3.0 s)"
+   "msg": "T yo'llari farqi 2.5 s (≤ 3.0 s)"
   },
   {
    "ok": true,
@@ -4257,47 +4263,47 @@
   },
   {
    "ok": true,
-   "msg": "T spawn (-4.0, -46.0) bo'sh joyda"
+   "msg": "T spawn (-4.0, -47.0) bo'sh joyda"
   },
   {
    "ok": true,
-   "msg": "T spawn (-4.0, -46.0) sotib olish zonasida"
+   "msg": "T spawn (-4.0, -47.0) sotib olish zonasida"
   },
   {
    "ok": true,
-   "msg": "T spawn (-2.0, -46.0) bo'sh joyda"
+   "msg": "T spawn (-2.0, -47.0) bo'sh joyda"
   },
   {
    "ok": true,
-   "msg": "T spawn (-2.0, -46.0) sotib olish zonasida"
+   "msg": "T spawn (-2.0, -47.0) sotib olish zonasida"
   },
   {
    "ok": true,
-   "msg": "T spawn (0.0, -46.0) bo'sh joyda"
+   "msg": "T spawn (0.0, -47.0) bo'sh joyda"
   },
   {
    "ok": true,
-   "msg": "T spawn (0.0, -46.0) sotib olish zonasida"
+   "msg": "T spawn (0.0, -47.0) sotib olish zonasida"
   },
   {
    "ok": true,
-   "msg": "T spawn (2.0, -46.0) bo'sh joyda"
+   "msg": "T spawn (2.0, -47.0) bo'sh joyda"
   },
   {
    "ok": true,
-   "msg": "T spawn (2.0, -46.0) sotib olish zonasida"
+   "msg": "T spawn (2.0, -47.0) sotib olish zonasida"
   },
   {
    "ok": true,
-   "msg": "T spawn (4.0, -46.0) bo'sh joyda"
+   "msg": "T spawn (4.0, -47.0) bo'sh joyda"
   },
   {
    "ok": true,
-   "msg": "T spawn (4.0, -46.0) sotib olish zonasida"
+   "msg": "T spawn (4.0, -47.0) sotib olish zonasida"
   },
   {
    "ok": true,
-   "msg": "T: 5 spawn joyidan eng yaqin chiqishgacha farq 0.18 s (≤ 0.6 s)"
+   "msg": "T: 5 spawn joyidan eng yaqin chiqishgacha farq 0.42 s (≤ 0.6 s)"
   },
   {
    "ok": true,
@@ -4369,7 +4375,7 @@
   },
   {
    "ok": true,
-   "msg": "89 ta pana/obyekt bino ichida emas"
+   "msg": "88 ta pana/obyekt bino ichida emas"
   },
   {
    "ok": true,
@@ -4381,7 +4387,7 @@
   },
   {
    "ok": true,
-   "msg": "T spawn zonasini dushman eng erta 19.1 s da ko'radi — T spawn ↔ Top mid (≥ 15.0 s)"
+   "msg": "T spawn zonasini dushman eng erta 17.8 s da ko'radi — T spawn ↔ Top mid (≥ 15.0 s)"
   },
   {
    "ok": true,

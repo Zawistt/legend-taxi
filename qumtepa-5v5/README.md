@@ -11,36 +11,41 @@ Godot 4.3, bomba rejimi (T hujum qiladi, CT himoya qiladi).
 |---|---|---|
 | 0 | Konsepsiya: yo'llar sxemasi, vaqt maqsadlari | ✅ |
 | 1 | 2D blokaut: yakuniy reja, panalar, ko'rish chiziqlari, smoke rejasi, callout'lar | ✅ ([hisobot](docs/STAGE1.md)) |
-| 2 | Godot greybox: qutilardan 3D, collision, NavMesh, spawn, zonalar, raund, testlar | ⏳ |
-| 3 | Balans sinovi: 5v5 botlar, hujum/qaytarib olish stsenariylari, tuzatishlar | — |
+| 2 | Godot greybox: qutilardan 3D, collision, NavMesh, spawn, zonalar, raund, testlar | ✅ ([hisobot](docs/STAGE2.md)) |
+| 3 | Balans sinovi: 5v5 botlar, hujum/qaytarib olish stsenariylari, tuzatishlar | ⏳ |
 | 4 | Arxitektura: binolar, arkalar, derazalar, tomlar, hudud uslublari | — |
 | 5 | Props va teksturalar, sirt turlari | — |
 | 6 | Yorug'lik, osmon, atmosfera, tovush zonalari | — |
 | 7 | Optimallashtirish (occlusion, LOD, MultiMesh), minimap, yakuniy testlar | — |
+
+## O'ynash
+
+Godot 4.3 → Import → `qumtepa-5v5/godot/project.godot` → F5. Boshqaruv va sinov ro'yxati: [STAGE2.md](docs/STAGE2.md).
 
 ## Tuzilma
 
 ```
 qumtepa-5v5/
 ├── tools/
-│   ├── layout5.py    # xarita rejasi: kataklar, zonalar, panalar, spawn, bomba/sotib olish zonalari,
-│   │                 # raund qoidalari, smoke rejasi, bot nuqtalari, vaqt maqsadlari
-│   └── analyze5.py   # tahlil va avtomatik tekshiruvlar, chizmalarni yaratadi
-└── docs/
-    ├── STAGE1.md               # 1-bosqich hisoboti
-    ├── blueprint_stage1.png    # reja, yo'llar, panalar, smoke nishonlari, bot nuqtalari
-    ├── contact_stage1.png      # birinchi to'qnashuv xaritasi
-    ├── analysis_stage1.json    # barcha o'lchovlar (2-bosqich generatori shuni o'qiydi)
-    └── layout_stage1.txt       # kataklar (ASCII)
+│   ├── layout5.py      # xarita rejasi: kataklar, zonalar, panalar, spawn, bomba/sotib olish zonalari,
+│   │                   # raund qoidalari, smoke rejasi, bot nuqtalari, vaqt maqsadlari (YAGONA MANBA)
+│   ├── analyze5.py     # 2D tahlil va 59 ta tekshiruv, chizmalar
+│   ├── build5.py       # greybox 3D model (GLB) + to'qnashuv ma'lumotlari
+│   ├── gen_godot5.py   # Godot loyihasini yaratadi (sahna, collision, map_data, test ma'lumotlari)
+│   ├── make_all.sh     # hammasi ketma-ket + NavMesh + 79 ta Godot testi
+│   └── godot_src/      # Godot testlari va skrinshot skripti (manba)
+├── godot/              # tayyor Godot 4.3 loyihasi (avtomatik yaratilgan)
+└── docs/               # hisobotlar, chizmalar, skrinshotlar, tahlil JSON
 ```
 
-## Tahlilni ishga tushirish
+O'yin skriptlari (o'yinchi, raund, HUD, bomba) va tovushlar `qumtepa-v2/` dan olinadi.
+
+## Qayta yaratish
 
 ```
-pip install numpy scipy pillow
+pip install numpy scipy pillow trimesh
 cd qumtepa-5v5/tools
-python3 analyze5.py        # ~25 s; natija: "Tekshiruvlar: 59 / 59", xato bo'lsa chiqish kodi 1
+GODOT=/yo'l/godot4 ./make_all.sh     # natija: "Tekshiruvlar: 59 / 59" va "NATIJA: 79 / 79"
 ```
 
-`layout5.py` o'zgartirilgandan keyin har safar `analyze5.py` ni ishga tushiring. U vaqt, muvozanat
-va ko'rish chiziqlari maqsadlardan chiqib ketganini darhol ko'rsatadi.
+Xaritani o'zgartirish: faqat `layout5.py` ni tahrirlang va `make_all.sh` ni ishga tushiring.

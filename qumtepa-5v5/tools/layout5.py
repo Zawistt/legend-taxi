@@ -94,7 +94,7 @@ ALIASES = {"Mid-window yo'li": "Mid-window", "CT mid g'arb og'zi": "CT spawn", "
            "CT mid sharq": "CT mid", "A ramp yo'li": "A ramp", "B ramp yo'li": "B ramp"}
 
 # ------------------------------------------------------------------ o'yin hajmlari (metr)
-T_SPAWN = (0.0, -46.0)
+T_SPAWN = (0.0, -47.0)
 CT_SPAWN = (0.0, 42.0)
 A_PLANT = (-40.0, 13.0)
 B_PLANT = (40.0, 13.0)
@@ -102,11 +102,11 @@ MID_DOORS = (0.0, 4.0)
 
 # 5 tadan spawn joyi; T janubga (+z), CT shimolga (-z) qaraydi
 SPAWNS = {
-    "T": [(-4.0, -46.0), (-2.0, -46.0), (0.0, -46.0), (2.0, -46.0), (4.0, -46.0)],
+    "T": [(-4.0, -47.0), (-2.0, -47.0), (0.0, -47.0), (2.0, -47.0), (4.0, -47.0)],
     "CT": [(-4.0, 42.0), (-2.0, 42.0), (0.0, 42.0), (2.0, 42.0), (4.0, 42.0)],
 }
 BOMB_ZONES = {"A": (-45.0, 8.0, -21.0, 27.0), "B": (21.0, 8.0, 45.0, 27.0)}
-BUY_ZONES = {"T": (-15.0, -51.0, 15.0, -39.0), "CT": (-17.0, 35.0, 17.0, 49.0)}
+BUY_ZONES = {"T": (-15.0, -51.0, 15.0, -43.5), "CT": (-17.0, 35.0, 17.0, 49.0)}
 
 # Raund qoidalari (soniya) — 110 m xarita uchun: T site'ga 17–20 s, CT 12 s da yetadi.
 ROUND = {"freeze": 12.0, "buy_time": 25.0, "round_time": 115.0, "bomb_timer": 40.0,
@@ -169,7 +169,7 @@ PROPS = [
     ("wall", 13.0, 16.5, 15.0, 19.0, 4.5),
     # --- B site: zich, yaqin jang, ko'p kichik panalar
     ("decal", 40.0, 13.0, "B"),
-    ("stack", 32.0, 19.0, W2(), 0.0), ("stack", 32.6, 20.2, S1(), 0.0),  # B default
+    ("stack", 30.8, 19.5, L3(), 0.0),                      # B default (A default ning ko'zgu nusxasi)
     ("stack", 32.0, 8.5, W2(1.1), 0.1),                    # Tunnel chiqishi
     ("crate", 22.0, 9.5, 1.1, 0.2),                        # Window chiqishi
     ("wall", 17.0, 5.5, 21.5, 7.5, 3.0),                   # Window chiqishi devori
@@ -194,10 +194,10 @@ PROPS = [
     ("crate", -22.0, 36.0, 1.1, 0.2), ("barrel", -29.5, 39.5),
     ("crate", 22.0, 36.0, 1.1, -0.2), ("barrel", 29.5, 39.5),
     # --- Spawn'lar
-    ("stack", -12.5, -49.0, W2(1.1), 0.0), ("stack", 12.5, -49.0, S1(1.2), 0.0), ("urn", 0.0, -50.0),
+    ("stack", -12.5, -49.0, W2(1.1), 0.0), ("stack", 12.5, -49.0, [(0, 0, 0, 1.2, True)], 0.0), ("urn", 0.0, -50.0),
     ("barrel", -13.5, -41.0), ("barrel", 13.5, -41.0),
-    ("wall", -10.0, -42.0, -2.5, -40.5, 3.0),              # T spawn: top mid dan spawn ko'rinmasin
-    ("wall", 2.5, -42.0, 10.0, -40.5, 3.0),
+    ("wall", -10.0, -45.0, -1.25, -43.5, 3.0),             # T spawn: top mid dan spawn ko'rinmasin (ramp oldida 4.5 m o'tish)
+    ("wall", 1.25, -45.0, 10.0, -43.5, 3.0),
     ("wall", -13.0, 33.0, -6.0, 35.0, 3.0),                # CT mid yo'li og'zi: CT mid dan spawn ko'rinmasin
     ("wall", 6.0, 33.0, 13.0, 35.0, 3.0),
     ("stack", -15.0, 47.0, S1(1.2), 0.0), ("stack", 14.0, 47.0, W2(1.1), 0.0),
@@ -275,7 +275,7 @@ AI_POINTS = [
     ("B ramp", "retake", "CT", 28.0, 38.0),
     ("Tunnel chiqishi", "entry", "T", 44.0, 3.0),
     ("Window chiqishi", "entry", "T", 22.0, 3.0),
-    ("Tunnel cho'ntagi", "lurk", "T", 32.0, -10.0),
+    ("Tunnel cho'ntagi", "lurk", "T", 29.5, -12.0),
     ("Upper tunnels", "rotate", "T", 31.0, -38.0),
     ("Mid-window", "rotate", "T", 12.0, -6.0),
     ("Top mid chap", "hold", "T", -10.0, -22.5),
@@ -286,5 +286,5 @@ AI_POINTS = [
     ("CT mid g'arb", "rotate", "CT", -9.0, 30.0),
     ("CT mid sharq", "rotate", "CT", 9.0, 30.0),
     ("CT spawn", "rotate", "CT", 0.0, 42.0),
-    ("T spawn", "rotate", "T", 0.0, -46.0),
+    ("T spawn", "rotate", "T", 0.0, -47.0),
 ]

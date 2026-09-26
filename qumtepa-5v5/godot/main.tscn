@@ -1,0 +1,1561 @@
+[gd_scene load_steps=30 format=3]
+
+[ext_resource type="PackedScene" path="res://map/qumtepa5v5_greybox.glb" id="1_map"]
+
+[ext_resource type="PackedScene" path="res://map/collision.tscn" id="2_col"]
+
+[ext_resource type="Script" path="res://scripts/player.gd" id="3_pl"]
+
+[ext_resource type="Script" path="res://scripts/game_mode.gd" id="4_gm"]
+
+[ext_resource type="Script" path="res://scripts/hud.gd" id="5_hud"]
+
+[ext_resource type="NavigationMesh" path="res://map/navmesh.res" id="6_nav"]
+
+[sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
+sky_top_color = Color(0.27, 0.49, 0.78, 1)
+sky_horizon_color = Color(0.86, 0.8, 0.68, 1)
+ground_bottom_color = Color(0.45, 0.36, 0.25, 1)
+ground_horizon_color = Color(0.86, 0.8, 0.68, 1)
+
+[sub_resource type="Sky" id="sky"]
+sky_material = SubResource("sky_mat")
+
+[sub_resource type="Environment" id="env"]
+background_mode = 2
+sky = SubResource("sky")
+ambient_light_source = 2
+ambient_light_color = Color(0.8, 0.74, 0.64, 1)
+ambient_light_energy = 0.6
+tonemap_mode = 3
+tonemap_exposure = 0.95
+ssao_enabled = true
+ssao_radius = 1.2
+ssao_intensity = 1.6
+fog_enabled = true
+fog_light_color = Color(0.84, 0.76, 0.62, 1)
+fog_density = 0.0025
+fog_sky_affect = 0.2
+
+[sub_resource type="CapsuleShape3D" id="capsule"]
+radius = 0.35
+height = 1.8
+
+[sub_resource type="PlaneMesh" id="ground"]
+size = Vector2(600, 600)
+
+[sub_resource type="StandardMaterial3D" id="ground_mat"]
+albedo_color = Color(0.62, 0.5, 0.35, 1)
+roughness = 1.0
+
+[sub_resource type="StandardMaterial3D" id="vm_site"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+no_depth_test = true
+albedo_color = Color(0.85, 0.25, 0.18, 0.22)
+
+[sub_resource type="StandardMaterial3D" id="vm_buy"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+no_depth_test = true
+albedo_color = Color(0.23, 0.64, 0.35, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="vm_T"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+no_depth_test = true
+albedo_color = Color(0.84, 0.38, 0.12, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="vm_CT"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+no_depth_test = true
+albedo_color = Color(0.16, 0.36, 0.67, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="vm_ai"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+no_depth_test = true
+albedo_color = Color(1, 1, 1, 0.9)
+
+[sub_resource type="StandardMaterial3D" id="vm_smoke"]
+transparency = 1
+shading_mode = 0
+cull_mode = 2
+no_depth_test = true
+albedo_color = Color(0.85, 0.85, 0.85, 0.35)
+
+[sub_resource type="CylinderMesh" id="spawn_disc"]
+top_radius = 0.35
+bottom_radius = 0.35
+height = 0.06
+
+[sub_resource type="CylinderMesh" id="ai_pole"]
+top_radius = 0.06
+bottom_radius = 0.06
+height = 1.6
+material = SubResource("vm_ai")
+
+[sub_resource type="SphereMesh" id="smoke_sph"]
+radius = 2.6
+height = 5.2
+material = SubResource("vm_smoke")
+
+[sub_resource type="BoxShape3D" id="z_BombSiteA"]
+size = Vector3(24, 3.5, 19)
+
+[sub_resource type="BoxMesh" id="zm_BombSiteA"]
+size = Vector3(24, 3.5, 19)
+material = SubResource("vm_site")
+
+[sub_resource type="BoxShape3D" id="z_BombSiteB"]
+size = Vector3(24, 3.5, 19)
+
+[sub_resource type="BoxMesh" id="zm_BombSiteB"]
+size = Vector3(24, 3.5, 19)
+material = SubResource("vm_site")
+
+[sub_resource type="BoxShape3D" id="z_BuyZoneT"]
+size = Vector3(30, 5.0, 7.5)
+
+[sub_resource type="BoxMesh" id="zm_BuyZoneT"]
+size = Vector3(30, 5.0, 7.5)
+material = SubResource("vm_buy")
+
+[sub_resource type="BoxShape3D" id="z_BuyZoneCT"]
+size = Vector3(34, 5.0, 14)
+
+[sub_resource type="BoxMesh" id="zm_BuyZoneCT"]
+size = Vector3(34, 5.0, 14)
+material = SubResource("vm_buy")
+
+[node name="Main" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("env")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.51450, 0.00000, 0.85749, 0.67697, 0.61378, 0.40618, -0.52632, 0.78947, -0.31579, 0, 40, 0)
+light_color = Color(1, 0.9, 0.74, 1)
+light_energy = 1.15
+shadow_enabled = true
+shadow_blur = 1.5
+directional_shadow_max_distance = 140.0
+
+[node name="Map" parent="." instance=ExtResource("1_map")]
+
+[node name="Navigation" type="NavigationRegion3D" parent="."]
+navigation_mesh = ExtResource("6_nav")
+
+[node name="Collision" parent="Navigation" instance=ExtResource("2_col")]
+
+[node name="OuterGround" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.32, 0)
+mesh = SubResource("ground")
+surface_material_override/0 = SubResource("ground_mat")
+
+[node name="Lamps" type="Node3D" parent="."]
+
+[node name="Lamp0" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.61, 2.55, -42)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp1" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25.39, 2.55, -36)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp2" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.61, 2.55, -36)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp3" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18, 2.55, -30.61)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp4" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 2.55, -30.61)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp5" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 2.55, -30.61)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp6" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24, 2.55, -30.61)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp7" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.61, 2.55, -30)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp8" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.39, 2.55, -24)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp9" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.61, 2.55, -24)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp10" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, -18)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp11" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.39, 2.55, -18)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp12" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, -18)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp13" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.61, 2.55, -18)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp14" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.39, 2.55, -18)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp15" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, -18)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp16" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.39, 2.55, -18)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp17" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38, 2.55, -18.61)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp18" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 2.55, -18.61)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp19" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 42, 2.55, -18.61)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp20" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 2.55, -18.61)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp21" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 2.55, -18.61)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp22" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.61, 2.55, -18)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp23" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, -12)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp24" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.39, 2.55, -12)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp25" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, -12)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp26" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.61, 2.55, -12)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp27" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.39, 2.55, -12)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp28" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, -12)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp29" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.39, 2.55, -12)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp30" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.61, 2.55, -12)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp31" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.39, 2.55, -12)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp32" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.61, 2.55, -12)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp33" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, -6)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp34" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.39, 2.55, -6)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp35" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, -6)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp36" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, -6)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp37" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.39, 2.55, -6)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp38" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30, 2.55, -5.39)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp39" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.61, 2.55, -6)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp40" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.39, 2.55, -6)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp41" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.61, 2.55, -6)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp42" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, 0)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp43" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.39, 2.55, 0)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp44" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, 0)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp45" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.61, 2.55, 0)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp46" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.39, 2.55, 0)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp47" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, 0)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp48" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.39, 2.55, 0)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp49" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 48.61, 2.55, 0)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp50" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.61, 2.55, 42)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Lamp51" type="OmniLight3D" parent="Lamps"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.61, 2.55, 42)
+light_color = Color(1, 0.68, 0.36, 1)
+light_energy = 1.4
+omni_range = 7.0
+omni_attenuation = 1.6
+
+[node name="Zones" type="Node3D" parent="."]
+
+[node name="BombSiteA" type="Area3D" parent="Zones" groups=["bomb_sites"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33, 1.75, 17.5)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+metadata/site = "A"
+
+[node name="Shape" type="CollisionShape3D" parent="Zones/BombSiteA"]
+shape = SubResource("z_BombSiteA")
+
+[node name="Viz" type="MeshInstance3D" parent="Zones/BombSiteA" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("zm_BombSiteA")
+
+[node name="BombSiteB" type="Area3D" parent="Zones" groups=["bomb_sites"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33, 1.75, 17.5)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+metadata/site = "B"
+
+[node name="Shape" type="CollisionShape3D" parent="Zones/BombSiteB"]
+shape = SubResource("z_BombSiteB")
+
+[node name="Viz" type="MeshInstance3D" parent="Zones/BombSiteB" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("zm_BombSiteB")
+
+[node name="BuyZoneT" type="Area3D" parent="Zones" groups=["buy_zones"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -47.25)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+metadata/team = "T"
+
+[node name="Shape" type="CollisionShape3D" parent="Zones/BuyZoneT"]
+shape = SubResource("z_BuyZoneT")
+
+[node name="Viz" type="MeshInstance3D" parent="Zones/BuyZoneT" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("zm_BuyZoneT")
+
+[node name="BuyZoneCT" type="Area3D" parent="Zones" groups=["buy_zones"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 42)
+collision_layer = 64
+collision_mask = 8
+monitorable = false
+metadata/team = "CT"
+
+[node name="Shape" type="CollisionShape3D" parent="Zones/BuyZoneCT"]
+shape = SubResource("z_BuyZoneCT")
+
+[node name="Viz" type="MeshInstance3D" parent="Zones/BuyZoneCT" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("zm_BuyZoneCT")
+
+[node name="Spawns" type="Node3D" parent="."]
+
+[node name="T1" type="Marker3D" parent="Spawns" groups=["spawn_T"]]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -4, 0.05, -47)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/T1" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_T")
+
+[node name="T2" type="Marker3D" parent="Spawns" groups=["spawn_T"]]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -2, 0.05, -47)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/T2" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_T")
+
+[node name="T3" type="Marker3D" parent="Spawns" groups=["spawn_T"]]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 0, 0.05, -47)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/T3" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_T")
+
+[node name="T4" type="Marker3D" parent="Spawns" groups=["spawn_T"]]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 2, 0.05, -47)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/T4" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_T")
+
+[node name="T5" type="Marker3D" parent="Spawns" groups=["spawn_T"]]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 4, 0.05, -47)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/T5" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_T")
+
+[node name="CT1" type="Marker3D" parent="Spawns" groups=["spawn_CT"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 0.05, 42)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/CT1" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_CT")
+
+[node name="CT2" type="Marker3D" parent="Spawns" groups=["spawn_CT"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 0.05, 42)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/CT2" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_CT")
+
+[node name="CT3" type="Marker3D" parent="Spawns" groups=["spawn_CT"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.05, 42)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/CT3" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_CT")
+
+[node name="CT4" type="Marker3D" parent="Spawns" groups=["spawn_CT"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0.05, 42)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/CT4" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_CT")
+
+[node name="CT5" type="Marker3D" parent="Spawns" groups=["spawn_CT"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 0.05, 42)
+
+[node name="Viz" type="MeshInstance3D" parent="Spawns/CT5" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("spawn_disc")
+surface_material_override/0 = SubResource("vm_CT")
+
+[node name="AIPoints" type="Node3D" parent="."]
+
+[node name="P00" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40, 0, 13)
+metadata/label = "A plant"
+metadata/kind = "plant"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P00" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P00" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "A plant (plant, T)"
+
+[node name="P01" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -47.5, 1.3, 22.5)
+metadata/label = "A platforma"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P01" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P01" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "A platforma (hold, CT)"
+
+[node name="P02" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31.5, 0, 22)
+metadata/label = "A default orqasi"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P02" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P02" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "A default orqasi (hold, CT)"
+
+[node name="P03" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.5, 0, 25)
+metadata/label = "A CT tomoni"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P03" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P03" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "A CT tomoni (hold, CT)"
+
+[node name="P04" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 0, 15)
+metadata/label = "A CT yo'li"
+metadata/kind = "retake"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P04" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P04" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "A CT yo'li (retake, CT)"
+
+[node name="P05" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 0, 38)
+metadata/label = "A ramp"
+metadata/kind = "retake"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P05" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P05" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "A ramp (retake, CT)"
+
+[node name="P06" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -44, 0, 3)
+metadata/label = "Long chiqishi"
+metadata/kind = "entry"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P06" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P06" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Long chiqishi (entry, T)"
+
+[node name="P07" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0, 3)
+metadata/label = "Short chiqishi"
+metadata/kind = "entry"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P07" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P07" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Short chiqishi (entry, T)"
+
+[node name="P08" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34, 0, -24)
+metadata/label = "Long corner"
+metadata/kind = "hold"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P08" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P08" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Long corner (hold, T)"
+
+[node name="P09" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32, 0, -10)
+metadata/label = "Long pit"
+metadata/kind = "lurk"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P09" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P09" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Long pit (lurk, T)"
+
+[node name="P10" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31, 0, -38)
+metadata/label = "Outside long"
+metadata/kind = "rotate"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P10" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P10" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Outside long (rotate, T)"
+
+[node name="P11" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 0, -42)
+metadata/label = "Long doors"
+metadata/kind = "entry"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P11" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P11" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Long doors (entry, T)"
+
+[node name="P12" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22, 0, -10)
+metadata/label = "Catwalk"
+metadata/kind = "rotate"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P12" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P12" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Catwalk (rotate, T)"
+
+[node name="P13" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 13)
+metadata/label = "B plant"
+metadata/kind = "plant"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P13" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P13" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "B plant (plant, T)"
+
+[node name="P14" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 47.5, 1.3, 22.5)
+metadata/label = "B platforma"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P14" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P14" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "B platforma (hold, CT)"
+
+[node name="P15" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34, 0, 22)
+metadata/label = "B default orqasi"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P15" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P15" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "B default orqasi (hold, CT)"
+
+[node name="P16" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 40, 0, 14)
+metadata/label = "B o'rtasi"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P16" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P16" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "B o'rtasi (hold, CT)"
+
+[node name="P17" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 0, 15)
+metadata/label = "B doors ichi"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P17" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P17" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "B doors ichi (hold, CT)"
+
+[node name="P18" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 0, 15)
+metadata/label = "B doors"
+metadata/kind = "retake"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P18" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P18" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "B doors (retake, CT)"
+
+[node name="P19" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 0, 38)
+metadata/label = "B ramp"
+metadata/kind = "retake"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P19" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P19" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "B ramp (retake, CT)"
+
+[node name="P20" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 0, 3)
+metadata/label = "Tunnel chiqishi"
+metadata/kind = "entry"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P20" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P20" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Tunnel chiqishi (entry, T)"
+
+[node name="P21" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 22, 0, 3)
+metadata/label = "Window chiqishi"
+metadata/kind = "entry"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P21" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P21" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Window chiqishi (entry, T)"
+
+[node name="P22" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.5, 0, -12)
+metadata/label = "Tunnel cho'ntagi"
+metadata/kind = "lurk"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P22" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P22" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Tunnel cho'ntagi (lurk, T)"
+
+[node name="P23" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31, 0, -38)
+metadata/label = "Upper tunnels"
+metadata/kind = "rotate"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P23" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P23" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Upper tunnels (rotate, T)"
+
+[node name="P24" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, -6)
+metadata/label = "Mid-window"
+metadata/kind = "rotate"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P24" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P24" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Mid-window (rotate, T)"
+
+[node name="P25" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, -22.5)
+metadata/label = "Top mid chap"
+metadata/kind = "hold"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P25" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P25" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Top mid chap (hold, T)"
+
+[node name="P26" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, -28)
+metadata/label = "Top mid o'ng"
+metadata/kind = "hold"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P26" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P26" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Top mid o'ng (hold, T)"
+
+[node name="P27" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -6)
+metadata/label = "Mid"
+metadata/kind = "entry"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P27" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P27" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Mid (entry, T)"
+
+[node name="P28" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 8)
+metadata/label = "Mid doors"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P28" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P28" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "Mid doors (hold, CT)"
+
+[node name="P29" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, 0, 14.5)
+metadata/label = "CT mid cho'ntagi"
+metadata/kind = "hold"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P29" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P29" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "CT mid cho'ntagi (hold, CT)"
+
+[node name="P30" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 0, 30)
+metadata/label = "CT mid g'arb"
+metadata/kind = "rotate"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P30" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P30" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "CT mid g'arb (rotate, CT)"
+
+[node name="P31" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 0, 30)
+metadata/label = "CT mid sharq"
+metadata/kind = "rotate"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P31" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P31" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "CT mid sharq (rotate, CT)"
+
+[node name="P32" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 42)
+metadata/label = "CT spawn"
+metadata/kind = "rotate"
+metadata/team = "CT"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P32" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P32" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "CT spawn (rotate, CT)"
+
+[node name="P33" type="Marker3D" parent="AIPoints" groups=["ai_points"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -47)
+metadata/label = "T spawn"
+metadata/kind = "rotate"
+metadata/team = "T"
+
+[node name="Pole" type="MeshInstance3D" parent="AIPoints/P33" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+mesh = SubResource("ai_pole")
+
+[node name="Label" type="Label3D" parent="AIPoints/P33" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+billboard = 1
+no_depth_test = true
+font_size = 40
+outline_size = 10
+text = "T spawn (rotate, T)"
+
+[node name="Smokes" type="Node3D" parent="."]
+
+[node name="Smoke00" type="Marker3D" parent="Smokes" groups=["smoke_targets"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.5, 1, 15)
+metadata/label = "A CT"
+metadata/team = "T"
+
+[node name="Viz" type="MeshInstance3D" parent="Smokes/Smoke00" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("smoke_sph")
+
+[node name="Label" type="Label3D" parent="Smokes/Smoke00" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+billboard = 1
+no_depth_test = true
+font_size = 48
+outline_size = 10
+text = "smoke: A CT (T)"
+
+[node name="Smoke01" type="Marker3D" parent="Smokes" groups=["smoke_targets"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28, 1, 30)
+metadata/label = "A ramp"
+metadata/team = "T"
+
+[node name="Viz" type="MeshInstance3D" parent="Smokes/Smoke01" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("smoke_sph")
+
+[node name="Label" type="Label3D" parent="Smokes/Smoke01" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+billboard = 1
+no_depth_test = true
+font_size = 48
+outline_size = 10
+text = "smoke: A ramp (T)"
+
+[node name="Smoke02" type="Marker3D" parent="Smokes" groups=["smoke_targets"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -44, 1, 20)
+metadata/label = "A platforma"
+metadata/team = "T"
+
+[node name="Viz" type="MeshInstance3D" parent="Smokes/Smoke02" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("smoke_sph")
+
+[node name="Label" type="Label3D" parent="Smokes/Smoke02" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+billboard = 1
+no_depth_test = true
+font_size = 48
+outline_size = 10
+text = "smoke: A platforma (T)"
+
+[node name="Smoke03" type="Marker3D" parent="Smokes" groups=["smoke_targets"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.5, 1, 15)
+metadata/label = "B doors"
+metadata/team = "T"
+
+[node name="Viz" type="MeshInstance3D" parent="Smokes/Smoke03" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("smoke_sph")
+
+[node name="Label" type="Label3D" parent="Smokes/Smoke03" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+billboard = 1
+no_depth_test = true
+font_size = 48
+outline_size = 10
+text = "smoke: B doors (T)"
+
+[node name="Smoke04" type="Marker3D" parent="Smokes" groups=["smoke_targets"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28, 1, 30)
+metadata/label = "B ramp"
+metadata/team = "T"
+
+[node name="Viz" type="MeshInstance3D" parent="Smokes/Smoke04" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("smoke_sph")
+
+[node name="Label" type="Label3D" parent="Smokes/Smoke04" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+billboard = 1
+no_depth_test = true
+font_size = 48
+outline_size = 10
+text = "smoke: B ramp (T)"
+
+[node name="Smoke05" type="Marker3D" parent="Smokes" groups=["smoke_targets"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 1, 20)
+metadata/label = "B platforma"
+metadata/team = "T"
+
+[node name="Viz" type="MeshInstance3D" parent="Smokes/Smoke05" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("smoke_sph")
+
+[node name="Label" type="Label3D" parent="Smokes/Smoke05" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+billboard = 1
+no_depth_test = true
+font_size = 48
+outline_size = 10
+text = "smoke: B platforma (T)"
+
+[node name="Smoke06" type="Marker3D" parent="Smokes" groups=["smoke_targets"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 7.5)
+metadata/label = "Mid doors"
+metadata/team = "T"
+
+[node name="Viz" type="MeshInstance3D" parent="Smokes/Smoke06" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("smoke_sph")
+
+[node name="Label" type="Label3D" parent="Smokes/Smoke06" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+billboard = 1
+no_depth_test = true
+font_size = 48
+outline_size = 10
+text = "smoke: Mid doors (T)"
+
+[node name="Smoke07" type="Marker3D" parent="Smokes" groups=["smoke_targets"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -44, 1, 5.5)
+metadata/label = "Long chiqishi"
+metadata/team = "CT"
+
+[node name="Viz" type="MeshInstance3D" parent="Smokes/Smoke07" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("smoke_sph")
+
+[node name="Label" type="Label3D" parent="Smokes/Smoke07" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+billboard = 1
+no_depth_test = true
+font_size = 48
+outline_size = 10
+text = "smoke: Long chiqishi (CT)"
+
+[node name="Smoke08" type="Marker3D" parent="Smokes" groups=["smoke_targets"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 44, 1, 5.5)
+metadata/label = "Tunnel chiqishi"
+metadata/team = "CT"
+
+[node name="Viz" type="MeshInstance3D" parent="Smokes/Smoke08" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("smoke_sph")
+
+[node name="Label" type="Label3D" parent="Smokes/Smoke08" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+billboard = 1
+no_depth_test = true
+font_size = 48
+outline_size = 10
+text = "smoke: Tunnel chiqishi (CT)"
+
+[node name="Smoke09" type="Marker3D" parent="Smokes" groups=["smoke_targets"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -21)
+metadata/label = "Top mid"
+metadata/team = "CT"
+
+[node name="Viz" type="MeshInstance3D" parent="Smokes/Smoke09" groups=["debug_viz"]]
+visible = false
+mesh = SubResource("smoke_sph")
+
+[node name="Label" type="Label3D" parent="Smokes/Smoke09" groups=["debug_viz"]]
+visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.2, 0)
+billboard = 1
+no_depth_test = true
+font_size = 48
+outline_size = 10
+text = "smoke: Top mid (CT)"
+
+[node name="Player" type="CharacterBody3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -4, 0.2, -47)
+collision_layer = 8
+collision_mask = 3
+script = ExtResource("3_pl")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("capsule")
+
+[node name="Camera3D" type="Camera3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
+fov = 80.0
+far = 400.0
+
+[node name="FloorRay" type="RayCast3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+target_position = Vector3(0, -0.6, 0)
+collision_mask = 1
+
+[node name="Steps" type="AudioStreamPlayer3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
+volume_db = -8.0
+unit_size = 4.0
+
+[node name="GameMode" type="Node" parent="."]
+script = ExtResource("4_gm")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("5_hud")

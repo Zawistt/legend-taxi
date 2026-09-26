@@ -1,5 +1,7 @@
 # 1-bosqich: 2D blokaut — hisobot
 
+> 2-bosqichda T spawn devori surildi (ramp oldidagi o'tish 1.5 m dan 4.5 m ga), B default A default ning ko'zgu nusxasi qilindi. Raqamlar shu o'zgarishlardan keyingi holat.
+
 **Natija: 59 / 59 tekshiruv o'tdi.** Reja `tools/layout5.py` da, tahlil `tools/analyze5.py` da.
 
 Hamma o'lchovlar yugurish tezligi 4.5 m/s, o'yinchi radiusi 0.35 m bilan hisoblangan. Panalar va devorlar
@@ -27,7 +29,7 @@ Markaz: **T ramp** (2 ta) → **Top mid** (markazida xaroba) → **Mid** (yopiq)
 
 | Yo'l | Vaqt | Maqsad |
 |---|---|---|
-| T → A (Long) | 20.4 s | 16–20.5 s |
+| T → A (Long) | 20.5 s | 16–20.5 s |
 | T → A (Short / Catwalk) | 18.0 s | 16–20.5 s |
 | T → B (Tunnels) | 20.3 s | 16–20.5 s |
 | T → B (Window) | 18.1 s | 16–20.5 s |
@@ -39,10 +41,10 @@ Markaz: **T ramp** (2 ta) → **Top mid** (markazida xaroba) → **Mid** (yopiq)
 
 **Muvozanat:**
 - **A va B teng.** T uchun eng tez yo'l: A ga 18.0 s, B ga 18.1 s. CT uchun ikkalasi 13.3 s.
-- **T ning 4 ta hujum yo'li orasidagi farq 2.4 s.** Qisqa yo'llar tezroq, lekin tor. Uzun yo'llar sekinroq, lekin keng.
+- **T ning 4 ta hujum yo'li orasidagi farq 2.5 s.** Qisqa yo'llar tezroq, lekin tor. Uzun yo'llar sekinroq, lekin keng.
 - **CT site'ga 4.7 s oldin yetadi.** Bu himoyaga joylashish uchun vaqt.
 - **Qaytarib olish mumkin.** Bomba 40 s: CT rotatsiyasi 18.4 s + zararsizlantirish 10 s, yana 11.6 s zaxira qoladi.
-- **5 ta spawn joyi teng.** Eng yaqin chiqishgacha farq T da 0.18 s, CT da 0.37 s.
+- **5 ta spawn joyi teng.** Eng yaqin chiqishgacha farq T da 0.42 s, CT da 0.37 s.
 
 ## Ko'rish chiziqlari va to'qnashuvlar
 
@@ -50,7 +52,7 @@ Markaz: **T ramp** (2 ta) → **Top mid** (markazida xaroba) → **Mid** (yopiq)
 
 - **Birinchi to'qnashuv 8.6 s da**, Top mid ↔ CT mid, Mid doors eshigi orqali. Bu rejalashtirilgan
   snayper dueli, "Mid doors" smoke'i bilan yopiladi. Boshqa hamma joyda to'qnashuv kechroq.
-- **Spawn xavfsizligi.** T spawn'ni dushman eng erta 19.1 s da, CT spawn'ni 18.4 s da ko'ra oladi.
+- **Spawn xavfsizligi.** T spawn'ni dushman eng erta 17.8 s da, CT spawn'ni 18.4 s da ko'ra oladi.
   Maqsad ≥ 15 s edi: spawn'dan chiqayotganda o'q uzib bo'lmaydi.
 - **Eng uzun talashuvli ko'rish chizig'i 53 m** (Long chiqishi → A CT → CT mid). Maqsad ≤ 60 m edi.
   Bir jamoa hududining ichidagi chiziqlar hisobga olinmaydi (masalan, T ning orqa yo'laklari).
@@ -98,7 +100,7 @@ Qumtepa v2 da raund 1:25, bomba 35 s, zararsizlantirish 7 s edi.
 
 - **Callout'lar:** 32 ta nom, har bir yuriladigan katakda bor (`analysis_stage1.json` → `callout_grid`).
 - **Bot nuqtalari:** 34 ta (plant, ushlash, kirish, qaytarib olish, yashirinish, aylanish). Hammasiga yetib boriladi.
-- **Panalar:** 80 dan ortiq obyekt: qutilar, bochkalar, qoplar, xarobalar, quduqlar, 2 ta platforma.
+- **Panalar:** 88 ta obyekt: qutilar, bochkalar, qoplar, xarobalar, quduqlar, 2 ta platforma.
 
 ## Cheklovlar (2-bosqichda aniqlanadi)
 

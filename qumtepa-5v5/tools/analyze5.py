@@ -226,6 +226,10 @@ check(RT("CT rotatsiya A → B") < RT("T rotatsiya Long → Tunnels"),
 check(RT("CT rotatsiya A → B") + L.ROUND["defuse_time"] + 5 <= L.ROUND["bomb_timer"],
       f"Qaytarib olish: rotatsiya {RT('CT rotatsiya A → B')} s + zararsizlantirish {L.ROUND['defuse_time']} s + 5 s zaxira ≤ bomba {L.ROUND['bomb_timer']} s")
 
+shortest = {}
+for n, p, q in (("T→A", L.T_SPAWN, L.A_PLANT), ("T→B", L.T_SPAWN, L.B_PLANT), ("CT→A", L.CT_SPAWN, L.A_PLANT), ("CT→B", L.CT_SPAWN, L.B_PLANT)):
+    shortest[n] = round(float(field(p)[0][node(q)]) / SPEED, 2)
+
 # 2) spawn adolatliligi
 EXITS = {"T": {"Long doors": (-20.0, -42.0), "T ramp g'arb": (-7.0, -37.0), "T ramp sharq": (7.0, -37.0), "Upper tunnels": (20.0, -42.0)},
          "CT": {"CT mid g'arb": (-9.0, 33.0), "CT mid sharq": (9.0, 33.0), "A ramp yo'li": (-21.0, 41.0), "B ramp yo'li": (21.0, 41.0)}}
@@ -393,6 +397,7 @@ os.makedirs(DOCS, exist_ok=True)
 json.dump({
     "size_m": SIZE, "speed": SPEED, "round": L.ROUND, "targets": TG,
     "routes": {n: {k: v for k, v in r.items() if k != "pts"} for n, r in routes.items()},
+    "shortest": shortest,
     "spawns": spawn_rep, "ai_points": ai_rep, "smokes": smoke_rep,
     "first_contact": {"time_s": round(fc, 1), "T": list(fa), "CT": list(fb), "T_callout": callout(fa), "CT_callout": callout(fb)},
     "spawn_safety": {k: {"s": round(v[0], 1), "own": list(v[1]), "enemy": list(v[2]), "enemy_callout": callout(v[2])} for k, v in spawn_safe.items()},

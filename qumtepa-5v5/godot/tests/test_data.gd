@@ -1,0 +1,44 @@
+extends RefCounted
+## AVTOMATIK YARATILGAN (tools/gen_godot5.py). Testlar uchun xarita ma'lumotlari, layout5.py va 2D tahlildan.
+
+const T_SPAWN := Vector3(0, 0, -47)
+const CT_SPAWN := Vector3(0, 0, 42)
+const A_PLANT := Vector3(-40, 0, 13)
+const B_PLANT := Vector3(40, 0, 13)
+const MAP_MIN := -55
+const MAP_MAX := 55
+## 2D tahlildagi eng qisqa vaqtlar (s) — 3D fizika bilan solishtiriladi
+const SHORTEST_2D := {"T→A": 17.99, "T→B": 18.02, "CT→A": 12.27, "CT→B": 12.45}
+## [nom, jamoa, yo'l nuqtalari, 2D vaqt]
+const ROUTES := [
+	["T → A (Long)", "T", [Vector3(0, 0, -47), Vector3(-30, 0, -38), Vector3(-32, 0, -20), Vector3(-40, 0, -10), Vector3(-40, 0, 13)], 20.5],
+	["T → A (Short)", "T", [Vector3(0, 0, -47), Vector3(-10, 0, -30), Vector3(-22, 0, -8), Vector3(-40, 0, 13)], 18.0],
+	["T → B (Tunnels)", "T", [Vector3(0, 0, -47), Vector3(31, 0, -38), Vector3(32, 0, -20), Vector3(40, 0, -10), Vector3(40, 0, 13)], 20.3],
+	["T → B (Window)", "T", [Vector3(0, 0, -47), Vector3(20, 0, -20), Vector3(22, 0, 0), Vector3(40, 0, 13)], 18.1],
+	["T → Mid doors", "T", [Vector3(0, 0, -47), Vector3(0, 0, -14), Vector3(0, 0, 4)], 12.8],
+	["CT → A (Ramp)", "CT", [Vector3(0, 0, 42), Vector3(-28, 0, 38), Vector3(-40, 0, 13)], 13.3],
+	["CT → A (CT mid)", "CT", [Vector3(0, 0, 42), Vector3(-9, 0, 28), Vector3(-14, 0, 15), Vector3(-40, 0, 13)], 13.3],
+	["CT → B (Ramp)", "CT", [Vector3(0, 0, 42), Vector3(28, 0, 38), Vector3(40, 0, 13)], 13.3],
+	["CT → B (B doors)", "CT", [Vector3(0, 0, 42), Vector3(9, 0, 28), Vector3(14, 0, 15), Vector3(40, 0, 13)], 13.3],
+	["CT → Mid doors", "CT", [Vector3(0, 0, 42), Vector3(7, 0, 20), Vector3(0, 0, 4)], 9.8],
+]
+## [pastdagi nuqta, platforma usti]
+const PLATFORMS := [[Vector3(-43.5, 0, 22.5), Vector3(-47.5, 1.3, 22.5)], [Vector3(43.5, 0, 22.5), Vector3(47.5, 1.3, 22.5)]]
+## [nuqta, kutilgan callout]
+const CALLOUTS := [[Vector3(0, 0, -46), "T spawn"], [Vector3(-44, 0, -5), "Long"], [Vector3(0, 0, -24), "Top mid"], [Vector3(-22, 0, -10), "Catwalk"], [Vector3(22, 0, -10), "B window"], [Vector3(34, 0, -24), "Lower tunnels"], [Vector3(0, 0, 7), "Mid doors"], [Vector3(-40, 0, 13), "A site"], [Vector3(40, 0, 13), "B site"], [Vector3(8, 0, 15), "CT mid"], [Vector3(-31, 0, -12), "Long pit"], [Vector3(0, 0, 42), "CT spawn"], [Vector3(-28, 0, 38), "A ramp"], [Vector3(14, 0, 15), "B doors"]]
+## [ray boshi (tepada), sirt, izoh]
+const SURFACES := [
+	[Vector3(10, 3, -24), "stone", "Top mid poli"],
+	[Vector3(-20.5, 5, 23), "wood", "A CT qutilari"],
+	[Vector3(12.5, 3, -49), "metal", "T spawn yashil qutisi"],
+	[Vector3(-40.5, 3, 12), "cloth", "A site qum qoplari"],
+]
+## xaroba/quduq ustida player clip bor: [x, z]; nazorat nuqtasi — ochiq joy
+const WALL_TOP := Vector3(-31.75, 2.5, 24.5)
+const OPEN_CONTROL := Vector3(-40.0, 0.0, 22.0)
+## Mid doors: eshik o'rtasidan ko'rinadi, devor orqasidan ko'rinmaydi
+const MID_DOORS_OPEN := [Vector3(0, 1.6, -16), Vector3(0, 1.6, 9)]
+const MID_DOORS_WALL := [Vector3(-3.5, 1.6, -16), Vector3(-3.5, 1.6, 9)]
+## yopiq yo'lak (T spawn tomi 5.0 m)
+const COVERED_POINT := Vector3(0, 0, -46)
+const COVERED_H := 5.0
