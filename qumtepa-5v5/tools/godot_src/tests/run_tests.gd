@@ -381,32 +381,48 @@ func _run() -> void:
 	var mm: Control = main.get_node_or_null("UI/Minimap")
 	ok(mm != null and mm.MAP != null and mm.player == pl, "minimap bor va o'yinchini kuzatadi")
 
-	print("\n17) Realistik ko'rinish (8-bosqich)")
-	var matn: Node = main.get_node_or_null("Materials")
-	var lib_ok := 0
-	var lib_n := 0
-	if matn:
-		for k in matn.lib:
-			if matn.lib[k] != null:
-				lib_n += 1
-				var smat: StandardMaterial3D = matn.lib[k]
-				if smat.albedo_texture and smat.normal_texture and smat.roughness_texture:
-					lib_ok += 1
-	ok(matn != null and matn.replaced > 200 and lib_n >= 20 and lib_ok == lib_n, "PBR materiallar: %d ta sirt, %d material (albedo + normal + ORM)" % [matn.replaced if matn else 0, lib_n])
-	var dec := main.get_node_or_null("Decals")
-	var dec_in := 0
-	var dec_n := 0
-	if dec:
-		for d in dec.get_children():
-			if d is Decal:
-				dec_n += 1
-				var dp: Vector3 = d.global_position
-				if absf(dp.x) <= 56.0 and absf(dp.z) <= 56.0 and d.distance_fade_enabled:
-					dec_in += 1
-	ok(dec_n > 200 and dec_in == dec_n, "eskirish izlari: %d ta decal (kir, yomg'ir izi, yoriq, dog'), hammasi xarita ichida va uzoqda so'nadi" % dec_n)
+	print("\n17) Stilizatsiya qilingan low-poly ko'rinish")
+	var lp_mats := {}
+	var lp_tex := 0
+	var lp_vc := 0
+	var lp_surf := 0
+	var lp_smooth := 0
+	var lstack := [main.get_node("Map")]
+	while not lstack.is_empty():
+		var n: Node = lstack.pop_back()
+		lstack.append_array(n.get_children())
+		if not (n is MeshInstance3D) or (n as MeshInstance3D).mesh == null:
+			continue
+		var mesh: Mesh = (n as MeshInstance3D).mesh
+		for i in mesh.get_surface_count():
+			var lpm := mesh.surface_get_material(i) as BaseMaterial3D
+			if lpm == null or lpm.resource_name.begins_with("site_"):
+				continue
+			lp_surf += 1
+			lp_mats[lpm.resource_name] = true
+			if lpm.albedo_texture or lpm.normal_texture:
+				lp_tex += 1
+			var arr := mesh.surface_get_arrays(i)
+			if arr[Mesh.ARRAY_COLOR] != null and lpm.vertex_color_use_as_albedo:
+				lp_vc += 1
+			# tekis soya: har uchburchakning 3 ta normali bir xil (uchlar ulashilmagan)
+			var nr: PackedVector3Array = arr[Mesh.ARRAY_NORMAL]
+			var ix: PackedInt32Array = arr[Mesh.ARRAY_INDEX] if arr[Mesh.ARRAY_INDEX] != null else PackedInt32Array()
+			var tri_n := (ix.size() if ix.size() else nr.size()) / 3
+			for t in mini(tri_n, 40):
+				var i0 := ix[t * 3] if ix.size() else t * 3
+				var i1 := ix[t * 3 + 1] if ix.size() else t * 3 + 1
+				var i2 := ix[t * 3 + 2] if ix.size() else t * 3 + 2
+				if nr[i0].dot(nr[i1]) < 0.999 or nr[i0].dot(nr[i2]) < 0.999:
+					lp_smooth += 1
+					break
+	ok(lp_surf > 200 and lp_tex == 0 and lp_mats.size() >= 25, "tekis rangli materiallar: %d ta sirt, %d xil rang, teksturasiz" % [lp_surf, lp_mats.size()])
+	ok(lp_vc == lp_surf, "yuzalar orasida rang farqi va devor tagida yumshoq qorayish (vertex rang): %d/%d sirt" % [lp_vc, lp_surf])
+	ok(lp_smooth == 0, "tekis soya (flat shading): silliqlangan sirt yo'q")
+	ok(main.get_node_or_null("Decals") == null and main.get_node_or_null("Materials") == null, "PBR teksturalar va decal'lar yo'q")
 	var skym = env.sky.sky_material if env.sky else null
-	ok(skym is PanoramaSkyMaterial and skym.panorama != null and env.ambient_light_source == Environment.AMBIENT_SOURCE_SKY, "bulutli osmon panoramasi, atrof yorug'ligi osmondan")
-	ok(env.sdfgi_enabled and env.ssr_enabled, "SDFGI (qaytgan yorug'lik) va SSR (koshinlarda aks) yoqilgan")
+	ok(skym is ProceduralSkyMaterial and env.ambient_light_source == Environment.AMBIENT_SOURCE_SKY, "gradient osmon, atrof yorug'ligi osmondan")
+	ok(not env.sdfgi_enabled and not env.ssr_enabled and not env.volumetric_fog_enabled, "og'ir effektlar (SDFGI, SSR, hajmli tuman) o'chirilgan")
 
 	await section_characters()
 	await section_views()
@@ -422,54 +438,25 @@ func _run() -> void:
 
 ## 18-bo'lim alohida funksiyada (o'zgaruvchi nomlari _run bilan to'qnashmasin)
 func section_characters() -> void:
-	print("\n18) Personajlar, animatsiyalar, qurol ushlash, harakat turlari (8-bosqich)")
-	var need_an := ["idle", "walk_f", "walk_b", "walk_l", "walk_r", "run_f", "run_b", "run_l", "run_r", "crouch_idle",
-		"crouch_f", "crouch_b", "crouch_l", "crouch_r", "jump_start", "jump_air", "jump_land", "fire", "reload", "plant", "death"]
+	print("\n18) Personajlar (vaqtinchalik low-poly o'rinbosar), harakat turlari")
 	for key in ["T", "CT"]:
 		var chm = load("res://scripts/character_model.gd").new()
 		chm.team = key
 		root.add_child(chm)
-		await frames(1)
-		var mx: bool = chm.mixamo
-		var have := []
-		for an in need_an:
-			if chm.anim.has_animation(an):
-				have.append(an)
-		var gatt: int = chm.skel.find_children("*", "BoneAttachment3D", false, false).size()
-		# T — bizning skelet (21 animatsiya shart); CT — foydalanuvchi qahramoni, animatsiyalar bittadan qo'shiladi
-		var anim_ok: bool = have.size() == need_an.size() if not mx else "idle" in have
-		ok(anim_ok and chm.skel.get_bone_count() >= 25 and gatt >= 1,
-			"%s: %d suyakli skelet, %d/%d animatsiya%s, qurol qo'lda" % [key, chm.skel.get_bone_count(), have.size(), need_an.size(),
-			" (qahramon: qolganlari kelgani sari qo'shiladi)" if mx else ""])
-		# qo'llar quroldan ajralmaydi: bilak -> qurol masofasi hamma animatsiyada bir xil (IK)
-		chm.tree.active = false
-		var wbi: int = chm.skel.find_bone("m416" if mx else "weapon")
-		var hands := {"R": "mixamorig_RightHand" if mx else "hand.R", "L": "mixamorig_LeftHand" if mx else "hand.L"}
-		var feet := ["mixamorig_LeftFoot", "mixamorig_RightFoot"] if mx else ["foot.L", "foot.R"]
-		var hdev := {"R": [], "L": []}
-		var fmin := 9.0
-		var fmax := -9.0
-		for an in ["idle", "walk_f", "run_f", "run_l", "crouch_idle", "crouch_f", "jump_air", "fire", "plant"]:
-			if not chm.anim.has_animation(an):
-				continue
-			for k in 6:
-				chm.anim.play(an)
-				chm.anim.seek(chm.anim.current_animation_length * k / 6.0, true)
-				var wtr: Transform3D = chm.skel.get_bone_global_pose(wbi)
-				for s in ["R", "L"]:
-					var h: Vector3 = chm.skel.get_bone_global_pose(chm.skel.find_bone(hands[s])).origin
-					hdev[s].append((wtr.affine_inverse() * h))
-				if an == "idle" or an == "crouch_idle":
-					for fb in feet:
-						var fyy: float = chm.skel.get_bone_global_pose(chm.skel.find_bone(fb)).origin.y * chm.model.scale.y
-						fmin = minf(fmin, fyy)
-						fmax = maxf(fmax, fyy)
-		var hspread: float = 0.0
-		for s in ["R", "L"]:
-			for q in hdev[s]:
-				hspread = maxf(hspread, (q - hdev[s][0]).length())
-		ok(hspread < 0.02, "%s: qo'llar hamma harakatda qurolda (siljish %.3f m < 0.02)" % [key, hspread])
-		ok(fmin > 0.05 and fmax < 0.2, "%s: turganda oyoqlar yerda (to'piq balandligi %.3f–%.3f m)" % [key, fmin, fmax])
+		await frames(2)
+		var nmesh: int = chm.find_children("*", "MeshInstance3D", true, false).size()
+		var gun: Node3D = chm.model.find_child("Weapon", true, false)
+		ok(chm.PLACEHOLDER and nmesh >= 15 and gun != null and chm.skel.find_bone("chest") >= 0,
+			"%s: o'rinbosar manekin (%d quti, qurol ko'krakka bog'langan) — asl qahramon, animatsiya va qurol modellari o'chirilgan" % [key, nmesh])
+		chm.crouching = true
+		await secs(0.6)
+		var e_c: float = chm.eye_point().y
+		chm.crouching = false
+		chm.die()
+		await secs(0.6)
+		var lying: bool = absf(chm.model.rotation.x) > 1.4
+		chm.revive()
+		ok(e_c < 1.35 and lying and chm.model.rotation.x == 0.0, "%s: o'tirish (ko'z %.2f m), o'lim (yiqiladi) va qayta tirilish" % [key, e_c])
 		chm.queue_free()
 	# harakat turlari: oddiy (qadam eshitiladi), Shift (sekin, jim), o'tirish (sekin, jim, past), sakrash (qo'nish tovushi)
 	gm.skip_freeze()
@@ -506,7 +493,7 @@ func section_characters() -> void:
 		var am0: int = fpv.ammo
 		fpv.fire()
 		await frames(2)
-		ok(fpv.ammo == am0 - 1 and bool(fpv.ch.tree.get("parameters/fire/active")), "o'q uzish: o'q soni kamaydi, tepki animatsiyasi o'ynadi")
+		ok(fpv.ammo == am0 - 1 and fpv.ch.fire_count == 1, "o'q uzish: o'q soni kamaydi, tepki")
 
 
 ## 19-bo'lim: o'yinchi o'ziga 1-shaxs, boshqalarga 3-shaxs

@@ -231,7 +231,35 @@ SUN_ROT = "Vector3(-50, -86, 0)"
 DECAL_COUNT = {}
 
 
+LOWPOLY = os.environ.get("LOOK", "lowpoly") == "lowpoly"
+
+
 def sky_env(s, full=True):
+    if LOWPOLY:
+        return sky_env_lowpoly(s, full)
+    return sky_env_pbr(s, full)
+
+
+def sky_env_lowpoly(s, full=True):
+    """Stilizatsiya (low-poly): gradient osmon, iliq quyosh, yumshoq soya (SSAO), yengil tuman. Teksturasiz.
+    Og'ir effektlar (SDFGI, SSR, hajmli tuman) yo'q — tekis ranglar va aniq shakllar uchun kerak emas."""
+    s.add_sub("ProceduralSkyMaterial", "sky_mat", sky_top_color="Color(0.24, 0.5, 0.84, 1)", sky_horizon_color="Color(0.78, 0.84, 0.88, 1)",
+              sky_curve="0.12", ground_bottom_color="Color(0.52, 0.42, 0.3, 1)", ground_horizon_color="Color(0.84, 0.78, 0.66, 1)",
+              sun_angle_max="18.0", sun_curve="0.12", energy_multiplier="1.0")
+    s.add_sub("Sky", "sky", sky_material='SubResource("sky_mat")', radiance_size="1")
+    props = dict(background_mode="2", sky='SubResource("sky")', ambient_light_source="3", ambient_light_color="Color(0.8, 0.76, 0.7, 1)",
+                 ambient_light_sky_contribution="0.7", ambient_light_energy="1.0", reflected_light_source="2",
+                 tonemap_mode="2", tonemap_exposure="1.0", tonemap_white="6.0",
+                 fog_enabled="true", fog_light_color="Color(0.82, 0.84, 0.86, 1)", fog_density="0.0015", fog_sky_affect="0.1",
+                 volumetric_fog_density="0.0")
+    if full:
+        props.update(ssao_enabled="true", ssao_radius="1.2", ssao_intensity="1.6", ssao_detail="0.3", ssil_enabled="true", ssil_intensity="0.6",
+                     glow_enabled="true", glow_intensity="0.35", glow_bloom="0.03", glow_hdr_threshold="1.3",
+                     adjustment_enabled="true", adjustment_saturation="1.12", adjustment_contrast="1.04")
+    s.add_sub("Environment", "env", **props)
+
+
+def sky_env_pbr(s, full=True):
     """8-bosqich: osmon panoramasi (bulutlar, quyosh nuri) va realistik muhit.
     SDFGI (yorug'likning devorlardan qaytishi), SSR (koshinlarda aks), osmondan tushadigan atrof yorug'ligi.
     Tuman va quyosh 6-bosqich chegaralarida qoladi (test 15)."""
@@ -323,7 +351,7 @@ def decals(s):
 
 def perf_nodes(s, root_is_main=True, art=True):
     """7-bosqich: occluder'lar (bino bloklari), masofa bo'yicha bezakni yashirish, minimap va F9 ko'rsatkichlari"""
-    if art:
+    if art and not LOWPOLY:
         ms = s.add_ext("Script", "res://scripts/materials.gd", "11_mat")
         s.node("Materials", "Node", ".", script=ms)
         DECAL_COUNT.update(decals(s))

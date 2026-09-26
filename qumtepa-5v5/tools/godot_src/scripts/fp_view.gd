@@ -1,7 +1,7 @@
 extends Node3D
-## Birinchi shaxs ko'rinishi: kameraga bog'langan qo'llar va qurol (T — AKM, CT — M416).
-## O'yinchining harakatidan o'sha animatsiyalar o'ynaydi (yugurishda qurol tebranadi, o'tirganda pastlaydi),
-## ko'z nuqtasi doim kamerada turadi. Model 0.6 marta kichraytirilgan va kameraga yaqinlashtirilgan —
+## Birinchi shaxs ko'rinishi: kameraga bog'langan qo'llar va qurol (hozircha low-poly o'rinbosar — character_model.gd).
+## O'yinchining harakatiga qarab: qadam tebranishi, sichqoncha burilganda qurol kechikishi, tepki, qayta o'qlash.
+## Ko'z nuqtasi doim kamerada turadi. Model 0.6 marta kichraytirilgan va kameraga yaqinlashtirilgan —
 ## ko'rinishi aynan bir xil, lekin devorga kirib ketmaydi. Soya tashlamaydi.
 ## Sichqoncha chap tugmasi — o'q uzish (avtomatik, 600 o'q/daqiqa), R — qayta o'qlash (30 o'q).
 
@@ -12,8 +12,8 @@ const MAG := 30
 ## qurol ekranda CS dagidek o'ng pastda: kameraga nisbatan siljish (m, kichraytirishdan oldin) va og'ish (°)
 ## har bir personaj uchun alohida: [siljish, og'ish °, ko'tarilish °] (qurol ekranda o'ng pastda, og'zi nishon tomonga)
 const TUNE := {
-	"T": [Vector3(0.13, 0.07, -0.06), 5.0, 1.5],
-	"CT": [Vector3.ZERO, 0.0, 0.0],        # qahramon: qurol joyi tools/hero_ct.py da (VM) ko'zga nisbatan pishirilgan
+	"T": [Vector3(0.0, 0.1, 0.0), 0.0, 0.0],
+	"CT": [Vector3(0.0, 0.1, 0.0), 0.0, 0.0],
 }
 
 var player: CharacterBody3D

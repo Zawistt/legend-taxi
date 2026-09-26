@@ -8,10 +8,9 @@ GODOT="${GODOT:-godot}"
 python3 analyze5.py
 python3 audio5.py
 python3 minimap5.py
-# personajlar: skelet, animatsiyalar, qurollar (Blender kerak: pip install bpy==4.2.0). Tayyor GLB'lar repoda bor — RIG=1 bilan qayta yaratiladi
-if [ -n "${RIG:-}" ]; then python3 rig_characters.py; fi
-# 8-bosqich: 1024 px PBR teksturalar va osmon (~1.5 daqiqa; mavjud bo'lsa HQ=0 bilan o'tkazib yuborish mumkin)
-if [ "${HQ:-1}" != "0" ] || [ ! -f ../godot/textures/sky.png ]; then python3 textures_hq.py; fi
+# ko'rinish: LOOK=lowpoly (standart — stilizatsiya, tekis ranglar) yoki LOOK=pbr (8-bosqichning realistik teksturalari)
+export LOOK="${LOOK:-lowpoly}"
+if [ "$LOOK" = "pbr" ] && { [ "${HQ:-1}" != "0" ] || [ ! -f ../godot/textures/sky.png ]; }; then python3 textures_hq.py; fi
 STYLE=greybox python3 build5.py
 STYLE=arch python3 build5.py
 rm -f ../godot/map/navmesh.res

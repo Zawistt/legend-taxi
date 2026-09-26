@@ -20,6 +20,8 @@ import arch5
 HERE = os.path.dirname(os.path.abspath(__file__))
 # STYLE=greybox (2-bosqich, rangli kodlash) yoki STYLE=arch (4-bosqich, arxitektura). To'qnashuv ikkalasida bir xil.
 STYLE = os.environ.get("STYLE", "greybox")
+# arch rejimining ko'rinishi: LOOK=lowpoly (stilizatsiya: tekis ranglar, tekis soya, kam qirrali shakllar) yoki LOOK=pbr (teksturali)
+LOWPOLY = STYLE == "arch" and os.environ.get("LOOK", "lowpoly") == "lowpoly"
 OUT_GLB = os.path.join(HERE, "..", "godot", "map", "qumtepa5v5_greybox.glb" if STYLE == "greybox" else "qumtepa5v5.glb")
 OUT_META = os.path.join(HERE, "build", "meta5.json")
 rng = np.random.default_rng(42)
@@ -145,6 +147,8 @@ def box(group, mat, x0, y0, z0, x1, y1, z1, scale=None, unit=False, yaw=0.0, top
 
 
 def lathe(group, mat, cxp, cyp, czp, prof, seg=16, scale=4.0):
+    if LOWPOLY:
+        seg = max(6, int(round(seg * 0.5)))          # low-poly: qirralar yarmi (gumbaz 16 -> 8)
     verts, uvs, faces = [], [], []
     for j, (r, y) in enumerate(prof):
         for i in range(seg + 1):
@@ -471,6 +475,20 @@ def sufa_decor(x0, z0, x1, z1, h, stair_dir):
         k += 1
 
 
+_ICO = None
+
+
+def blob(group, mat, c, rad, prng):
+    """low-poly bo'rtiq shakl: ikosaedr (1 marta bo'lingan), uchlari tasodifiy siljigan"""
+    global _ICO
+    if _ICO is None:
+        import trimesh.creation as _tc
+        _ICO = _tc.icosphere(subdivisions=1)
+    v = np.array(_ICO.vertices) * (1.0 + prng.uniform(-0.12, 0.12, (len(_ICO.vertices), 1)))
+    v = v * rad + c
+    B(group, mat).add(v, [tuple(f) for f in _ICO.faces], [(0.0, 0.0)] * len(v))
+
+
 def chinor(x, z, h=7.5):
     """chinor daraxti: yo'g'on oqish tana, 3 ta shox, barg kartochkalaridan toj (faqat tana to'qnashuvi)"""
     prng = np.random.default_rng(int(abs(x * 29 + z * 11)))
@@ -491,6 +509,13 @@ def chinor(x, z, h=7.5):
             quad("Decor", "bark_light", [p0 - side * r0, p0 + side * r0, p1 + side * r1, p1 - side * r1], [(0, 0), (1, 0), (1, 1), (0, 1)], np.array([0, 0, 1]))
             quad("Decor", "bark_light", [p0 - side * r0, p0 + side * r0, p1 + side * r1, p1 - side * r1][::-1], [(0, 0), (1, 0), (1, 1), (0, 1)][::-1], np.array([0, 0, -1]))
         crowns.append((ex, ey + 0.6, ez, 2.2))
+    if LOWPOLY:
+        # low-poly toj: har bir shox uchida bir nechta qirrali "bulut" (ikosaedr, tasodifiy bo'rtiqlar)
+        for (px_, py_, pz_, r) in crowns:
+            for k in range(3):
+                off = prng.normal(0, 0.35, 3) * r * np.array([1.0, 0.45, 1.0]) if k else np.zeros(3)
+                blob("Decor", "leaves", np.array([px_, py_, pz_]) + off, r * (0.85 if k else 1.0) * np.array([1.0, 0.72, 1.0]), prng)
+        return
     for (px_, py_, pz_, r) in crowns:
         for k in range(4):
             a = k * math.pi / 4 + prng.uniform(0, 0.3)
@@ -648,26 +673,57 @@ if STYLE == "arch":
     n_col = len(COL)
     decor_stats = arch5.decorate(ctx)
     assert len(COL) == n_col, "arxitektura to'qnashuvni o'zgartirmasligi kerak"
-    T = TX.all_textures()
-    M = {}
-    for k, (img, nrm) in T.items():
-        M[k] = PBRMaterial(name=k, baseColorTexture=img, normalTexture=nrm, metallicFactor=0.0,
-                           roughnessFactor={"green": 0.6, "tile_blue": 0.35, "tile_turq": 0.35, "dome": 0.3}.get(k, 0.9))
-    M["dark"] = PBRMaterial(name="window_dark", baseColorFactor=[18, 14, 10, 255], metallicFactor=0, roughnessFactor=0.6)
-    M["dark_tile"] = PBRMaterial(name="niche_dark", baseColorTexture=T["tile_blue"][0], baseColorFactor=[70, 80, 120, 255],
-                                 metallicFactor=0, roughnessFactor=0.5)
-    M["metal"] = PBRMaterial(name="iron", baseColorFactor=[40, 36, 32, 255], metallicFactor=0.8, roughnessFactor=0.5)
-    M["lamp"] = PBRMaterial(name="lamp_glow", baseColorFactor=[255, 200, 120, 255], emissiveFactor=[1.0, 0.72, 0.38], metallicFactor=0)
-    M["cloth"] = PBRMaterial(name="cloth", baseColorTexture=T["plaster"][0], baseColorFactor=[210, 190, 150, 255], metallicFactor=0, roughnessFactor=1)
-    M["clay"] = PBRMaterial(name="clay", baseColorTexture=T["plaster"][0], baseColorFactor=[230, 150, 110, 255], metallicFactor=0, roughnessFactor=0.85)
-    V2T = TX.V2
-    M["frond"] = PBRMaterial(name="palm_frond", baseColorTexture=V2T.frond(), alphaMode="MASK", alphaCutoff=0.5, doubleSided=True, metallicFactor=0, roughnessFactor=0.8)
-    M["frond_core"] = PBRMaterial(name="palm_core", baseColorFactor=[70, 85, 35, 255], metallicFactor=0)
-    M["leaves"] = PBRMaterial(name="chinor_leaves", baseColorTexture=TX.leaves(), alphaMode="MASK", alphaCutoff=0.5, doubleSided=True, metallicFactor=0, roughnessFactor=0.9)
-    M["lagan"] = PBRMaterial(name="lagan", baseColorTexture=TX.lagan(), alphaMode="MASK", alphaCutoff=0.5, metallicFactor=0, roughnessFactor=0.3)
-    M["bark_light"] = PBRMaterial(name="chinor_bark", baseColorTexture=T["bark"][0], baseColorFactor=[220, 205, 180, 255], doubleSided=True, metallicFactor=0, roughnessFactor=1)
-    M["siteA"] = PBRMaterial(name="site_A", baseColorTexture=V2T.site_decal("A"), alphaMode="BLEND", metallicFactor=0, roughnessFactor=0.9)
-    M["siteB"] = PBRMaterial(name="site_B", baseColorTexture=V2T.site_decal("B"), alphaMode="BLEND", metallicFactor=0, roughnessFactor=0.9)
+    if LOWPOLY:
+        # stilizatsiya: har material — bitta tekis rang (O'zbekiston palitrasi), teksturasiz; faqat A/B belgilari rasm
+        PAL = {
+            "sandstone": (224, 188, 136), "sandstone_dk": (190, 150, 104), "plaster": (234, 214, 178), "plaster_w": (244, 236, 220),
+            "brick": (198, 122, 84), "cobble": (168, 152, 132), "flagstone": (206, 186, 152), "roof": (164, 104, 70),
+            "tile_blue": (38, 96, 176), "tile_turq": (36, 170, 178), "dome": (44, 182, 190), "girih": (52, 128, 186),
+            "majolica": (58, 150, 196), "ganch": (240, 232, 214), "wood_light": (190, 138, 86), "beam": (126, 86, 54),
+            "carved_wood": (146, 98, 60), "door": (120, 78, 48), "bark": (122, 98, 74), "crate": (182, 136, 82),
+            "green": (88, 124, 72), "awning_r": (200, 64, 54), "awning_b": (54, 96, 172), "awning_g": (72, 142, 84),
+            "carpet": (160, 50, 56), "atlas_1": (210, 62, 98), "atlas_2": (152, 62, 144), "suzani": (196, 74, 62),
+            "paxta": (244, 244, 236), "vassa": (174, 122, 80), "cloth": (216, 198, 160), "clay": (210, 124, 88),
+            "dark": (46, 38, 32), "dark_tile": (58, 82, 138), "metal": (64, 60, 56), "lamp": (255, 206, 128),
+            "frond": (104, 156, 66), "frond_core": (86, 114, 52), "leaves": (98, 156, 74), "lagan": (40, 112, 186),
+            "bark_light": (200, 184, 154),
+        }
+        NAMES = {"dark": "window_dark", "dark_tile": "niche_dark", "metal": "iron", "lamp": "lamp_glow", "frond": "palm_frond",
+                 "frond_core": "palm_core", "leaves": "chinor_leaves", "bark_light": "chinor_bark"}
+        GLOSS = {"tile_blue": 0.45, "tile_turq": 0.45, "dome": 0.4, "girih": 0.5, "majolica": 0.5, "lagan": 0.4, "metal": 0.6}
+        M = {}
+        for (g_, m_) in bufs:
+            if m_ in M or m_ in ("siteA", "siteB"):
+                continue
+            assert m_ in PAL, f"palitrada rang yo'q: {m_}"
+        for k, rgb in PAL.items():
+            M[k] = PBRMaterial(name=NAMES.get(k, k), baseColorFactor=[*rgb, 255], metallicFactor=0.3 if k == "metal" else 0.0,
+                               roughnessFactor=GLOSS.get(k, 0.95), doubleSided=k in ("frond", "leaves", "bark_light"),
+                               emissiveFactor=[1.0, 0.72, 0.38] if k == "lamp" else None)
+        V2T = TX.V2
+        M["siteA"] = PBRMaterial(name="site_A", baseColorTexture=V2T.site_decal("A"), alphaMode="BLEND", metallicFactor=0, roughnessFactor=0.9)
+        M["siteB"] = PBRMaterial(name="site_B", baseColorTexture=V2T.site_decal("B"), alphaMode="BLEND", metallicFactor=0, roughnessFactor=0.9)
+    else:
+        T = TX.all_textures()
+        M = {}
+        for k, (img, nrm) in T.items():
+            M[k] = PBRMaterial(name=k, baseColorTexture=img, normalTexture=nrm, metallicFactor=0.0,
+                               roughnessFactor={"green": 0.6, "tile_blue": 0.35, "tile_turq": 0.35, "dome": 0.3}.get(k, 0.9))
+        M["dark"] = PBRMaterial(name="window_dark", baseColorFactor=[18, 14, 10, 255], metallicFactor=0, roughnessFactor=0.6)
+        M["dark_tile"] = PBRMaterial(name="niche_dark", baseColorTexture=T["tile_blue"][0], baseColorFactor=[70, 80, 120, 255],
+                                     metallicFactor=0, roughnessFactor=0.5)
+        M["metal"] = PBRMaterial(name="iron", baseColorFactor=[40, 36, 32, 255], metallicFactor=0.8, roughnessFactor=0.5)
+        M["lamp"] = PBRMaterial(name="lamp_glow", baseColorFactor=[255, 200, 120, 255], emissiveFactor=[1.0, 0.72, 0.38], metallicFactor=0)
+        M["cloth"] = PBRMaterial(name="cloth", baseColorTexture=T["plaster"][0], baseColorFactor=[210, 190, 150, 255], metallicFactor=0, roughnessFactor=1)
+        M["clay"] = PBRMaterial(name="clay", baseColorTexture=T["plaster"][0], baseColorFactor=[230, 150, 110, 255], metallicFactor=0, roughnessFactor=0.85)
+        V2T = TX.V2
+        M["frond"] = PBRMaterial(name="palm_frond", baseColorTexture=V2T.frond(), alphaMode="MASK", alphaCutoff=0.5, doubleSided=True, metallicFactor=0, roughnessFactor=0.8)
+        M["frond_core"] = PBRMaterial(name="palm_core", baseColorFactor=[70, 85, 35, 255], metallicFactor=0)
+        M["leaves"] = PBRMaterial(name="chinor_leaves", baseColorTexture=TX.leaves(), alphaMode="MASK", alphaCutoff=0.5, doubleSided=True, metallicFactor=0, roughnessFactor=0.9)
+        M["lagan"] = PBRMaterial(name="lagan", baseColorTexture=TX.lagan(), alphaMode="MASK", alphaCutoff=0.5, metallicFactor=0, roughnessFactor=0.3)
+        M["bark_light"] = PBRMaterial(name="chinor_bark", baseColorTexture=T["bark"][0], baseColorFactor=[220, 205, 180, 255], doubleSided=True, metallicFactor=0, roughnessFactor=1)
+        M["siteA"] = PBRMaterial(name="site_A", baseColorTexture=V2T.site_decal("A"), alphaMode="BLEND", metallicFactor=0, roughnessFactor=0.9)
+        M["siteB"] = PBRMaterial(name="site_B", baseColorTexture=V2T.site_decal("B"), alphaMode="BLEND", metallicFactor=0, roughnessFactor=0.9)
     for (g_, m_) in bufs:
         assert m_ in M, f"material yo'q: {m_}"
     # Audit: o'yinchi ichidan o'tib ketadigan bezak bo'lmasligi kerak — 2 m dan past har bir bezak uchi
@@ -725,6 +781,20 @@ for (group, mat), b in sorted(bufs.items()):
     V = np.array(b.v); F = np.array(b.f); UV = np.array(b.uv)
     area = np.linalg.norm(np.cross(V[F[:, 1]] - V[F[:, 0]], V[F[:, 2]] - V[F[:, 0]]), axis=1)
     F = F[area > 1e-9]
+    COLS = None
+    if LOWPOLY and not mat.startswith("site"):
+        # tekis soya: har uchburchak o'z uchlariga ega (normal — yuzaniki); vertex rangi: yuzalar orasida ±4% farq
+        # (qirralar bir-biridan ajralib turadi) va devor tagida yumshoq qorayish (soxta AO)
+        V = V[F].reshape(-1, 3); UV = UV[F].reshape(-1, 2); F = np.arange(len(V)).reshape(-1, 3)
+        cen = V[F].mean(1)
+        nrm_ = np.cross(V[F[:, 1]] - V[F[:, 0]], V[F[:, 2]] - V[F[:, 0]])
+        nrm_ /= np.linalg.norm(nrm_, axis=1, keepdims=True)
+        hsh = np.sin(cen @ np.array([12.9898, 78.233, 37.719])) * 43758.5453
+        jit = 0.955 + 0.045 * (hsh - np.floor(hsh))
+        wall_ = np.abs(nrm_[:, 1]) < 0.5
+        ao = np.clip(0.8 + 0.2 * V[:, 1] / 1.2, 0.8, 1.0)
+        fac = np.repeat(jit, 3) * np.where(np.repeat(wall_, 3), ao, 1.0)
+        COLS = np.clip(np.stack([fac, fac, fac, np.ones_like(fac)], 1) * 255, 0, 255).astype(np.uint8)
     tris += len(F)
     gname = group.replace('-col', '')
     if group.startswith("Landmark") or CHUNKS <= 1:
@@ -745,6 +815,8 @@ for (group, mat), b in sorted(bufs.items()):
         remap[used] = np.arange(len(used))
         mesh = trimesh.Trimesh(vertices=V[used], faces=remap[Fp], process=False)
         mesh.visual = TextureVisuals(uv=UV[used], material=M[mat])
+        if COLS is not None:
+            mesh.visual.vertex_attributes["color"] = COLS[used]
         name = f"{mat}_{gname}" + ("" if len(parts) == 1 and (i_, j_) == (0, 0) and (group.startswith("Landmark") or CHUNKS <= 1) else f"_c{i_}{j_}")
         scene.add_geometry(mesh, node_name=name, geom_name=name)
         nodes += 1

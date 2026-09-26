@@ -72,12 +72,12 @@ func _run() -> void:
 	for i in 40:
 		await process_frame
 	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/19_hud_minimap.png"))
-	# CT qurol (M416) — jamoani almashtirib
+	# CT jamoasi — 1-shaxs (o'rinbosar qurol)
 	pl.team = "CT"
 	pl.global_position = Vector3(-34, 0.1, 22)
 	for i in 40:
 		await process_frame
-	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/21_fp_m416.png"))
+	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/21_fp_ct.png"))
 	pl.team = "T"
 	# bir paytning o'zi ikki kameradan: o'yinchining o'zi (1-shaxs) va boshqalar (3-shaxs to'liq tana)
 	main.get_node("HUD").visible = false
@@ -100,43 +100,9 @@ func _run() -> void:
 	pl.cam.rotation.x = 0.0
 	pl.global_position = Vector3(-34, 0.1, 22)
 	print("saqlandi: 1-shaxs / 3-shaxs")
-	# personajlar: T va CT, turli harakatlarda (uchinchi shaxs, botlar shunday ko'rinadi)
 	main.get_node("HUD").visible = false
-	main.get_node("UI").visible = false
+	main.get_node("UI").visible = true
 	cam.make_current()
-	var CM = load("res://scripts/character_model.gd")
-	var poses := [["T", "idle", 0.0], ["T", "run_f", 0.2], ["T", "crouch_idle", 0.0], ["T", "reload", 0.8],
-		["CT", "idle", 0.0], ["CT", "walk_f", 0.3], ["CT", "crouch_f", 0.2], ["CT", "fire", 0.05]]
-	var base := Vector3(-40.5, 0.02, 9.5)
-	var models := []
-	for i in poses.size():
-		var m = CM.new()
-		m.team = poses[i][0]
-		main.add_child(m)
-		m.global_position = base + Vector3((i % 4) * 1.6 - 2.4, 0, (i / 4) * 2.2)
-		m.rotation.y = 0.35
-		models.append(m)
-	await process_frame
-	for i in poses.size():
-		var m = models[i]
-		m.tree.active = false
-		m.anim.play(poses[i][1])
-		m.anim.seek(poses[i][2], true)
-		m.anim.pause()
-	cam.fov = 50.0
-	cam.global_position = base + Vector3(2.6, 1.7, 7.0)
-	cam.look_at(base + Vector3(-0.8, 0.9, 1.0), Vector3.UP)
-	for i in 20:
-		await process_frame
-	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/22_personajlar.png"))
-	cam.fov = 30.0
-	cam.global_position = base + Vector3(-1.2, 1.5, 3.0)
-	cam.look_at(base + Vector3(-2.3, 1.15, 0.0), Vector3.UP)
-	for i in 20:
-		await process_frame
-	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/23_qurol_ushlash.png"))
-	for m in models:
-		m.queue_free()
 	cam.fov = 80.0
 	cam.global_position = Vector3(-34, 1.7, 22)
 	cam.look_at(Vector3(-44, 1.5, 4), Vector3.UP)
