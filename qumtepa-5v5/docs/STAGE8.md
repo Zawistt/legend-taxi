@@ -13,10 +13,10 @@
 | Tekshiruv | Natija |
 |---|---|
 | 2D tahlil | 59/59 |
-| Godot | **111/111** |
+| Godot | **116/116** |
 | Smoke | 10/10 |
 | Audit | **6/6** |
-| Skrinshotlar | 22/22 |
+| Skrinshotlar | 24/24 |
 
 ![Personajlar Godot'da](shots/22_personajlar.png)
 
@@ -149,6 +149,43 @@ Hamma yurishlar bir xil siklda (0.6 s). Shu sababli sekin yurish ↔ yugurish �
 
 ![Birinchi shaxs, M416](shots/21_fp_m416.png)
 ![Botlar yaqindan](shots/bots_3_yaqindan.png)
+
+### O'yinchi: o'ziga 1-shaxs, boshqalarga 3-shaxs
+
+![O'yinchining o'z ko'zi (1-shaxs)](shots/24_ozi_1shaxs.png)
+![Aynan o'sha payt, chetdagi kameradan (3-shaxs)](shots/25_boshqalarga_3shaxs.png)
+
+Bu render qatlamlari bilan ajratilgan:
+
+| Kim ko'radi | Nima ko'rinadi |
+|---|---|
+| **O'yinchining o'z kamerasi** | Faqat qo'llar va qurol (12-qatlam, `Camera3D/FPView`). O'z tanasi ko'rinmaydi (11-qatlam kamera maskasidan chiqarilgan), lekin **soyasi yerda ko'rinadi** (CS2 dagidek) |
+| **Boshqa har qanday kamera:** tomoshabin, boshqa o'yinchi, bot kamerasi, skrinshot | To'liq tana (`Body`) qo'ldagi qurol bilan, xuddi botlardek |
+
+**Ikkinchi ro'yxatning 1-shaxs qo'llari boshqa kamerada yashiriladi.** Havoda uchib yurgan qo'l ko'rinmaydi.
+
+3-shaxs tana o'yinchiga ergashadi:
+
+- **Yurish:** oddiy yugurish, sekin yurish (Shift) va 4 yo'nalish animatsiyalari.
+- **Holat:** o'tirish, sakrash va qo'nish, bomba qo'yish.
+- **Qurol:** otganda tepki, R bosilganda qayta o'qlash animatsiyasi.
+- **Nishon:** tepaga yoki pastga qarasa, tananing yuqori qismi shu tomonga egiladi (umurtqa 40%, ko'krak 60%). Boshqalar qurolingiz qayerga qaraganini ko'radi.
+
+O'yinchi alohida sahnaga ajratildi: **`scenes/player.tscn`**.
+
+- **Bizning o'yinchi:** `local_player = true` — 1-shaxs + boshqalarga 3-shaxs.
+- **Masofaviy (tarmoqdagi) o'yinchi:** `local_player = false`.
+  - 1-shaxs qo'llari va klaviatura yo'q, faqat 3-shaxs tana.
+  - Uning tanasi hamma kameraga, shu jumladan bizning kameramizga ham ko'rinadi.
+  - Tarmoq o'yini qo'shilganda boshqa o'yinchilar shu sahnadan yaratiladi.
+
+**19-bo'lim testlari (5 ta):**
+
+- O'z kamerasi o'z tanasini ko'rmaydi, tana esa soya tashlaydi.
+- O'z kamerasida 1-shaxs ko'rinadi.
+- Boshqa kamerada 3-shaxs ko'rinadi, 1-shaxs qo'llari yo'q.
+- Tana o'tirish, yurish va nishon burchagiga ergashadi (0.6 rad qarashda 35°).
+- Masofaviy o'yinchi to'g'ri ko'rinadi.
 
 ### Avtomatik tekshiruvlar (`run_tests.gd`, 18-bo'lim)
 

@@ -409,6 +409,7 @@ func _run() -> void:
 	ok(env.sdfgi_enabled and env.ssr_enabled, "SDFGI (qaytgan yorug'lik) va SSR (koshinlarda aks) yoqilgan")
 
 	await section_characters()
+	await section_views()
 
 	print("\nVAQTLAR (2D tahlil -> 3D fizika):")
 	for row in timing_rows:
@@ -498,3 +499,67 @@ func section_characters() -> void:
 		fpv.fire()
 		await frames(2)
 		ok(fpv.ammo == am0 - 1 and bool(fpv.ch.tree.get("parameters/fire/active")), "o'q uzish: o'q soni kamaydi, tepki animatsiyasi o'ynadi")
+
+
+## 19-bo'lim: o'yinchi o'ziga 1-shaxs, boshqalarga 3-shaxs
+func section_views() -> void:
+	print("\n19) Ko'rinish: o'yinchining o'ziga 1-shaxs, boshqalarga 3-shaxs")
+	var CM := preload("res://scripts/character_model.gd")
+	var body: Node3D = pl.get_node_or_null("Body")
+	var fpv = pl.get_node_or_null("Camera3D/FPView")
+	pl.cam.make_current()
+	await frames(2)
+	var body_meshes: Array = body.find_children("*", "MeshInstance3D", true, false) if body else []
+	var vm_meshes: Array = fpv.ch.find_children("*", "MeshInstance3D", true, false) if fpv else []
+	var body_ok := body_meshes.size() >= 2
+	for m in body_meshes:
+		body_ok = body_ok and m.layers == CM.LAYER_OWN_BODY and m.cast_shadow != GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var vm_ok := vm_meshes.size() >= 2
+	for m in vm_meshes:
+		vm_ok = vm_ok and m.layers == CM.LAYER_VIEWMODEL and m.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	ok(body_ok and (pl.cam.cull_mask & CM.LAYER_OWN_BODY) == 0,
+		"o'yinchining o'z kamerasi o'z tanasini ko'rmaydi (%d mesh, 11-qatlam), lekin tana soya tashlaydi" % body_meshes.size())
+	ok(vm_ok and (pl.cam.cull_mask & CM.LAYER_VIEWMODEL) != 0 and fpv.ch.visible,
+		"o'z kamerasida 1-shaxs qo'llar va qurol ko'rinadi (12-qatlam, soyasiz)")
+	# boshqa kamera (tomoshabin / boshqa o'yinchi)
+	var other := Camera3D.new()
+	main.add_child(other)
+	other.global_position = pl.global_position + Vector3(0, 1.8, 4.0)
+	other.make_current()
+	await frames(2)
+	ok((other.cull_mask & CM.LAYER_OWN_BODY) != 0 and body.visible and not fpv.ch.visible,
+		"boshqa kamera o'yinchini 3-shaxs to'liq tana sifatida ko'radi, 1-shaxs qo'llar esa unga ko'rinmaydi")
+	other.queue_free()
+	pl.cam.make_current()
+	await frames(2)
+	# tana o'yinchi holatiga ergashadi: o'tirish, harakat, qarash burchagi
+	pl.force_crouch = true
+	pl.ai_move = Vector3(0, 0, -1)
+	await frames(20)
+	var follows: bool = body.crouching and body.velocity_local.z > 1.0
+	pl.force_crouch = false
+	pl.ai_move = Vector3.ZERO
+	await frames(10)
+	var chest: int = body.skel.find_bone("chest")
+	pl.cam.rotation.x = 0.0
+	await frames(3)
+	var c0: Vector3 = body.skel.get_bone_global_pose(chest).basis.y
+	pl.cam.rotation.x = 0.6
+	await frames(3)
+	var c1: Vector3 = body.skel.get_bone_global_pose(chest).basis.y
+	pl.cam.rotation.x = 0.0
+	ok(follows and c0.angle_to(c1) > 0.25, "3-shaxs tana o'yinchiga ergashadi: o'tirish, yurish, tepaga qarasa tana egiladi (%.0f°)" % rad_to_deg(c0.angle_to(c1)))
+	# masofaviy (tarmoqdagi) o'yinchi: faqat 3-shaxs
+	var remote: CharacterBody3D = load("res://scenes/player.tscn").instantiate()
+	remote.local_player = false
+	remote.name = "RemotePlayer"
+	main.add_child(remote)
+	remote.global_position = pl.global_position + Vector3(2, 0, 0)
+	await frames(3)
+	var rb: Node3D = remote.get_node_or_null("Body")
+	var r_ok: bool = remote.get_node_or_null("Camera3D/FPView") == null and rb != null and not rb.own_body and pl.cam.current
+	for m in rb.find_children("*", "MeshInstance3D", true, false):
+		r_ok = r_ok and m.layers == CM.LAYER_WORLD
+	ok(r_ok, "masofaviy o'yinchi: 1-shaxs yo'q, 3-shaxs tana hamma kameraga (shu jumladan bizning kameraga) ko'rinadi")
+	remote.queue_free()
+	await frames(2)

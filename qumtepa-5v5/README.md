@@ -25,7 +25,7 @@ Godot 4.3, bomba rejimi (T hujum qiladi, CT himoya qiladi).
 | 5 | Milliy buyumlar va teksturalar: girih, majolika, ganch, ayvon, vassa, atlas, so'zana, tandir, so'ri, paxta, chinor, Kalta Minor | ✅ ([hisobot](docs/STAGE5.md)) |
 | 6 | Yorug'lik (adolatli quyosh, qorong'i burchaksiz), shom rejimi, 6 xil fon tovushi, aks-sado | ✅ ([hisobot](docs/STAGE6.md)) |
 | 7 | Optimallashtirish (bo'laklar, occlusion, masofada yashirish: −69% chizish), minimap, F9, yakuniy tekshiruv | ✅ ([hisobot](docs/STAGE7.md)) |
-| 8 | Yakuniy audit (tirqish/teshik/tiqilish yo'q), PBR teksturalar va realistik yorug'lik, T/CT personajlari: skelet, 21 animatsiya, AKM/M416, Shift/o'tirish/sakrash, birinchi shaxs | ✅ ([hisobot](docs/STAGE8.md)) |
+| 8 | Yakuniy audit (tirqish/teshik/tiqilish yo'q), PBR teksturalar va realistik yorug'lik, T/CT personajlari: skelet, 21 animatsiya, AKM/M416, Shift/o'tirish/sakrash, o'ziga 1-shaxs, boshqalarga 3-shaxs | ✅ ([hisobot](docs/STAGE8.md)) |
 
 ## O'ynash
 
@@ -48,7 +48,7 @@ qumtepa-5v5/
 │   ├── textures_hq.py  # 8-bosqich: 1024 px PBR teksturalar (rang/normal/ORM/relyef), osmon, decal'lar
 │   ├── rig_characters.py # 8-bosqich: T/CT skelet, og'irliklar, IK bilan qurol ushlash, 21 animatsiya (Blender bpy)
 │   ├── gen_godot5.py   # Godot loyihasini yaratadi (sahna, collision, map_data, test ma'lumotlari)
-│   ├── make_all.sh     # hammasi ketma-ket + NavMesh + 111 Godot testi + audit
+│   ├── make_all.sh     # hammasi ketma-ket + NavMesh + 116 Godot testi + audit
 │   └── godot_src/      # Godot testlari va skrinshot skripti (manba)
 ├── assets_src/         # siz bergan Meshy modellari (T, CT, AKM, M416) — rig_characters.py manbasi
 ├── godot/              # tayyor Godot 4.3 loyihasi (avtomatik yaratilgan; characters/ — skeletli personajlar)
@@ -62,7 +62,7 @@ O'yin skriptlari (raund, HUD, bomba) va qadam tovushlari `qumtepa-v2/` dan olina
 ```
 pip install numpy scipy pillow trimesh     # personajlar uchun: pip install bpy==4.2.0
 cd qumtepa-5v5/tools
-GODOT=/yo'l/godot4 ./make_all.sh     # 2D 59/59, Godot 111/111, smoke 10/10, audit 6/6
+GODOT=/yo'l/godot4 ./make_all.sh     # 2D 59/59, Godot 116/116, smoke 10/10, audit 6/6
 RIG=1 GODOT=... ./make_all.sh        # + personajlarni qaytadan yaratish
 SHOTS=1 BOTS=360 GODOT=... ./make_all.sh   # + skrinshotlar va ko'rinish tekshiruvi, + 5v5 bot o'yinlari
 ```

@@ -74,6 +74,8 @@ func fire() -> bool:
 	ammo -= 1
 	shots_fired += 1
 	ch.fire()
+	if player.body:
+		player.body.fire()
 	_shot.pitch_scale = randf_range(0.96, 1.04)
 	_shot.play()
 	_flash.light_energy = 3.0
@@ -86,6 +88,8 @@ func reload() -> void:
 	if ammo >= MAG or reserve <= 0 or _reload_end > _t:
 		return
 	ch.reload()
+	if player.body:
+		player.body.reload()
 	_reload_snd.play()
 	_reload_end = _t + 2.6
 
@@ -121,4 +125,6 @@ func _process(delta: float) -> void:
 	var b := (r * Basis(Vector3.UP, PI)).scaled(Vector3.ONE * SCALE)
 	ch.transform = Transform3D(b, -(b * _eye_s) + OFFSET * SCALE)
 	_label.text = "%d / %d" % [ammo, reserve]
+	# 1-shaxs faqat o'yinchining o'z kamerasi faol bo'lganda (boshqa kamerada o'yinchi 3-shaxs tana bo'lib ko'rinadi)
 	_label.visible = player.cam.current
+	ch.visible = player.cam.current

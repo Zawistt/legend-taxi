@@ -90,23 +90,33 @@
   "ok": true
  },
  "20_katta_xarita": {
-  "lum": 0.663,
-  "dark_frac": 0.0,
+  "lum": 0.233,
+  "dark_frac": 0.012,
   "ok": true
  },
  "21_fp_m416": {
-  "lum": 0.553,
-  "dark_frac": 0.039,
+  "lum": 0.554,
+  "dark_frac": 0.038,
   "ok": true
  },
  "22_personajlar": {
-  "lum": 0.465,
-  "dark_frac": 0.006,
+  "lum": 0.46,
+  "dark_frac": 0.008,
   "ok": true
  },
  "23_qurol_ushlash": {
   "lum": 0.326,
   "dark_frac": 0.034,
+  "ok": true
+ },
+ "24_ozi_1shaxs": {
+  "lum": 0.473,
+  "dark_frac": 0.008,
+  "ok": true
+ },
+ "25_boshqalarga_3shaxs": {
+  "lum": 0.494,
+  "dark_frac": 0.008,
   "ok": true
  }
 }

@@ -1,10 +1,8 @@
-[gd_scene load_steps=170 format=3]
+[gd_scene load_steps=168 format=3]
 
 [ext_resource type="PackedScene" path="res://map/qumtepa5v5.glb" id="1_map"]
 
 [ext_resource type="PackedScene" path="res://map/collision.tscn" id="2_col"]
-
-[ext_resource type="Script" path="res://scripts/player.gd" id="3_pl"]
 
 [ext_resource type="Script" path="res://scripts/game_mode.gd" id="4_gm"]
 
@@ -44,7 +42,7 @@
 
 [ext_resource type="Script" path="res://scripts/perf_overlay.gd" id="10_po"]
 
-[ext_resource type="Script" path="res://scripts/fp_view.gd" id="12_fp"]
+[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="3_pl"]
 
 [sub_resource type="PanoramaSkyMaterial" id="sky_mat"]
 panorama = ExtResource("s_sky")
@@ -100,10 +98,6 @@ volumetric_fog_length = 80.0
 adjustment_enabled = true
 adjustment_saturation = 1.04
 adjustment_contrast = 1.06
-
-[sub_resource type="CapsuleShape3D" id="capsule"]
-radius = 0.35
-height = 1.8
 
 [sub_resource type="PlaneMesh" id="ground"]
 size = Vector2(600, 600)
@@ -10685,33 +10679,8 @@ font_size = 48
 outline_size = 10
 text = "smoke: Top mid (CT)"
 
-[node name="Player" type="CharacterBody3D" parent="."]
+[node name="Player" parent="." instance=ExtResource("3_pl")]
 transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, -4, 0.2, -47)
-collision_layer = 8
-collision_mask = 3
-script = ExtResource("3_pl")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Player"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
-shape = SubResource("capsule")
-
-[node name="Camera3D" type="Camera3D" parent="Player"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
-fov = 80.0
-far = 400.0
-
-[node name="FloorRay" type="RayCast3D" parent="Player"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-target_position = Vector3(0, -0.6, 0)
-collision_mask = 1
-
-[node name="Steps" type="AudioStreamPlayer3D" parent="Player"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.1, 0)
-volume_db = -8.0
-unit_size = 4.0
-
-[node name="FPView" type="Node3D" parent="Player/Camera3D"]
-script = ExtResource("12_fp")
 
 [node name="GameMode" type="Node" parent="."]
 script = ExtResource("4_gm")

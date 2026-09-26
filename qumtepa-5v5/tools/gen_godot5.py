@@ -340,11 +340,33 @@ def perf_nodes(s, root_is_main=True, art=True):
     s.node("Perf", "Label", "UI", script=po)
 
 
+def player_scene(art, out):
+    """O'yinchi sahnasi. art=True: 1-shaxs qo'llar/qurol (Camera3D/FPView) + 3-shaxs tana (Body).
+    O'z kamerasi — 1-shaxs; boshqa kameralar — 3-shaxs tana (render qatlamlari, player.gd)."""
+    s = Scene()
+    pscr = s.add_ext("Script", "res://scripts/player.gd", "1_pl")
+    s.add_sub("CapsuleShape3D", "capsule", radius="0.35", height="1.8")
+    s.node("Player", "CharacterBody3D", None, collision_layer="8", collision_mask="3", script=pscr)
+    s.node("CollisionShape3D", "CollisionShape3D", ".", transform=T(0, 0.9, 0), shape='SubResource("capsule")')
+    s.node("Camera3D", "Camera3D", ".", transform=T(0, 1.65, 0), fov="80.0", far="400.0")
+    s.node("FloorRay", "RayCast3D", ".", transform=T(0, 0.2, 0), target_position="Vector3(0, -0.6, 0)", collision_mask="1")
+    s.node("Steps", "AudioStreamPlayer3D", ".", transform=T(0, 0.1, 0), volume_db="-8.0", unit_size="4.0")
+    if art:
+        fpv = s.add_ext("Script", "res://scripts/fp_view.gd", "2_fp")
+        s.node("FPView", "Node3D", "Camera3D", script=fpv)
+        cmod = s.add_ext("Script", "res://scripts/character_model.gd", "3_cm")
+        s.node("Body", "Node3D", ".", transform=T(0, 0, 0, yaw_pi=True), script=cmod, team='"T"', own_body="true")
+    s.save(f"{OUT}/scenes/{out}")
+
+
+player_scene(True, "player.tscn")
+player_scene(False, "player_greybox.tscn")
+
+
 def main_scene(glb_path, out_name):
   s = Scene()
   glb = s.add_ext("PackedScene", glb_path, "1_map")
   col = s.add_ext("PackedScene", "res://map/collision.tscn", "2_col")
-  pscr = s.add_ext("Script", "res://scripts/player.gd", "3_pl")
   gscr = s.add_ext("Script", "res://scripts/game_mode.gd", "4_gm")
   hscr = s.add_ext("Script", "res://scripts/hud.gd", "5_hud")
   if NAVMESH:
@@ -355,7 +377,6 @@ def main_scene(glb_path, out_name):
                      agent_max_climb="0.25", agent_max_slope="45.0",
                      filter_baking_aabb=f"AABB({f(E0)}, -1, {f(E0)}, {f(SIZE)}, 4, {f(SIZE)})")
   sky_env(s)
-  s.add_sub("CapsuleShape3D", "capsule", radius="0.35", height="1.8")
   s.add_sub("PlaneMesh", "ground", size="Vector2(600, 600)")
   s.add_sub("StandardMaterial3D", "ground_mat", albedo_color="Color(0.62, 0.5, 0.35, 1)", roughness="1.0")
   for k, c in (("site", "Color(0.85, 0.25, 0.18, 0.22)"), ("buy", "Color(0.23, 0.64, 0.35, 0.2)"), ("T", "Color(0.84, 0.38, 0.12, 0.9)"),
@@ -435,14 +456,9 @@ def main_scene(glb_path, out_name):
       s.node("Label", "Label3D", f"Smokes/{nme}", groups=["debug_viz"], visible="false", transform=T(0, 3.2, 0), billboard="1",
              no_depth_test="true", font_size="48", outline_size="10", text=json.dumps(f"smoke: {name} ({team})", ensure_ascii=False))
   tx, tz = L.SPAWNS["T"][0]
-  s.node("Player", "CharacterBody3D", ".", transform=T(tx, 0.2, tz, yaw_pi=True), collision_layer="8", collision_mask="3", script=pscr)
-  s.node("CollisionShape3D", "CollisionShape3D", "Player", transform=T(0, 0.9, 0), shape='SubResource("capsule")')
-  s.node("Camera3D", "Camera3D", "Player", transform=T(0, 1.65, 0), fov="80.0", far="400.0")
-  s.node("FloorRay", "RayCast3D", "Player", transform=T(0, 0.2, 0), target_position="Vector3(0, -0.6, 0)", collision_mask="1")
-  s.node("Steps", "AudioStreamPlayer3D", "Player", transform=T(0, 0.1, 0), volume_db="-8.0", unit_size="4.0")
-  if "greybox" not in glb_path:
-      fpv = s.add_ext("Script", "res://scripts/fp_view.gd", "12_fp")
-      s.node("FPView", "Node3D", "Player/Camera3D", script=fpv)
+  # o'yinchi — alohida sahna (scenes/player.tscn): tarmoqdagi boshqa o'yinchilar ham shu sahnadan (local_player=false)
+  pl_scene = s.add_ext("PackedScene", "res://scenes/player_greybox.tscn" if "greybox" in glb_path else "res://scenes/player.tscn", "3_pl")
+  s.node("Player", parent=".", instance=pl_scene, transform=T(tx, 0.2, tz, yaw_pi=True))
   s.node("GameMode", "Node", ".", script=gscr)
   s.node("HUD", "CanvasLayer", ".", script=hscr)
   s.save(f"{OUT}/{out_name}")
@@ -705,6 +721,9 @@ window/size/viewport_height=900
 3d_physics/layer_6="grenades"
 3d_physics/layer_7="triggers"
 3d_physics/layer_8="smoke"
+3d_render/layer_1="dunyo"
+3d_render/layer_11="o'yinchining o'z tanasi (3-shaxs)"
+3d_render/layer_12="1-shaxs qo'llar va qurol"
 
 [audio]
 

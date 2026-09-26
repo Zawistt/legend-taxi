@@ -17,7 +17,7 @@ Me'morchiligi o'zbek milliy uslubida. 8 bosqichning hammasi bajarildi: xarita, a
 | 5 | Milliy buyumlar | Girih, majolika, ganch, ayvon, vassa, atlas, so'zana, tandir, so'ri, paxta, chinor, Kalta Minor | [STAGE5](STAGE5.md) |
 | 6 | Yorug'lik va tovush | Adolatli quyosh, qorong'i burchaksiz, shom rejimi, 6 xil fon tovushi, aks-sado | [STAGE6](STAGE6.md) |
 | 7 | Optimallashtirish | Obyekt va chizish buyruqlari −69%, minimap, F9 ko'rsatkichlari, yakuniy tekshiruv | [STAGE7](STAGE7.md) |
-| 8 | Audit, realizm, personajlar | Tirqish, teshik va tiqilish yo'q (audit 6/6); PBR teksturalar, osmon, SDFGI, 558 decal; T/CT skelet, 21 animatsiya, AKM/M416 qo'lda, Shift/o'tirish/sakrash, birinchi shaxs | [STAGE8](STAGE8.md) |
+| 8 | Audit, realizm, personajlar | Tirqish, teshik va tiqilish yo'q (audit 6/6); PBR teksturalar, osmon, SDFGI, 558 decal; T/CT skelet, 21 animatsiya, AKM/M416 qo'lda, Shift/o'tirish/sakrash, o'ziga 1-shaxs, boshqalarga 3-shaxs | [STAGE8](STAGE8.md) |
 
 ## Xarita haqida qisqacha
 
@@ -44,7 +44,7 @@ Me'morchiligi o'zbek milliy uslubida. 8 bosqichning hammasi bajarildi: xarita, a
 | Personajlar | T (AKM) va CT (M416): 29 suyak, 21 animatsiya |
 | To'qnashuv qutilari | 986 |
 | Bot sinovlari | 8 × 360 = 2880 raund |
-| Avtomatik tekshiruvlar | 59 + 111 + 10 + 6 + 22 = **208** |
+| Avtomatik tekshiruvlar | 59 + 116 + 10 + 6 + 24 = **215** |
 
 ## Qanday ochish
 

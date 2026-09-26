@@ -7,12 +7,18 @@ extends Node3D
 ##   bomba qo'yish/zararsizlantirish (tiz cho'kish) va o'lim.
 ## Model +Z ga qarab turadi (Godot'da ota tugun "oldinga"sini shunga moslab buradi).
 ## first_person=true — faqat qo'llar va qurol (o'yinchi kamerasi uchun), ko'z nuqtasi kameraga bog'lanadi.
+## own_body=true — o'yinchining o'z 3-shaxs tanasi: boshqa hamma kameralarga ko'rinadi, o'yinchining o'z kamerasiga
+##   ko'rinmaydi (render qatlami 11, kamera uni chiqarib tashlaydi), lekin soyasi yerda ko'rinadi (CS2 dagidek).
+## Render qatlamlari: 1 — dunyo, 11 — o'yinchining o'z tanasi, 12 — birinchi shaxs qo'llari/quroli.
 
 const LOOPS := ["idle", "crouch_idle", "jump_air", "plant",
 	"walk_f", "walk_b", "walk_l", "walk_r", "run_f", "run_b", "run_l", "run_r",
 	"crouch_f", "crouch_b", "crouch_l", "crouch_r"]
 const UPPER := ["spine1", "chest", "neck", "head", "clavicle.L", "clavicle.R", "upper_arm.L", "upper_arm.R",
 	"forearm.L", "forearm.R", "hand.L", "hand.R", "fingers.L", "fingers.R", "weapon", "mag"]
+const LAYER_WORLD := 1
+const LAYER_OWN_BODY := 1 << 10     ## 11-qatlam
+const LAYER_VIEWMODEL := 1 << 11    ## 12-qatlam
 const RUN_SPEED := 4.5
 const WALK_SPEED := 2.3
 const CROUCH_SPEED := 1.55
@@ -23,6 +29,10 @@ const SCENES := {
 
 @export var team := "T"
 @export var first_person := false
+@export var own_body := false
+## nishonga qarash (radian, + tepaga): tananing yuqori qismi (umurtqa, ko'krak) egiladi — boshqalar qayerga
+## qarab turganingizni ko'radi. Qo'llar va qurol ko'krakka bog'langani uchun birga egiladi.
+var aim_pitch := 0.0
 
 var model: Node3D
 var skel: Skeleton3D
@@ -42,6 +52,7 @@ var _plant_amt := 0.0
 var _blend := Vector2.ZERO
 var _was_floor := true
 var _head := -1
+var _spine: Array = []
 
 
 func _ready() -> void:
@@ -64,8 +75,14 @@ func load_model(t: String) -> void:
 		if anim.has_animation(n):
 			anim.get_animation(n).loop_mode = Animation.LOOP_LINEAR
 	for m in _all(model, "MeshInstance3D"):
+		var mi := m as MeshInstance3D
 		if first_person:
-			(m as MeshInstance3D).cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			mi.layers = LAYER_VIEWMODEL
+		elif own_body:
+			mi.layers = LAYER_OWN_BODY
+		else:
+			mi.layers = LAYER_WORLD
 	_build_tree()
 	dead = false
 
@@ -167,7 +184,9 @@ func _build_tree() -> void:
 	bt.connect_node("reload", 1, "reload_anim")
 	bt.connect_node("output", 0, "reload")
 	tree.tree_root = bt
+	tree.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
 	tree.active = true
+	_spine = [skel.find_bone("spine1"), skel.find_bone("chest")]
 
 
 func _upper_paths() -> Array:
@@ -213,6 +232,7 @@ func revive() -> void:
 	dead = false
 	anim.stop()
 	tree.active = true
+	tree.advance(0.0)
 	_air_amt = 0.0
 
 
@@ -248,3 +268,20 @@ func _process(delta: float) -> void:
 	if on_floor and not _was_floor:
 		tree.set("parameters/land/request", AnimationNodeOneShot.ONE_SHOT_REQUEST_FIRE)
 	_was_floor = on_floor
+	tree.advance(delta)
+	_apply_aim()
+
+
+## animatsiyadan keyin: umurtqa (40%) va ko'krak (60%) nishon burchagiga egiladi (model +Z oldinga, +X chapga)
+func _apply_aim() -> void:
+	if first_person or absf(aim_pitch) < 0.001:
+		return
+	var share := [0.4, 0.6]
+	for k in _spine.size():
+		var i: int = _spine[k]
+		if i < 0:
+			continue
+		var g := skel.get_bone_global_pose(i).basis.orthonormalized()
+		var r := Basis(Vector3.RIGHT, -aim_pitch * share[k])
+		var d := Quaternion(g.inverse() * r * g)
+		skel.set_bone_pose_rotation(i, (skel.get_bone_pose_rotation(i) * d).normalized())

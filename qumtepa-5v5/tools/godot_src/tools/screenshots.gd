@@ -79,6 +79,27 @@ func _run() -> void:
 		await process_frame
 	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/21_fp_m416.png"))
 	pl.team = "T"
+	# bir paytning o'zi ikki kameradan: o'yinchining o'zi (1-shaxs) va boshqalar (3-shaxs to'liq tana)
+	main.get_node("HUD").visible = false
+	main.get_node("UI").visible = false
+	pl.global_position = Vector3(-40.5, 0.1, 12.0)
+	pl.rotation.y = PI * 0.85
+	pl.cam.rotation.x = 0.12
+	pl.force_crouch = true
+	for i in 50:
+		await process_frame
+	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/24_ozi_1shaxs.png"))
+	cam.make_current()
+	cam.fov = 50.0
+	cam.global_position = pl.global_position + pl.global_transform.basis * Vector3(-1.2, 1.5, -3.4)
+	cam.look_at(pl.global_position + Vector3(0, 0.8, 0), Vector3.UP)
+	for i in 10:
+		await process_frame
+	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/25_boshqalarga_3shaxs.png"))
+	pl.force_crouch = false
+	pl.cam.rotation.x = 0.0
+	pl.global_position = Vector3(-34, 0.1, 22)
+	print("saqlandi: 1-shaxs / 3-shaxs")
 	# personajlar: T va CT, turli harakatlarda (uchinchi shaxs, botlar shunday ko'rinadi)
 	main.get_node("HUD").visible = false
 	main.get_node("UI").visible = false

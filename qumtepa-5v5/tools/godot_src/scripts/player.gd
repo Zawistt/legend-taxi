@@ -6,6 +6,11 @@ extends CharacterBody3D
 ##   sakrash (Space) — qo'nishda tovush bor. O'tirganda bo'y 1.8 -> 1.25 m, ko'z 1.65 -> 1.08 m;
 ##   ustida shift bo'lsa (past tom), turib bo'lmaydi.
 ## Qurol: birinchi shaxsda qo'llar va qurol (T — AKM, CT — M416). Sichqoncha chap tugmasi — o'q uzish, R — qayta o'qlash.
+## Ko'rinish ajratilgan:
+##   o'yinchining O'Z kamerasi — 1-shaxs: faqat qo'llar va qurol (Camera3D/FPView); o'z tanasi ko'rinmaydi, faqat soyasi;
+##   BOSHQA har qanday kamera (tomoshabin, boshqa o'yinchi, bot kamerasi) — 3-shaxs: to'liq tana (Body), qurol qo'lda,
+##   yurish/o'tirish/sakrash animatsiyalari, qayerga qarab turgani (tana egiladi), o'q uzish va qayta o'qlash.
+## local_player=false — masofaviy (tarmoqdagi) o'yinchi: 1-shaxs ko'rinishi va klaviatura yo'q, faqat 3-shaxs tana.
 
 signal footstep(surface: String)
 
@@ -16,6 +21,7 @@ signal footstep(surface: String)
 @export var sprint_speed := 7.0
 @export var jump_velocity := 4.8
 @export var mouse_sensitivity := 0.0025
+@export var local_player := true
 
 const STAND_H := 1.8
 const CROUCH_H := 1.25
@@ -49,6 +55,8 @@ const STEP_SOUNDS := {
 @onready var floor_ray: RayCast3D = $FloorRay
 @onready var steps: AudioStreamPlayer3D = $Steps
 @onready var shape_node: CollisionShape3D = $CollisionShape3D
+@onready var body: Node3D = get_node_or_null("Body")       ## 3-shaxs tana (boshqalarga ko'rinadi)
+@onready var fp_view: Node3D = get_node_or_null("Camera3D/FPView")
 
 var gravity: float = ProjectSettings.get_setting("physics/3d/default_gravity")
 var _step_timer := 0.0
@@ -62,7 +70,7 @@ var _stand_query: PhysicsShapeQueryParameters3D
 func _ready() -> void:
 	preload("res://scripts/input_setup.gd").ensure()
 	_ensure_extra_input()
-	if DisplayServer.get_name() != "headless":
+	if local_player and DisplayServer.get_name() != "headless":
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	_capsule = (shape_node.shape as CapsuleShape3D).duplicate()
 	shape_node.shape = _capsule
@@ -73,6 +81,18 @@ func _ready() -> void:
 	_stand_query.shape = stand
 	_stand_query.collision_mask = 1 | 2
 	_stand_query.exclude = [get_rid()]
+	var CM := preload("res://scripts/character_model.gd")
+	if local_player:
+		# o'z kamerasi o'z tanasini ko'rmaydi (11-qatlam), 1-shaxs qo'llarini ko'radi (12-qatlam)
+		cam.cull_mask = (cam.cull_mask & ~CM.LAYER_OWN_BODY) | CM.LAYER_VIEWMODEL
+	else:
+		if fp_view:
+			fp_view.queue_free()
+			fp_view = null
+		cam.current = false
+	if body and not local_player and body.own_body:
+		body.own_body = false
+		body.load_model(team)
 
 
 static func _ensure_extra_input() -> void:
@@ -93,6 +113,8 @@ static func _ensure_extra_input() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not local_player:
+		return
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		rotate_y(-event.relative.x * mouse_sensitivity)
 		cam.rotate_x(-event.relative.y * mouse_sensitivity)
@@ -113,21 +135,23 @@ func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 	var locked := frozen or busy
-	var keyboard := ai_move == Vector3.ZERO
+	var keyboard := ai_move == Vector3.ZERO and local_player
 	# o'tirish: tugma bosilgan yoki tepada past tom bo'lsa
 	var want_crouch := force_crouch or (keyboard and Input.is_action_pressed("crouch"))
 	if want_crouch != crouching:
 		if want_crouch or can_stand():
 			_set_crouch(want_crouch)
 	walking = force_walk or (keyboard and Input.is_action_pressed("walk") and not allow_sprint)
-	if is_on_floor() and not locked and Input.is_action_just_pressed("jump"):
+	if keyboard and is_on_floor() and not locked and Input.is_action_just_pressed("jump"):
 		velocity.y = jump_velocity
+		if body:
+			body.jump()
 
 	var dir := Vector3.ZERO
 	if not locked:
 		if ai_move != Vector3.ZERO:
 			dir = Vector3(ai_move.x, 0, ai_move.z).normalized()
-		else:
+		elif local_player:
 			var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
 			dir = (transform.basis * Vector3(input.x, 0, input.y)).normalized()
 	var s := speed
@@ -145,6 +169,21 @@ func _physics_process(delta: float) -> void:
 	_eye = lerpf(_eye, EYE_CROUCH if crouching else EYE_STAND, 1.0 - exp(-delta * 12.0))
 	cam.position.y = _eye
 	_update_footsteps(delta, air_vy)
+	_update_body()
+
+
+## 3-shaxs tana o'yinchi holatiga ergashadi (boshqa kameralar shuni ko'radi)
+func _update_body() -> void:
+	if body == null:
+		return
+	if body.team != team:
+		body.load_model(team)
+	var v: Vector3 = global_transform.basis.inverse() * velocity
+	body.velocity_local = Vector3(-v.x, 0, -v.z)      # tana 180° burilgan: +Z — o'yinchining oldi
+	body.crouching = crouching
+	body.on_floor = is_on_floor()
+	body.planting = busy
+	body.aim_pitch = cam.rotation.x
 
 
 func _set_crouch(c: bool) -> void:

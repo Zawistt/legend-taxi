@@ -22,6 +22,9 @@ window/size/viewport_height=900
 3d_physics/layer_6="grenades"
 3d_physics/layer_7="triggers"
 3d_physics/layer_8="smoke"
+3d_render/layer_1="dunyo"
+3d_render/layer_11="o'yinchining o'z tanasi (3-shaxs)"
+3d_render/layer_12="1-shaxs qo'llar va qurol"
 
 [audio]
 
