@@ -381,6 +381,33 @@ func _run() -> void:
 	var mm: Control = main.get_node_or_null("UI/Minimap")
 	ok(mm != null and mm.MAP != null and mm.player == pl, "minimap bor va o'yinchini kuzatadi")
 
+	print("\n17) Realistik ko'rinish (8-bosqich)")
+	var matn: Node = main.get_node_or_null("Materials")
+	var lib_ok := 0
+	var lib_n := 0
+	if matn:
+		for k in matn.lib:
+			if matn.lib[k] != null:
+				lib_n += 1
+				var sm: StandardMaterial3D = matn.lib[k]
+				if sm.albedo_texture and sm.normal_texture and sm.roughness_texture:
+					lib_ok += 1
+	ok(matn != null and matn.replaced > 300 and lib_n >= 20 and lib_ok == lib_n, "PBR materiallar: %d ta sirt, %d material (albedo + normal + ORM)" % [matn.replaced if matn else 0, lib_n])
+	var dec := main.get_node_or_null("Decals")
+	var dec_in := 0
+	var dec_n := 0
+	if dec:
+		for d in dec.get_children():
+			if d is Decal:
+				dec_n += 1
+				var dp: Vector3 = d.global_position
+				if absf(dp.x) <= 56.0 and absf(dp.z) <= 56.0 and d.distance_fade_enabled:
+					dec_in += 1
+	ok(dec_n > 200 and dec_in == dec_n, "eskirish izlari: %d ta decal (kir, yomg'ir izi, yoriq, dog'), hammasi xarita ichida va uzoqda so'nadi" % dec_n)
+	var skym = env.sky.sky_material if env.sky else null
+	ok(skym is PanoramaSkyMaterial and skym.panorama != null and env.ambient_light_source == Environment.AMBIENT_SOURCE_SKY, "bulutli osmon panoramasi, atrof yorug'ligi osmondan")
+	ok(env.sdfgi_enabled and env.ssr_enabled, "SDFGI (qaytgan yorug'lik) va SSR (koshinlarda aks) yoqilgan")
+
 	print("\nVAQTLAR (2D tahlil -> 3D fizika):")
 	for row in timing_rows:
 		print("  %-28s %5.1f s -> %5.1f s" % [row[0], row[1], row[2]])

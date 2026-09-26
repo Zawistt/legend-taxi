@@ -670,6 +670,37 @@ if STYLE == "arch":
     M["siteB"] = PBRMaterial(name="site_B", baseColorTexture=V2T.site_decal("B"), alphaMode="BLEND", metallicFactor=0, roughnessFactor=0.9)
     for (g_, m_) in bufs:
         assert m_ in M, f"material yo'q: {m_}"
+    # Audit: o'yinchi ichidan o'tib ketadigan bezak bo'lmasligi kerak — 2 m dan past har bir bezak uchi
+    # devor, pana yoki to'siqdan ≤ 0.35 m uzoqlikda bo'lishi shart (to'qnashuvsiz "arvoh" buyumlar yo'q)
+    from scipy import ndimage as _nd
+    R_ = 0.1
+    Nn = int(SIZE / R_)
+    solid = np.zeros((Nn, Nn), bool)
+    for rr in range(G):
+        for cc in range(G):
+            if grid[rr][cc] == "#":
+                solid[int(rr * CS / R_):int((rr + 1) * CS / R_), int(cc * CS / R_):int((cc + 1) * CS / R_)] = True
+    for sf, x0_, y0_, z0_, x1_, y1_, z1_ in COL:
+        if y0_ < 2.0 and y1_ > 0.05:
+            solid[max(0, int((z0_ - OFF) / R_)):int((z1_ - OFF) / R_) + 1, max(0, int((x0_ - OFF) / R_)):int((x1_ - OFF) / R_) + 1] = True
+    for x0_, z0_, x1_, z1_, h_ in FP_PLAT:
+        solid[int((z0_ - OFF) / R_):int((z1_ - OFF) / R_) + 1, int((x0_ - OFF) / R_) - 20:int((x1_ - OFF) / R_) + 21] = True
+    dist_ = _nd.distance_transform_edt(~solid) * R_
+    ghosts = []
+    for (g_, m_), b_ in bufs.items():
+        if not (g_.startswith("Decor") or g_.startswith("Landmark")) or not b_.v:
+            continue
+        V_ = np.array(b_.v)
+        low = V_[(V_[:, 1] < 2.0) & (V_[:, 1] > 0.05)]
+        if not len(low):
+            continue
+        ix = np.clip(((low[:, 0] - OFF) / R_).astype(int), 0, Nn - 1)
+        iz = np.clip(((low[:, 2] - OFF) / R_).astype(int), 0, Nn - 1)
+        bad = low[dist_[iz, ix] > 0.35]
+        if len(bad):
+            ghosts.append((m_, len(bad), [round(float(v), 1) for v in bad[0]]))
+    print("audit — to'qnashuvsiz past bezaklar:", ghosts if ghosts else "yo'q")
+    assert not ghosts, "o'yinchi ichidan o'tadigan bezak topildi"
 
 # ------------------------------------------------------------------ clip'lar (xarita ustida qopqoq, chegaralar)
 E0, E1 = OFF, OFF + SIZE

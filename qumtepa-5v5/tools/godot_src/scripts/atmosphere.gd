@@ -17,11 +17,10 @@ func _ready() -> void:
 	for p in get_tree().get_nodes_in_group("ambient"):
 		var s: AudioStreamWAV = p.stream
 		if s:
-			s = s.duplicate()
+			# bir xil fayl bir necha manbada ishlatiladi — halqa sozlamasi umumiy resursga bir marta qo'yiladi
 			s.loop_mode = AudioStreamWAV.LOOP_FORWARD
 			s.loop_begin = 0
 			s.loop_end = s.data.size() / 2   # 16-bit mono
-			p.stream = s
 			p.play(randf() * 10.0)
 	if DisplayServer.get_name() != "headless":
 		_make_dust()
@@ -29,6 +28,11 @@ func _ready() -> void:
 	var env: Environment = (get_node(env_path) as WorldEnvironment).environment
 	_day = {"basis": sun.global_transform.basis, "color": sun.light_color, "energy": sun.light_energy,
 		"fog": env.fog_light_color, "ambient": env.ambient_light_color}
+
+
+func _exit_tree() -> void:
+	for p in get_tree().get_nodes_in_group("ambient"):
+		p.stop()
 
 
 func _unhandled_input(event: InputEvent) -> void:

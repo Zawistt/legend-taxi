@@ -101,6 +101,11 @@ for fn in ("player.gd", "game_mode.gd", "hud.gd", "bomb.gd", "input_setup.gd"):
 for fn in os.listdir(f"{V2}/audio"):
     shutil.copy(f"{V2}/audio/{fn}", f"{OUT}/audio/{fn}")
 shutil.copy(f"{V2}/scenes/bomb.tscn", f"{OUT}/scenes/bomb.tscn")
+# HUD yordam qatoriga 5v5 dagi yangi tugmalar (M, F4, F9)
+_h = open(f"{OUT}/scripts/hud.gd").read()
+_h = _h.replace("F3 — raundni qayta boshlash\"", "F3 — raund   F4 — shom   F9 — FPS   M — xarita\"")
+assert "F9 — FPS" in _h
+open(f"{OUT}/scripts/hud.gd", "w").write(_h)
 for sub in ("scripts", "tests"):
     for fn in os.listdir(f"{SRC}/{sub}"):
         shutil.copy(f"{SRC}/{sub}/{fn}", f"{OUT}/{sub}/{fn}")
@@ -222,10 +227,105 @@ for zname, n in (("A site", 260), ("B site", 260), ("Top mid", 200), ("CT mid", 
 
 # Quyosh: g'arbda, 50° balandlikda, sharq-g'arb o'qidan 4° og'gan. Euler YXZ: avval pastga (−50°), keyin sharqqa buriladi.
 SUN_ROT = "Vector3(-50, -86, 0)"
+DECAL_COUNT = {}
 
 
-def perf_nodes(s, root_is_main=True):
+def sky_env(s, full=True):
+    """8-bosqich: osmon panoramasi (bulutlar, quyosh nuri) va realistik muhit.
+    SDFGI (yorug'likning devorlardan qaytishi), SSR (koshinlarda aks), osmondan tushadigan atrof yorug'ligi.
+    Tuman va quyosh 6-bosqich chegaralarida qoladi (test 15)."""
+    sky_tex = s.add_ext("Texture2D", "res://textures/sky.png", "s_sky")
+    s.add_sub("PanoramaSkyMaterial", "sky_mat", panorama=sky_tex, energy_multiplier="1.0")
+    s.add_sub("Sky", "sky", sky_material='SubResource("sky_mat")', radiance_size="2")
+    props = dict(background_mode="2", sky='SubResource("sky")', ambient_light_source="3", ambient_light_color="Color(0.8, 0.74, 0.64, 1)",
+                 ambient_light_sky_contribution="0.75", ambient_light_energy="0.75", reflected_light_source="2",
+                 tonemap_mode="3", tonemap_exposure="0.92", tonemap_white="6.0")
+    if full:
+        props.update(ssr_enabled="true", ssr_max_steps="48", ssr_fade_in="0.15", ssr_fade_out="2.0", ssr_depth_tolerance="0.2",
+                     ssao_enabled="true", ssao_radius="1.4", ssao_intensity="1.8", ssao_detail="0.6",
+                     ssil_enabled="true", ssil_intensity="0.8",
+                     sdfgi_enabled="true", sdfgi_use_occlusion="true", sdfgi_cascades="4", sdfgi_min_cell_size="0.25",
+                     sdfgi_bounce_feedback="0.45", sdfgi_energy="0.9", sdfgi_normal_bias="1.1",
+                     glow_enabled="true", glow_intensity="0.5", glow_bloom="0.05", glow_hdr_threshold="1.2",
+                     fog_enabled="true", fog_light_color="Color(0.86, 0.78, 0.64, 1)", fog_density="0.0015", fog_sky_affect="0.25",
+                     fog_aerial_perspective="0.35",
+                     volumetric_fog_enabled="true", volumetric_fog_density="0.004", volumetric_fog_albedo="Color(0.95, 0.88, 0.75, 1)",
+                     volumetric_fog_anisotropy="0.5", volumetric_fog_length="80.0",
+                     adjustment_enabled="true", adjustment_saturation="1.04", adjustment_contrast="1.06")
+    s.add_sub("Environment", "env", **props)
+
+
+def decals(s):
+    """8-bosqich: realistik eskirish izlari (faqat ko'rinish, to'qnashuvga ta'sirsiz, Forward+ renderda):
+    devor tagidagi kir, tom qirrasidan tushgan yomg'ir izlari, devordagi yoriqlar, poldagi dog'lar."""
+    import random
+    rnd = random.Random(8)
+    tex = {k: s.add_ext("Texture2D", f"res://textures/{fn}.png", f"d_{k}") for k, fn in
+           (("grime", "grime"), ("rain", "rain"), ("crack", "decal_crack"), ("stain", "decal_stain"))}
+    s.node("Decals", "Node3D", ".")
+    G = L.G
+
+    def cell(x, z):
+        c, r = int((x - E0) // L.CELL), int((z - E0) // L.CELL)
+        return L.grid[r][c] if 0 <= r < G and 0 <= c < G else None
+
+    def basis(X, Y, Z):
+        return ", ".join(f(v) for v in (X[0], Y[0], Z[0], X[1], Y[1], Z[1], X[2], Y[2], Z[2]))
+
+    def cross(a, b):
+        return (a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0])
+
+    def put(kind, pos, X, Y, Z, size, mod="Color(1, 1, 1, 1)", fade=30.0):
+        n = len(s.nodes)
+        s.node(f"D{n}_{kind}", "Decal", "Decals", transform=f"Transform3D({basis(X, Y, Z)}, {f(pos[0])}, {f(pos[1])}, {f(pos[2])})",
+               size=f"Vector3({f(size[0])}, {f(size[1])}, {f(size[2])})", texture_albedo=tex[kind], modulate=mod,
+               normal_fade="0.5", upper_fade="0.2", lower_fade="0.2", cast_shadow="false",
+               distance_fade_enabled="true", distance_fade_begin=f(fade), distance_fade_length="10.0")
+        cnt[kind] += 1
+
+    cnt = {k: 0 for k in tex}
+    UP = (0.0, 1.0, 0.0)
+    for (x0, z0, x1, z1, h) in meta["blocks"]:
+        for n, a, b, fixed, along_x in (((0, 0, -1), x0, x1, z0, True), ((0, 0, 1), x0, x1, z1, True),
+                                        ((-1, 0, 0), z0, z1, x0, False), ((1, 0, 0), z0, z1, x1, False)):
+            ln = b - a
+            k = max(1, math.ceil(ln / 6.0))
+            seg = ln / k
+            for i in range(k):
+                m = a + seg * (i + 0.5)
+                px, pz = (m, fixed) if along_x else (fixed, m)
+                out = cell(px + n[0] * 1.0, pz + n[2] * 1.0)
+                if out is None or out == "#":
+                    continue
+                covered = out in L.COVER
+                t_g = cross(n, UP)
+                put("grime", (px, 0.5, pz), t_g, n, UP, (seg + 0.1, 0.8, 1.15), "Color(1, 1, 1, 0.9)")
+                if not covered and h > 3.5:
+                    put("rain", (px, h - 1.3, pz), t_g, n, UP, (seg + 0.1, 0.8, 2.6), "Color(1, 1, 1, 0.75)", 40.0)
+                if rnd.random() < 0.18:
+                    hh = rnd.uniform(1.0, 2.6 if covered else 3.2)
+                    sz = rnd.uniform(1.0, 1.8)
+                    put("crack", (px + rnd.uniform(-1, 1) * (along_x), hh, pz + rnd.uniform(-1, 1) * (not along_x)), t_g, n, UP,
+                        (sz, 0.6, sz), "Color(1, 1, 1, 0.85)", 25.0)
+    for r in range(G):
+        for c in range(G):
+            t = L.grid[r][c]
+            if t == "#" or rnd.random() > 0.07:
+                continue
+            x, z = E0 + (c + 0.5) * L.CELL, E0 + (r + 0.5) * L.CELL
+            a = rnd.uniform(0, math.tau)
+            X, Z = (math.cos(a), 0.0, -math.sin(a)), (math.sin(a), 0.0, math.cos(a))
+            sz = rnd.uniform(1.2, 2.4)
+            put("stain", (x + rnd.uniform(-0.4, 0.4), 0.3, z + rnd.uniform(-0.4, 0.4)), X, UP, Z, (sz, 1.2, sz), "Color(1, 1, 1, 0.8)", 30.0)
+    return cnt
+
+
+def perf_nodes(s, root_is_main=True, art=True):
     """7-bosqich: occluder'lar (bino bloklari), masofa bo'yicha bezakni yashirish, minimap va F9 ko'rsatkichlari"""
+    if art:
+        ms = s.add_ext("Script", "res://scripts/materials.gd", "11_mat")
+        s.node("Materials", "Node", ".", script=ms)
+        DECAL_COUNT.update(decals(s))
     s.node("Occluders", "Node3D", ".")
     for i, (x0, z0, x1, z1, h) in enumerate(meta["blocks"]):
         oc = s.add_sub("BoxOccluder3D", f"oc{i}", size=f"Vector3({f(x1 - x0 - 0.1)}, {f(h - 0.1)}, {f(z1 - z0 - 0.1)})")
@@ -253,16 +353,7 @@ def main_scene(glb_path, out_name):
                      cell_size="0.25", cell_height="0.25", agent_height="2.0", agent_radius="0.5",
                      agent_max_climb="0.25", agent_max_slope="45.0",
                      filter_baking_aabb=f"AABB({f(E0)}, -1, {f(E0)}, {f(SIZE)}, 4, {f(SIZE)})")
-  s.add_sub("ProceduralSkyMaterial", "sky_mat", sky_top_color="Color(0.27, 0.49, 0.78, 1)", sky_horizon_color="Color(0.86, 0.8, 0.68, 1)",
-            ground_bottom_color="Color(0.45, 0.36, 0.25, 1)", ground_horizon_color="Color(0.86, 0.8, 0.68, 1)")
-  s.add_sub("Sky", "sky", sky_material='SubResource("sky_mat")')
-  s.add_sub("Environment", "env", background_mode="2", sky='SubResource("sky")', ambient_light_source="2", ambient_light_color="Color(0.8, 0.74, 0.64, 1)", ambient_light_energy="0.6",
-            tonemap_mode="3", tonemap_exposure="0.92", ssao_enabled="true", ssao_radius="1.4", ssao_intensity="1.8",
-            ssil_enabled="true", ssil_intensity="0.8", glow_enabled="true", glow_intensity="0.5", glow_bloom="0.05",
-            fog_enabled="true", fog_light_color="Color(0.86, 0.78, 0.64, 1)", fog_density="0.0015", fog_sky_affect="0.25",
-            volumetric_fog_enabled="true", volumetric_fog_density="0.004", volumetric_fog_albedo="Color(0.95, 0.88, 0.75, 1)",
-            volumetric_fog_anisotropy="0.5", volumetric_fog_length="80.0",
-            adjustment_enabled="true", adjustment_saturation="1.06", adjustment_contrast="1.04")
+  sky_env(s)
   s.add_sub("CapsuleShape3D", "capsule", radius="0.35", height="1.8")
   s.add_sub("PlaneMesh", "ground", size="Vector2(600, 600)")
   s.add_sub("StandardMaterial3D", "ground_mat", albedo_color="Color(0.62, 0.5, 0.35, 1)", roughness="1.0")
@@ -307,7 +398,7 @@ def main_scene(glb_path, out_name):
       s.node("Shape", "CollisionShape3D", f"Reverb/Rev{i}", shape=sh)
   ascr = s.add_ext("Script", "res://scripts/atmosphere.gd", "7_atm")
   s.node("Atmosphere", "Node3D", ".", script=ascr)
-  perf_nodes(s)
+  perf_nodes(s, art="greybox" not in glb_path)
   s.node("Zones", "Node3D", ".")
   for kind, data, grp, h, vm in (("BombSite", L.BOMB_ZONES, "bomb_sites", 3.5, "vm_site"), ("BuyZone", L.BUY_ZONES, "buy_zones", 5.0, "vm_buy")):
       for k, (x0, z0, x1, z1) in data.items():
@@ -482,6 +573,10 @@ const CT_SETUPS := [
 const ROTATE_SPOT := {{
 {chr(10).join(f"	{gdstr(site)}: [" + ", ".join(f"[{V3(p)}, {V3(l)}]" for k, (p, l, r) in L.CT_SPOTS.items() if r == site) + "]," for site in ("A", "B"))}
 }}
+## qaytarib olish oldidan to'planish joylari
+const RETAKE_GATHER := {{
+{chr(10).join(f"	{gdstr(k)}: {gdarr(v)}," for k, v in L.RETAKE_GATHER.items())}
+}}
 ## smoke: nom -> [jamoa, nishon, uchish vaqti (s, fizika bilan topilgan lineup'dan)]
 const SMOKES := {{
 {chr(10).join(f"	{gdstr(n)}: [{gdstr(tm)}, {V3(tg)}, {lineups.get(n, {}).get('flight_s', 2.0)}]," for n, tm, tg, _th, _l in L.SMOKES)}
@@ -496,11 +591,7 @@ col = s.add_ext("PackedScene", "res://map/collision.tscn", "2_col")
 mscr = s.add_ext("Script", "res://scripts/bot_match.gd", "3_bm")
 cscr = s.add_ext("Script", "res://scripts/spectator.gd", "4_sp")
 nm = s.add_ext("NavigationMesh", "res://map/navmesh.res", "6_nav") if NAVMESH else s.add_sub("NavigationMesh", "navmesh")
-s.add_sub("ProceduralSkyMaterial", "sky_mat", sky_top_color="Color(0.27, 0.49, 0.78, 1)", sky_horizon_color="Color(0.86, 0.8, 0.68, 1)",
-          ground_bottom_color="Color(0.45, 0.36, 0.25, 1)", ground_horizon_color="Color(0.86, 0.8, 0.68, 1)")
-s.add_sub("Sky", "sky", sky_material='SubResource("sky_mat")')
-s.add_sub("Environment", "env", background_mode="2", sky='SubResource("sky")', ambient_light_source="2",
-          ambient_light_color="Color(0.8, 0.74, 0.64, 1)", ambient_light_energy="0.6", tonemap_mode="3", tonemap_exposure="0.95")
+sky_env(s, full=False)
 s.node("Bots", "Node3D")
 s.node("WorldEnvironment", "WorldEnvironment", ".", environment='SubResource("env")')
 s.node("Sun", "DirectionalLight3D", ".", transform=T(0, 40, 0), rotation_degrees=SUN_ROT, light_color="Color(1, 0.9, 0.74, 1)",
@@ -513,7 +604,7 @@ for team, pts in L.SPAWNS.items():
     for i, (x0, z0) in enumerate(pts):
         s.node(f"{team}{i + 1}", "Marker3D", "Spawns", groups=[f"spawn_{team}"], transform=T(x0, 0.05, z0, yaw_pi=(team == "T")))
 s.node("BotMatch", "Node3D", ".", script=mscr)
-perf_nodes(s)
+perf_nodes(s, art=ART)
 s.node("Spectator", "Camera3D", ".", script=cscr, current="true")
 s.save(f"{OUT}/bots.tscn")
 
@@ -547,6 +638,46 @@ bus/2/mute = false
 bus/2/bypass_fx = false
 bus/2/volume_db = -4.0
 bus/2/send = &"Master"
+''')
+
+# ------------------------------------------------------------------ 8-bosqich: HQ teksturalarni import sozlamalari
+# Skript orqali yuklanadigan teksturalarni Godot "3D uchun" deb avtomatik aniqlamaydi, shuning uchun .import ni o'zimiz yozamiz:
+# VRAM siqish (videoxotira ~4× kam), mipmap'lar; normal xaritalar uchun maxsus siqish.
+TEXDIR = f"{OUT}/textures"
+if os.path.isdir(TEXDIR):
+    for fn in sorted(os.listdir(TEXDIR)):
+        if not fn.endswith((".jpg", ".png")) or os.path.exists(f"{TEXDIR}/{fn}.import"):
+            continue
+        ui = fn in ("sky.png",) or fn.startswith(("grime", "rain", "decal_"))
+        nrm = fn.endswith("_normal.jpg")
+        open(f"{TEXDIR}/{fn}.import", "w").write(f'''[remap]
+
+importer="texture"
+type="CompressedTexture2D"
+
+[deps]
+
+source_file="res://textures/{fn}"
+
+[params]
+
+compress/mode={0 if fn == "sky.png" else 2}
+compress/high_quality=false
+compress/lossy_quality=0.7
+compress/hdr_compression=1
+compress/normal_map={1 if nrm else 2}
+compress/channel_pack=0
+mipmaps/generate={"false" if fn == "sky.png" else "true"}
+mipmaps/limit=-1
+roughness/mode=0
+roughness/src_normal=""
+process/fix_alpha_border=true
+process/premult_alpha=false
+process/normal_map_invert_y=false
+process/hdr_as_srgb=false
+process/hdr_clamp_exposure=false
+process/size_limit=0
+detect_3d/compress_to={0 if ui else 1}
 ''')
 
 # ------------------------------------------------------------------ project.godot, bake_nav.gd
@@ -583,11 +714,22 @@ buses/default_bus_layout="res://default_bus_layout.tres"
 
 occlusion_culling/use_occlusion_culling=true
 anti_aliasing/quality/msaa_3d=2
+anti_aliasing/quality/screen_space_aa=1
+anti_aliasing/quality/use_debanding=true
 lights_and_shadows/directional_shadow/size=8192
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3
+lights_and_shadows/positional_shadow/soft_shadow_filter_quality=3
 textures/default_filters/anisotropic_filtering_level=4
+limits/cluster_builder/max_clustered_elements=4096
+environment/ssao/quality=2
+environment/ssil/quality=1
+global_illumination/sdfgi/probe_ray_count=1
 ''')
 open(f"{OUT}/tools/bake_nav.gd", "w").write('''extends SceneTree
 ## NavMesh'ni oldindan pishirish: godot --headless -s res://tools/bake_nav.gd
+## Pishirgandan keyin tozalash: to'siqlar (qutilar, devorchalar) ICHIDAGI va bino tomlaridagi poligonlar olib tashlanadi.
+## Sabab: NavMesh generatori qutini faqat yuzalar sifatida ko'radi va yopiq qutining ichidagi polni ham
+## "yuriladigan" deb hisoblaydi. Bunday orolchalarga bot yoki o'yinchining maqsadi tushib qolmasligi kerak.
 
 
 func _initialize() -> void:
@@ -602,8 +744,62 @@ func _run() -> void:
 	var region: NavigationRegion3D = main.get_node("Navigation")
 	region.bake_navigation_mesh(false)
 	var nm := region.navigation_mesh
-	print("navmesh poligonlar: ", nm.get_polygon_count())
-	ResourceSaver.save(nm, "res://map/navmesh.res")
+	var space := (main.get_node("Player") as Node3D).get_world_3d().direct_space_state
+	var verts := nm.get_vertices()
+	var clean := NavigationMesh.new()
+	for prop in ["cell_size", "cell_height", "agent_height", "agent_radius", "agent_max_climb", "agent_max_slope"]:
+		clean.set(prop, nm.get(prop))
+	clean.set_vertices(verts)
+	var removed_inside := 0
+	var removed_roof := 0
+	var q := PhysicsPointQueryParameters3D.new()
+	q.collision_mask = 1
+	var keep := []
+	for i in nm.get_polygon_count():
+		var poly := nm.get_polygon(i)
+		var c := Vector3.ZERO
+		for k in poly:
+			c += verts[k]
+		c /= poly.size()
+		if c.y > 2.0:
+			removed_roof += 1
+			continue
+		q.position = c + Vector3.UP * 0.6
+		if not space.intersect_point(q, 1).is_empty():
+			removed_inside += 1
+			continue
+		keep.append(poly)
+	# asosiy maydonga ulanmagan orolchalar (qutilar va devor orasidagi yopiq bo'shliqlar) ham olib tashlanadi:
+	# poligonlar umumiy uchlar orqali bog'lanadi, T spawn joylashgan qism qoladi
+	var parent := {}
+	var find := func(x):
+		while parent.get(x, x) != x:
+			x = parent[x]
+		return x
+	for poly in keep:
+		var r0 = find.call(poly[0])
+		for k in poly:
+			var rk = find.call(k)
+			if rk != r0:
+				parent[rk] = r0
+	var t_spawn := Vector3(0, 0, -47)
+	var best := -1
+	var bd := INF
+	for poly in keep:
+		for k in poly:
+			var d := verts[k].distance_to(t_spawn)
+			if d < bd:
+				bd = d
+				best = k
+	var main_root = find.call(best)
+	var removed_island := 0
+	for poly in keep:
+		if find.call(poly[0]) == main_root:
+			clean.add_polygon(poly)
+		else:
+			removed_island += 1
+	print("navmesh poligonlar: ", clean.get_polygon_count(), " (olib tashlandi: to'siq ichida ", removed_inside, ", tomlarda ", removed_roof, ", yakka orolchalar ", removed_island, ")")
+	ResourceSaver.save(clean, "res://map/navmesh.res")
 	quit()
 ''')
 print("yaratildi:", OUT, counts, "navmesh:", NAVMESH)

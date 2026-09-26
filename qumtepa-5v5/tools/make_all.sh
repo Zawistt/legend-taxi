@@ -8,6 +8,8 @@ GODOT="${GODOT:-godot}"
 python3 analyze5.py
 python3 audio5.py
 python3 minimap5.py
+# 8-bosqich: 1024 px PBR teksturalar va osmon (~1.5 daqiqa; mavjud bo'lsa HQ=0 bilan o'tkazib yuborish mumkin)
+if [ "${HQ:-1}" != "0" ] || [ ! -f ../godot/textures/sky.png ]; then python3 textures_hq.py; fi
 STYLE=greybox python3 build5.py
 STYLE=arch python3 build5.py
 rm -f ../godot/map/navmesh.res
@@ -20,6 +22,8 @@ python3 gen_godot5.py
 (cd ../godot && "$GODOT" --headless --fixed-fps 60 -s res://tests/run_tests.gd 2>&1 | grep -v "^$" | grep -v "mesh_get_surface_count\|Parameter \"m\"\|ObjectDB\|resources still in use\|at: " )
 # smoke lineup'lari (granata fizikasi)
 (cd ../godot && "$GODOT" --headless -s res://tests/run_grenades.gd 2>&1 | grep "NATIJA\|XATO")
+# yakuniy audit: devor tirqishlari, tom teshiklari, yetib bo'lmaydigan va tiqiladigan joylar, chegara
+(cd ../godot && "$GODOT" --headless --fixed-fps 60 -s res://tests/run_audit.gd 2>&1 | grep "AUDIT\|XATO")
 # skrinshotlar va ko'rinish tekshiruvi (ekran kerak: xvfb-run bo'lsa ishlatiladi). SHOTS=1 ./make_all.sh
 if [ -n "${SHOTS:-}" ]; then
   (cd ../godot && xvfb-run -a -s "-screen 0 1600x900x24" "$GODOT" --rendering-method gl_compatibility --rendering-driver opengl3 -s res://tools/screenshots.gd 2>&1 | grep -c saqlandi)
