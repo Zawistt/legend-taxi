@@ -103,11 +103,13 @@ for fn in os.listdir(f"{V2}/audio"):
 shutil.copy(f"{V2}/scenes/bomb.tscn", f"{OUT}/scenes/bomb.tscn")
 # HUD yordam qatoriga 5v5 dagi yangi tugmalar (M, F4, F9)
 _h = open(f"{OUT}/scripts/hud.gd").read()
-_h = _h.replace("F3 — raundni qayta boshlash\"", "F3 — raund   F4 — shom   F9 — FPS   M — xarita\\n"
-                "Shift — sekin yurish (jim)   Ctrl/C — o'tirish   Space — sakrash   Sichqoncha — o'q   R — qayta o'qlash\"")
+_h = _h.replace("F3 — raundni qayta boshlash\"", "F3 — raund   F4 — shom   F7 — mashq nishonlari   F9 — FPS   M — xarita\\n"
+                "Shift — sekin yurish (jim)   Ctrl/C — o'tirish   Space — sakrash   Sichqoncha — o'q, o'ng tugma — nishonga olish\\n"
+                "1/2/3 — avtomat / to'pponcha / pichoq   R — qayta o'qlash   B — o'q rejimi\"")
 assert "F9 — FPS" in _h
 open(f"{OUT}/scripts/hud.gd", "w").write(_h)
-for sub in ("scripts", "tests"):
+os.makedirs(f"{OUT}/weapons", exist_ok=True)
+for sub in ("scripts", "tests", "weapons"):
     for fn in os.listdir(f"{SRC}/{sub}"):
         shutil.copy(f"{SRC}/{sub}/{fn}", f"{OUT}/{sub}/{fn}")
 for fn in os.listdir(f"{SRC}/tools"):
@@ -489,6 +491,10 @@ def main_scene(glb_path, out_name):
   s.node("Player", parent=".", instance=pl_scene, transform=T(tx, 0.2, tz, yaw_pi=True))
   s.node("GameMode", "Node", ".", script=gscr)
   s.node("HUD", "CanvasLayer", ".", script=hscr)
+  if "greybox" not in glb_path:
+      # F7 — mashq nishonlari (qurol va tana zonalarini sinash uchun)
+      prs = s.add_ext("Script", "res://scripts/practice.gd", "12_pr")
+      s.node("Practice", "Node3D", ".", script=prs)
   s.save(f"{OUT}/{out_name}")
 
 

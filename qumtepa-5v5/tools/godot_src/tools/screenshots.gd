@@ -79,6 +79,38 @@ func _run() -> void:
 		await process_frame
 	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/21_fp_ct.png"))
 	pl.team = "T"
+	# qurol tizimi: mashq nishonlari (F7), tegish belgisi, keyin ADS
+	var pr = main.get_node_or_null("Practice")
+	var fpv = pl.get_node("Camera3D/FPView")
+	pl.global_position = Vector3(-34, 0.1, 22)
+	pl.rotation.y = atan2(34.0 - 44.0, 22.0 - 4.0) + PI
+	pl.cam.rotation.x = -0.05
+	for i in 10:
+		await process_frame
+	var tg: Array = pr.spawn([7.0, 14.0, 24.0]) if pr else []
+	for i in 10:
+		await process_frame
+	if tg.size() > 0:
+		var hb: Vector3 = tg[0].model.hitboxes[0].global_position
+		var d: Vector3 = (hb - pl.cam.global_position).normalized()
+		pl.rotation.y = atan2(-d.x, -d.z)
+		pl.cam.rotation.x = asin(d.y)
+		for i in 5:
+			await process_frame
+		fpv.no_spread = true
+		fpv.fire()
+		fpv.no_spread = false
+	for i in 4:
+		await process_frame
+	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/26_mashq_nishonlari.png"))
+	fpv.force_ads = true
+	for i in 40:
+		await process_frame
+	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/27_ads.png"))
+	fpv.force_ads = false
+	if pr:
+		pr.clear()
+	print("saqlandi: mashq nishonlari / ADS")
 	# bir paytning o'zi ikki kameradan: o'yinchining o'zi (1-shaxs) va boshqalar (3-shaxs to'liq tana)
 	main.get_node("HUD").visible = false
 	main.get_node("UI").visible = false

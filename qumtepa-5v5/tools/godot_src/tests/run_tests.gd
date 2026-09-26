@@ -426,6 +426,7 @@ func _run() -> void:
 
 	await section_characters()
 	await section_views()
+	await section_weapons()
 
 	print("\nVAQTLAR (2D tahlil -> 3D fizika):")
 	for row in timing_rows:
@@ -557,4 +558,137 @@ func section_views() -> void:
 		r_ok = r_ok and m.layers == CM.LAYER_WORLD
 	ok(r_ok, "masofaviy o'yinchi: 1-shaxs yo'q, 3-shaxs tana hamma kameraga (shu jumladan bizning kameraga) ko'rinadi")
 	remote.queue_free()
+	await frames(2)
+
+
+func _aim_at(p: Vector3) -> void:
+	var e: Vector3 = pl.global_position + Vector3.UP * pl.cam.position.y
+	var d := (p - e).normalized()
+	pl.rotation.y = atan2(-d.x, -d.z)
+	pl.cam.rotation.x = asin(d.y)
+
+
+func _zone_pos(t: Node3D, zone: String) -> Vector3:
+	for h in t.model.hitboxes:
+		if h.get_meta("zone") == zone:
+			return h.global_position
+	return t.global_position
+
+
+## 20-bo'lim: qurol tizimi (Legend Tactical FPS'dan olingan: qurol ma'lumotlari, tepki, tarqalish, ADS, tana zonalari, HUD)
+func section_weapons() -> void:
+	print("\n20) Qurollar: tana zonalari bo'yicha zarar, tepki, tarqalish, ADS, qayta o'qlash, HUD")
+	var fpv = pl.get_node("Camera3D/FPView")
+	var pr = main.get_node_or_null("Practice")
+	gm.skip_freeze()
+	gm.time_left = 1.0e6
+	pl.force_crouch = false
+	pl.force_walk = false
+	pl.ai_move = Vector3.ZERO
+	pl.teleport(Transform3D(Basis(), Vector3(0, 0.1, -24)))
+	pl.rotation.y = -PI * 0.5
+	pl.cam.rotation.x = 0.0
+	fpv.equip(1, true)
+	await frames(5)
+	var names := []
+	for w in fpv.weapons:
+		names.append("%s (%d)" % [w.weapon_name, w.slot])
+	ok(fpv.weapons.size() == 3 and fpv.current.weapon_name == "LAR-01" and pl.body.weapon_kind == 0,
+		"3 ta qurol ma'lumotdan (weapons/*.tres): %s" % ", ".join(names))
+	var tg: Array = pr.spawn([6.0, 12.0]) if pr else []
+	await frames(3)
+	ok(tg.size() == 2, "F7 mashq nishonlari: %d ta manekin (o'q tegadigan zonalar bilan)" % tg.size())
+	if tg.size() < 2:
+		return
+	var t0: Node3D = tg[0]
+	var t1: Node3D = tg[1]
+	fpv.no_spread = true
+	var res := {}
+	for z in [[t0, "head", 85.0], [t1, "leg", 28.9], [t1, "body", 34.0], [t1, "arm", 28.9]]:
+		fpv._next_shot = 0.0
+		_aim_at(_zone_pos(z[0], z[1]))
+		await frames(2)
+		fpv.fire()
+		res[z[1]] = [fpv.last_hit.get("zone", "-"), float(fpv.last_hit.get("damage", 0.0)), fpv.last_hit.get("target") == z[0]]
+	var zones_ok := true
+	for z in [["head", 85.0], ["leg", 28.9], ["body", 34.0], ["arm", 28.9]]:
+		zones_ok = zones_ok and res[z[0]][0] == z[0] and absf(res[z[0]][1] - z[1]) < 0.2 and res[z[0]][2]
+	ok(zones_ok, "tana zonalari: bosh %.0f, tana %.0f, qo'l %.1f, oyoq %.1f (LAR-01: 34 × 2.5 / 1 / 0.85 / 0.85)" % [res.head[1], res.body[1], res.arm[1], res.leg[1]])
+	ok(fpv.hud.hitmarker_visible() and t0.hp == 15.0, "tegish belgisi HUD'da; nishon HP: %d" % t0.hp)
+	fpv._next_shot = 0.0
+	_aim_at(_zone_pos(t0, "body"))
+	await frames(2)
+	fpv.fire()
+	var killed: bool = fpv.last_hit.get("killed", false)
+	await frames(2)
+	var hits_dead: int = t0.hits
+	var am_dead: int = fpv.ammo
+	fpv._next_shot = 0.0
+	fpv.fire()
+	ok(killed and t0.model.dead and fpv.ammo == am_dead - 1 and t0.hits == hits_dead, "o'ldirilgan nishon yiqiladi, o'q endi unga tegmaydi")
+	var W = fpv.current
+	ok(absf(W.damage_at(60.0, "body") - 34.0 * 0.65) < 0.01 and W.damage_at(50.0, "body") == 34.0,
+		"masofa: 55 m gacha to'liq zarar, uzoqda ×0.65 (%.1f)" % W.damage_at(60.0, "body"))
+	# tepki naqshi va qaytish
+	_aim_at(pl.global_position + Vector3(0, 1.6, 0) + (-pl.global_transform.basis.z) * 5.0)
+	pl.cam.rotation.x = 0.0
+	await secs(0.5)
+	var p0: float = pl.cam.rotation.x
+	for i in 6:
+		fpv._next_shot = 0.0
+		fpv.fire()
+		await frames(1)
+	var kick := rad_to_deg(pl.cam.rotation.x - p0)
+	var expect := 0.0
+	for i in 6:
+		expect += W.recoil_pattern_v[i] * W.recoil_scale
+	var bl: float = fpv.bloom
+	ok(absf(kick - expect) < 0.3 and bl > W.base_spread, "tepki naqshi: 6 o'qda %.2f° tepaga (kutilgan %.2f°), tarqalish o'sdi" % [kick, expect])
+	await secs(1.5)
+	ok(absf(rad_to_deg(pl.cam.rotation.x - p0)) < 0.3 and fpv.bloom < W.base_spread * 0.2, "otish to'xtaganda nishon joyiga qaytadi, tarqalish tiklanadi")
+	var s_idle: float = fpv.current_spread()
+	fpv.force_ads = true
+	await secs(0.6)
+	var s_ads: float = fpv.current_spread()
+	var fov_ads: float = pl.cam.fov
+	var ls: float = pl.look_scale
+	fpv.force_ads = false
+	await secs(0.6)
+	ok(s_ads < s_idle * 0.5 and fov_ads < 80.0 * 0.8 and ls < 0.8 and pl.cam.fov > 79.0,
+		"ADS: FOV %.0f°, tarqalish %.4f -> %.4f, sezgirlik ×%.2f; qo'yib yuborilganda qaytadi" % [fov_ads, s_idle, s_ads, ls])
+	var m0: int = fpv.fire_mode
+	fpv.cycle_mode()
+	var m1: int = fpv.fire_mode
+	fpv.cycle_mode()
+	fpv.cycle_mode()
+	ok(m0 != m1 and fpv.fire_mode == m0, "o'q rejimlari (B): avtomat -> 3 talik -> bittalik")
+	fpv.ammo = 5
+	var r0: int = fpv.reserve
+	fpv.reload()
+	await secs(W.reload_time + 0.2)
+	ok(fpv.ammo == 30 and fpv.reserve == r0 - 25, "qayta o'qlash %.1f s: magazin 30, zaxira %d" % [W.reload_time, fpv.reserve])
+	fpv.equip(2)
+	await secs(0.5)
+	ok(fpv.current.weapon_name == "Apex-9" and fpv.ch.weapon_kind == 1 and pl.body.weapon_kind == 1 and fpv.ammo == 15,
+		"to'pponcha: 2-tugma, magazin 15, qo'lda (1- va 3-shaxs) almashdi")
+	fpv.equip(3)
+	await secs(0.4)
+	fpv._next_shot = 0.0
+	_aim_at(_zone_pos(t1, "body"))
+	await frames(2)
+	var h0: int = t1.hits
+	fpv.fire()
+	var far_miss: bool = t1.hits == h0
+	var dir: Vector3 = (pl.global_position - t1.global_position)
+	dir.y = 0.0
+	pl.teleport(Transform3D(Basis(), t1.global_position + dir.normalized() * 1.6 + Vector3.UP * 0.1))
+	await frames(4)
+	fpv._next_shot = 0.0
+	_aim_at(_zone_pos(t1, "body"))
+	await frames(2)
+	fpv.fire()
+	ok(far_miss and t1.hits == h0 + 1 and absf(t1.last_damage - 75.0) < 0.1, "pichoq: 12 m da yetmaydi, 1.6 m da 75 zarar")
+	fpv.no_spread = false
+	fpv.equip(1)
+	pr.clear()
 	await frames(2)

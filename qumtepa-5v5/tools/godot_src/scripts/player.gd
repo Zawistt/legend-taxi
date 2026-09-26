@@ -5,7 +5,8 @@ extends CharacterBody3D
 ##   Shift — sekin yurish 2.3 m/s, qadam tovushi YO'Q; Ctrl/C — o'tirish 1.55 m/s, qadam tovushi YO'Q;
 ##   sakrash (Space) — qo'nishda tovush bor. O'tirganda bo'y 1.8 -> 1.25 m, ko'z 1.65 -> 1.08 m;
 ##   ustida shift bo'lsa (past tom), turib bo'lmaydi.
-## Qurol: birinchi shaxsda qo'llar va qurol (T — AKM, CT — M416). Sichqoncha chap tugmasi — o'q uzish, R — qayta o'qlash.
+## Qurol: birinchi shaxsda qo'llar va qurol (fp_view.gd): 1/2/3 — avtomat/to'pponcha/pichoq, chap tugma — o'q,
+##   o'ng tugma — nishonga olish (ADS), R — qayta o'qlash, B — o'q rejimi.
 ## Ko'rinish ajratilgan:
 ##   o'yinchining O'Z kamerasi — 1-shaxs: faqat qo'llar va qurol (Camera3D/FPView); o'z tanasi ko'rinmaydi, faqat soyasi;
 ##   BOSHQA har qanday kamera (tomoshabin, boshqa o'yinchi, bot kamerasi) — 3-shaxs: to'liq tana (Body), qurol qo'lda,
@@ -38,6 +39,8 @@ var ai_move := Vector3.ZERO
 ## testlar uchun: klaviaturasiz sekin yurish / o'tirishni majburlash
 var force_walk := false
 var force_crouch := false
+## sichqoncha sezgirligi ko'paytuvchisi (ADS da kamayadi — fp_view.gd)
+var look_scale := 1.0
 
 var walking := false
 var crouching := false
@@ -116,8 +119,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not local_player:
 		return
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		rotate_y(-event.relative.x * mouse_sensitivity)
-		cam.rotate_x(-event.relative.y * mouse_sensitivity)
+		rotate_y(-event.relative.x * mouse_sensitivity * look_scale)
+		cam.rotate_x(-event.relative.y * mouse_sensitivity * look_scale)
 		cam.rotation.x = clamp(cam.rotation.x, -1.45, 1.45)
 	elif event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE

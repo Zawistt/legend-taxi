@@ -21,6 +21,11 @@ const PLACEHOLDER := true
 const EYE := Vector3(0, 1.67, 0.09)
 const HIPS_Y := 0.95
 const RELOAD_TIME := 2.6
+## o'q tegadigan zonalar (Area3D, 10-qatlam): bosh, tana, qo'llar, oyoqlar — qurol ma'lumotidagi ko'paytuvchilar uchun
+const LAYER_HITBOX := 1 << 9
+const WEAPON_RIFLE := 0
+const WEAPON_PISTOL := 1
+const WEAPON_KNIFE := 2
 
 ## jamoa ranglari: ko'ylak, jilet, shim, bosh kiyim, qurol yog'ochi
 const COLORS := {
@@ -54,6 +59,10 @@ var planting := false
 
 var _legs: Array = []
 var _gun: Node3D
+var _chest: Node3D
+var _hand_nodes: Array = []
+var weapon_kind := WEAPON_RIFLE
+var hitboxes: Array = []
 var _crouch_amt := 0.0
 var _step := 0.0
 var _kick := 0.0
@@ -74,6 +83,7 @@ func load_model(t: String) -> void:
 		model = null
 	_mats = {}
 	_legs = []
+	_hand_nodes = []
 	model = Node3D.new()
 	model.name = "Placeholder"
 	add_child(model)
@@ -115,7 +125,19 @@ func load_model(t: String) -> void:
 			_box(leg, Vector3(0.13, 0.42, 0.14), Vector3(0, -0.66, 0), c.pants)
 			_box(leg, Vector3(0.13, 0.12, 0.26), Vector3(0, -0.84, 0.04), c.boots)
 			_legs.append(leg)
+	_chest = chest
 	_build_arms_gun(chest, c)
+	hitboxes = []
+	if not first_person and not own_body:
+		_build_hitboxes()
+	_apply_layers()
+	dead = false
+	_die_t = 0.0
+	model.rotation = Vector3.ZERO
+	model.position = Vector3.ZERO
+
+
+func _apply_layers() -> void:
 	for m in _all(model, "MeshInstance3D"):
 		var mi := m as MeshInstance3D
 		if first_person:
@@ -125,10 +147,61 @@ func load_model(t: String) -> void:
 			mi.layers = LAYER_OWN_BODY
 		else:
 			mi.layers = LAYER_WORLD
-	dead = false
-	_die_t = 0.0
-	model.rotation = Vector3.ZERO
-	model.position = Vector3.ZERO
+
+
+## o'q tegadigan zonalar: har biri suyakka bog'langan Area3D (o'tirish, egilish, o'limda birga harakatlanadi)
+func _build_hitboxes() -> void:
+	for z in [["head", "head", Vector3(0.26, 0.3, 0.27), Vector3(0, 0.12, 0)],
+			["body", "chest", Vector3(0.44, 0.42, 0.32), Vector3(0, 0.08, 0)],
+			["body", "spine1", Vector3(0.38, 0.24, 0.26), Vector3(0, 0.1, 0)],
+			["body", "hips", Vector3(0.36, 0.22, 0.26), Vector3(0, 0.02, 0)],
+			["arm", "chest", Vector3(0.12, 0.3, 0.3), Vector3(-0.27, 0.0, 0.08)],
+			["arm", "chest", Vector3(0.12, 0.3, 0.3), Vector3(0.2, -0.02, 0.14)]]:
+		_hitbox(_attach(z[1]), z[0], z[2], z[3])
+	for leg in _legs:
+		_hitbox(leg, "leg", Vector3(0.18, 0.92, 0.2), Vector3(0, -0.44, 0.02))
+
+
+func _hitbox(parent: Node3D, zone: String, size: Vector3, pos: Vector3) -> void:
+	var a := Area3D.new()
+	a.collision_layer = LAYER_HITBOX
+	a.collision_mask = 0
+	a.monitoring = false
+	a.set_meta("zone", zone)
+	a.set_meta("owner_model", self)
+	var cs := CollisionShape3D.new()
+	var bs := BoxShape3D.new()
+	bs.size = size
+	cs.shape = bs
+	a.add_child(cs)
+	a.position = pos
+	parent.add_child(a)
+	hitboxes.append(a)
+
+
+## o'q tekkan zonani egasiga yetkazadi: ota tugunlardan take_hit() bor birinchisi (bot, mashq nishoni, o'yinchi)
+func receiver() -> Node:
+	var n: Node = self
+	while n:
+		if n.has_method("take_hit"):
+			return n
+		n = n.get_parent()
+	return null
+
+
+## qo'ldagi qurolni almashtirish (1-shaxs va 3-shaxsda bir xil shakl)
+func set_weapon(kind: int) -> void:
+	if kind == weapon_kind and _gun:
+		return
+	weapon_kind = kind
+	if _chest:
+		for n in _hand_nodes:
+			n.queue_free()
+		_hand_nodes = []
+		if _gun:
+			_gun.queue_free()
+		_build_arms_gun(_chest, COLORS.get(team, COLORS["T"]))
+		_apply_layers()
 
 
 ## qo'llar va qurol (3-shaxsda ham, 1-shaxsda ham bir xil joyda): ko'krak suyagi fazosida
@@ -136,25 +209,51 @@ func _build_arms_gun(chest: Node3D, c: Dictionary) -> void:
 	var o := Vector3(0, HIPS_Y + 0.35, 0)            # ko'krak suyagining model fazosidagi joyi (tinch holat)
 	_gun = Node3D.new()
 	_gun.name = "Weapon"
-	_gun.position = Vector3(-0.13, 1.37, 0.12) - o
 	chest.add_child(_gun)
-	var long_gun := team == "T"                       # T — AKM'ga o'xshash (yog'och qo'ndoq), CT — M416'ga o'xshash
-	_box(_gun, Vector3(0.06, 0.09, 0.44), Vector3(0, 0, 0.28), METAL)                              # quti
-	_box(_gun, Vector3(0.03, 0.03, 0.34 if long_gun else 0.3), Vector3(0, 0.02, 0.66), METAL)       # stvol
-	_box(_gun, Vector3(0.065, 0.075, 0.22), Vector3(0, -0.005, 0.5), c.wood)                         # old tutqich
-	_box(_gun, Vector3(0.05, 0.1, 0.24), Vector3(0, -0.02, -0.08), c.wood)                           # qo'ndoq
-	_box(_gun, Vector3(0.045, 0.16, 0.08), Vector3(0, -0.12, 0.34), METAL).rotation.x = 0.35 if long_gun else 0.1   # magazin
-	_box(_gun, Vector3(0.04, 0.1, 0.05), Vector3(0, -0.08, 0.15), METAL).rotation.x = -0.3         # dasta
-	if not long_gun:
-		_box(_gun, Vector3(0.035, 0.05, 0.1), Vector3(0, 0.07, 0.3), METAL)                          # nishon
+	var grip: Vector3
+	var fore: Vector3
+	match weapon_kind:
+		WEAPON_PISTOL:
+			_gun.position = Vector3(-0.05, 1.36, 0.42) - o
+			_box(_gun, Vector3(0.035, 0.05, 0.2), Vector3(0, 0.02, 0.05), METAL)                    # zatvor
+			_box(_gun, Vector3(0.032, 0.11, 0.05), Vector3(0, -0.05, -0.02), c.wood).rotation.x = -0.25   # dasta
+			grip = _gun.position + Vector3(0, -0.06, -0.03)
+			fore = _gun.position + Vector3(0.04, -0.07, -0.02)
+		WEAPON_KNIFE:
+			_gun.position = Vector3(-0.2, 1.2, 0.34) - o
+			_box(_gun, Vector3(0.03, 0.03, 0.11), Vector3(0, 0, -0.02), c.wood)                     # dasta
+			_box(_gun, Vector3(0.008, 0.035, 0.17), Vector3(0, 0.005, 0.12), Color(0.72, 0.74, 0.76))   # tig'
+			grip = _gun.position + Vector3(0, 0, -0.03)
+			fore = Vector3(0.22, 1.1, 0.12) - o
+		_:
+			_gun.position = Vector3(-0.13, 1.37, 0.12) - o
+			var long_gun := team == "T"                   # T — yog'och qo'ndoqli, CT — qora (M416 ko'rinishida)
+			_box(_gun, Vector3(0.06, 0.09, 0.44), Vector3(0, 0, 0.28), METAL)                            # quti
+			_box(_gun, Vector3(0.03, 0.03, 0.34 if long_gun else 0.3), Vector3(0, 0.02, 0.66), METAL)     # stvol
+			_box(_gun, Vector3(0.065, 0.075, 0.22), Vector3(0, -0.005, 0.5), c.wood)                       # old tutqich
+			_box(_gun, Vector3(0.05, 0.1, 0.24), Vector3(0, -0.02, -0.08), c.wood)                         # qo'ndoq
+			_box(_gun, Vector3(0.045, 0.16, 0.08), Vector3(0, -0.12, 0.34), METAL).rotation.x = 0.35 if long_gun else 0.1   # magazin
+			_box(_gun, Vector3(0.04, 0.1, 0.05), Vector3(0, -0.08, 0.15), METAL).rotation.x = -0.3       # dasta
+			if not long_gun:
+				_box(_gun, Vector3(0.035, 0.05, 0.1), Vector3(0, 0.07, 0.3), METAL)                        # nishon
+			grip = _gun.position + Vector3(0, -0.07, 0.16)
+			fore = _gun.position + Vector3(0, -0.04, 0.5)
+	var muzzle := Node3D.new()
+	muzzle.name = "Muzzle"
+	muzzle.position = Vector3(0, 0.02, {WEAPON_PISTOL: 0.16, WEAPON_KNIFE: 0.2}.get(weapon_kind, 0.82))
+	_gun.add_child(muzzle)
 	# qo'llar: yelka -> tirsak -> musht (ko'krak fazosida)
-	var grip := _gun.position + Vector3(0, -0.07, 0.16)
-	var fore := _gun.position + Vector3(0, -0.04, 0.5)
 	for arm in [[Vector3(-0.22, 1.42, 0) - o, Vector3(-0.3, 1.2, 0.02) - o, grip], [Vector3(0.22, 1.42, 0) - o, Vector3(0.1, 1.22, 0.28) - o, fore]]:
 		if not first_person:
-			_limb(chest, arm[0], arm[1], 0.1, c.shirt)
-		_limb(chest, arm[1], arm[2], 0.085, c.shirt if not first_person else c.vest)
-		_box(chest, Vector3(0.08, 0.09, 0.09), arm[2], Color(0.18, 0.16, 0.14))                   # qo'lqop
+			_hand_nodes.append(_limb(chest, arm[0], arm[1], 0.1, c.shirt))
+		_hand_nodes.append(_limb(chest, arm[1], arm[2], 0.085, c.shirt if not first_person else c.vest))
+		_hand_nodes.append(_box(chest, Vector3(0.08, 0.09, 0.09), arm[2], Color(0.18, 0.16, 0.14)))   # qo'lqop
+
+
+## qurol og'zi (dunyo fazosida) — o'q izi shu yerdan chiqadi
+func muzzle_position() -> Vector3:
+	var m := _gun.get_node_or_null("Muzzle") as Node3D if _gun else null
+	return m.global_position if m else global_position + Vector3.UP * 1.4
 
 
 func _attach(bone: String) -> BoneAttachment3D:
@@ -185,10 +284,11 @@ func _box(parent: Node3D, size: Vector3, pos: Vector3, col: Color) -> MeshInstan
 	return mi
 
 
-func _limb(parent: Node3D, a: Vector3, b: Vector3, thick: float, col: Color) -> void:
+func _limb(parent: Node3D, a: Vector3, b: Vector3, thick: float, col: Color) -> MeshInstance3D:
 	var mi := _box(parent, Vector3(thick, thick, (b - a).length()), (a + b) * 0.5, col)
 	var up := Vector3.UP if absf((b - a).normalized().dot(Vector3.UP)) < 0.95 else Vector3.RIGHT
 	mi.basis = Basis.looking_at(b - a, up)
+	return mi
 
 
 func _all(n: Node, cls: String, out: Array = []) -> Array:
@@ -230,10 +330,18 @@ func die() -> void:
 		return
 	dead = true
 	_die_t = 0.0
+	_set_hitboxes(false)
+
+
+func _set_hitboxes(on: bool) -> void:
+	for h in hitboxes:
+		if is_instance_valid(h):
+			h.collision_layer = LAYER_HITBOX if on else 0
 
 
 func revive() -> void:
 	dead = false
+	_set_hitboxes(true)
 	_die_t = 0.0
 	model.rotation = Vector3.ZERO
 	model.position = Vector3.ZERO
@@ -281,4 +389,4 @@ func _process(delta: float) -> void:
 		skel.set_bone_pose_rotation(k + 1, r)
 	if _gun:
 		var rl := sin(clampf(1.0 - _reload_left / RELOAD_TIME, 0.0, 1.0) * PI) if _reload_left > 0.0 else 0.0
-		_gun.rotation = Vector3(0.6 * rl, 0.0, -0.5 * rl)
+		_gun.rotation = Vector3(0.6 * rl - (0.9 * _kick if weapon_kind == WEAPON_KNIFE else 0.0), 0.0, -0.5 * rl)

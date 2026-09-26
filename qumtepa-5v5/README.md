@@ -25,6 +25,7 @@ Godot 4.3, bomba rejimi (T hujum qiladi, CT himoya qiladi).
 | 7 | Optimallashtirish (bo'laklar, occlusion, masofada yashirish: −69% chizish), minimap, F9, yakuniy tekshiruv | ✅ ([hisobot](docs/STAGE7.md)) |
 | 8 | Yakuniy audit (tirqish/teshik/tiqilish yo'q), PBR teksturalar va realistik yorug'lik, T/CT personajlari: skelet, 21 animatsiya, AKM/M416, Shift/o'tirish/sakrash, o'ziga 1-shaxs, boshqalarga 3-shaxs | ✅ ([hisobot](docs/STAGE8.md)) |
 | 9 | Stilizatsiya: low-poly ko'rinish (tekis ranglar, tekis soya, kam qirrali shakllar, gradient osmon); eski personaj/animatsiya/qurollar o'rniga vaqtinchalik manekin | ✅ ([hisobot](docs/STAGE9.md)) |
+| 10 | Qurol tizimi (Legend Tactical FPS'dan): 3 qurol ma'lumotdan, tepki naqshi, tarqalish, ADS, o'q rejimlari, bosh/tana/qo'l/oyoq zarari, HUD, F7 mashq nishonlari | ✅ ([hisobot](docs/STAGE10.md)) |
 
 ## O'ynash
 

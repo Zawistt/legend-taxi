@@ -213,6 +213,11 @@ func step(delta: float, can_move: bool) -> void:
 			_step_t = 0.0
 
 
+## o'yinchi o'qi tekkanda (fp_view.gd, tana zonasi bo'yicha zarar): true — o'ldi
+func take_hit(amount: float, _zone: String, _from: Node) -> bool:
+	return alive and damage(amount)
+
+
 func damage(amount: float) -> bool:
 	hp -= amount
 	_update_label()

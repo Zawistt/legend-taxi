@@ -1,4 +1,4 @@
-[gd_scene load_steps=162 format=3]
+[gd_scene load_steps=163 format=3]
 
 [ext_resource type="PackedScene" path="res://map/qumtepa5v5.glb" id="1_map"]
 
@@ -31,6 +31,8 @@
 [ext_resource type="Script" path="res://scripts/perf_overlay.gd" id="10_po"]
 
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="3_pl"]
+
+[ext_resource type="Script" path="res://scripts/practice.gd" id="12_pr"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.24, 0.5, 0.84, 1)
@@ -3405,3 +3407,6 @@ script = ExtResource("4_gm")
 
 [node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource("5_hud")
+
+[node name="Practice" type="Node3D" parent="."]
+script = ExtResource("12_pr")
