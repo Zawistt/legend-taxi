@@ -77,20 +77,20 @@
   {
     "lineup": {
       "callout": "B window",
-      "flight_s": 1.26,
+      "flight_s": 1.24,
       "land": [
         18.4,
-        15.9
+        16.6
       ],
-      "miss_m": 0.9,
-      "moved_m": 0,
+      "miss_m": 1.61,
+      "moved_m": 1,
       "origin": [
         19.8,
-        -1
+        0
       ],
-      "pitch_deg": 18.9,
+      "pitch_deg": 18.2,
       "speed": 14,
-      "yaw_deg": -4.5
+      "yaw_deg": -4.8
     },
     "name": "B doors",
     "target": [

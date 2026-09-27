@@ -67,7 +67,7 @@ const SMOKES := {
 	"A CT": ["T", Vector3(-18.5, 0, 15), 3.94],
 	"A ramp": ["T", Vector3(-28, 0, 30), 1.6],
 	"A platforma": ["T", Vector3(-44, 0, 20), 3.9],
-	"B doors": ["T", Vector3(18.5, 0, 15), 1.26],
+	"B doors": ["T", Vector3(18.5, 0, 15), 1.24],
 	"B ramp": ["T", Vector3(28, 0, 30), 1.6],
 	"B platforma": ["T", Vector3(44, 0, 20), 1.38],
 	"Mid doors": ["T", Vector3(0, 0, 7.5), 3.7],

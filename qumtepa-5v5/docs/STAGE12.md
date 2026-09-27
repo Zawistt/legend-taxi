@@ -1,7 +1,7 @@
 # 12-bosqich: botlar, audit va CS2 qoidalari (1 ga 1)
 
-Tekshiruvlar: 5v5 Godot **@@T5@@**, 3v3 xaritaning o'z testlari **@@T3@@**, botlar bilan o'yin 5v5 **@@B5@@**, 3v3 **@@B3@@**,
-3v3 audit **@@A3@@**, smoke **@@SM@@**, 5v5 audit **@@A5@@**.
+Tekshiruvlar: 5v5 Godot **149/149**, 3v3 xaritaning o'z testlari **52/52**, botlar bilan o'yin 5v5 **16/16**, 3v3 **16/16**,
+3v3 audit **0 muammo**, smoke **10/10**, 5v5 audit **6/6**.
 Eski fayllar (qahramonlar, animatsiyalar, AKM/M416) o'chirilmadi.
 
 ![Sotib olish — avtomatlar](shots/41_sotib_olish_avtomat.png)
@@ -119,7 +119,17 @@ Tashlash: 4 — granata tanlash (yana bossa — keyingisi), sichqoncha chap — 
   + qurol tarqalishi (harakatda katta — bot to'xtab otadi) + tepki (80 % nazorat); yaqinda spray, o'rtada 3–4 lik burst, uzoqda bittalab;
   har o'q aniq geometriya bilan (bosh / ko'krak / qorin / qo'l / oyoq) — "har tomonga" otmaydi; magazin tugasa qayta o'qlaydi.
 
-@@BOTSTATS@@
+**Sinov (8 raund, `tests/run_botplay.gd`):**
+
+| | 5v5 | 3v3 |
+|---|---|---|
+| Natija | T 7 : 1 CT | T 5 : 3 CT |
+| Tugash sabablari | CT yo'q qilindi 7, zararsizlantirildi 1 | bomba portladi 3, T yo'q qilindi 3, CT yo'q qilindi 2 |
+| Bomba aylana ichiga | 6/6 | 3/3 |
+| Tashlangan granatalar | tutun 15, flesh 9, molotov 20, HE 7 | tutun 6, flesh 6, molotov 7, HE 7, yondiruvchi 2 |
+| Kill feed qurollari | 10 xil (AK-47, Galil, AWP, SSG 08, FAMAS, USP-S, Glock, MP9, Tec-9, HE) | 9 xil (+ bomba) |
+| Tiqilib qolgan bot | 0 | 0 |
+| Pul chegaradan chiqdi | 0 | 0 |
 
 ## 8. Oldingi so'rov: botlar, audit, 3v3 qorayish
 

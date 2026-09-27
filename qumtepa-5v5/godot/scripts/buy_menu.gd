@@ -31,8 +31,6 @@ var _mouse_before := Input.MOUSE_MODE_CAPTURED
 
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_CENTER)
-	position = Vector2(-470, -290)
 	custom_minimum_size = Vector2(940, 560)
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.05, 0.06, 0.08, 0.9)
@@ -162,6 +160,8 @@ func _process(_d: float) -> void:
 		set_open(false)
 	visible = show
 	if show:
+		size = get_combined_minimum_size()
+		position = ((get_viewport_rect().size - size) * 0.5).floor()
 		var gm := game_mode()
 		_title.text = "SOTIB OLISH   $%d   (%d s)      B / Esc — yopish" % [fpv.player.loadout.money, int(gm.buy_time_left)]
 

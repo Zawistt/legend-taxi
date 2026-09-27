@@ -721,7 +721,7 @@ func section_weapons() -> void:
 	# Zeus: pichoq ustida 3 ni yana bosish; bitta otishda o'ldiradi, keyin 30 s zaryadlanadi
 	lo.zeus = true
 	fpv.equip(3)
-	await secs(0.5)
+	await secs(0.8)
 	var zeus_on: bool = fpv.is_zeus()
 	t1.hp = 100.0
 	fpv._next_shot = 0.0

@@ -167,7 +167,7 @@ func _process(delta: float) -> void:
 	team_lbl.text = ("Terrorchilar (T)" if player.team == "T" else "Maxsus kuchlar (CT)") + ("   •   bomba sizda" if player.has_bomb else "")
 	team_lbl.modulate = T_COLOR if player.team == "T" else CT_COLOR
 	var lo = player.loadout
-	hp_lbl.text = ("+ %d" % int(ceil(player.hp))) + ("     %s %d" % ["⛑" if lo.helmet else "▣", int(lo.armor)] if lo.armor > 0 else "") \
+	hp_lbl.text = ("+ %d" % int(ceil(player.hp))) + ("     %s %d" % ["Zirh+kaska" if lo.helmet else "Zirh", int(lo.armor)] if lo.armor > 0 else "") \
 		if player.alive else "O'LDINGIZ — jamoadoshni kuzatish (sichqoncha)"
 	hp_lbl.modulate = Color(1, 0.35, 0.3) if player.alive and player.hp <= 30 else Color.WHITE
 	money_lbl.text = "$%d" % lo.money
@@ -224,7 +224,7 @@ func _update_feed() -> void:
 		var vc := "#%s" % (T_COLOR if e.victim_team == "T" else CT_COLOR).to_html(false)
 		var mine: bool = e.get("attacker") == player or e.get("victim_node") == player
 		var line := ("[color=%s]%s[/color]  " % [kc, e.killer] if e.killer != "" else "") + "[%s]%s  [color=%s]%s[/color]" % [
-			e.weapon, "  ⌖" if e.head else "", vc, e.victim]
+			e.weapon, " (HS)" if e.head else "", vc, e.victim]
 		s += ("[bgcolor=#8a1a1a88]%s[/bgcolor]" % line if mine else line) + "\n"
 	feed_lbl.text = s
 
@@ -234,18 +234,20 @@ func scoreboard_text() -> String:
 	var s := "[center][b]T %d : %d CT[/b]   —   raund %d, %d gacha[/center]\n" % [gm.score["T"], gm.score["CT"], gm.round_no, gm.win_target]
 	for team in ["CT", "T"]:
 		var col := (T_COLOR if team == "T" else CT_COLOR).to_html(false)
-		s += "\n[color=#%s][b]%s[/b][/color]\n[code]%-14s %4s %4s %4s %5s %5s %7s[/code]\n" % [col,
-			"Maxsus kuchlar (CT)" if team == "CT" else "Terrorchilar (T)", "O'yinchi", "K", "D", "A", "HS%", "ADR", "Pul"]
+		s += "\n[color=#%s][b]%s[/b][/color]\n[table=7]" % [col, "Maxsus kuchlar (CT)" if team == "CT" else "Terrorchilar (T)"]
+		for h in ["O'yinchi", "K", "D", "A", "HS%", "ADR", "Pul"]:
+			s += "[cell][color=#aaaaaa]%s[/color]     [/cell]" % h
 		var mem: Array = gm.team_members(team)
 		mem.sort_custom(func(a, b): return a.loadout.kills > b.loadout.kills)
 		for c in mem:
 			var lo = c.loadout
 			var money := "$%d" % lo.money if team == player.team else "—"
 			var nm: String = lo.name + ("" if c.alive else " †")
-			var line := "%-14s %4d %4d %4d %4d%% %5d %7s" % [nm, lo.kills, lo.deaths, lo.assists, lo.hs_pct(), lo.adr(), money]
-			s += ("[code][b]%s[/b][/code]\n" % line) if c == player else "[code]%s[/code]\n" % line
+			var cells := [nm, str(lo.kills), str(lo.deaths), str(lo.assists), "%d%%" % lo.hs_pct(), str(lo.adr()), money]
+			for v in cells:
+				s += ("[cell][b]%s[/b]     [/cell]" % v) if c == player else "[cell]%s     [/cell]" % v
+		s += "[/table]\n"
 	return s
-
 
 func _hint() -> String:
 	match gm.phase:

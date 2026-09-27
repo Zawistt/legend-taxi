@@ -645,7 +645,7 @@ func _think_ct() -> void:
 ## vaziyatga qarab granata: zararsizlantirilayotgan bombaga molotov (T), dushman eshitilgan/yashiringan joyga HE,
 ## yaqin kelayotgan dushmanga flesh (o'zi ko'r bo'lmasligi uchun teskari tomonga qaramaydi — nishon joyiga tashlaydi)
 func _utility() -> void:
-	var defusing := gm.action == "defuse"
+	var defusing: bool = gm.action == "defuse"
 	for b in side("CT"):
 		if b.alive and b.busy == "defuse":
 			defusing = true
