@@ -151,7 +151,17 @@ def main():
     # 3v3 botlar taktikasi (tools/godot_src/maps3v3/)
     shutil.copy(os.path.join(HERE, "godot_src", "maps3v3", "strategies_3v3.gd"), os.path.join(DST, "scripts", "strategies_3v3.gd"))
     for fn in SCRIPTS:
-        t = fix_paths(open(os.path.join(SRC, "scripts", fn)).read())
+        src = os.path.join(SRC, "scripts", fn)
+        if fn in ("game_mode.gd", "hud.gd"):
+            src = os.path.join(HERE, "godot_src", "scripts", fn)       # CS2 qoidalari — 5v5 bilan bir xil kod
+        t = fix_paths(open(src).read())
+        if fn == "map_data.gd":
+            # CS2 Wingman qoidalari: MR8 (9 g'alabagacha), raund 1:30, bomba 40 s, o'rnatish 3.2 s
+            i = t.index("const ROUND := {")
+            j = t.index("}", i) + 1
+            t = t[:i] + ('const ROUND := {\n\t"freeze": 10.0, "buy_time": 20.0, "round_time": 90.0,\n'
+                         '\t"bomb_timer": 40.0, "plant_time": 3.2, "defuse_time": 10.0,\n'
+                         '\t"defuse_time_kit": 5.0, "round_end": 7.0, "win_rounds": 9,\n}') + t[j:]
         if fn == "graphics.gd":
             # SDFGI va hajmli tuman: harakatda yorug'lik kaskadlari qayta hisoblanadi — ekran qorayib-yorishadi
             for a in ("_env.sdfgi_enabled = high", "_env.volumetric_fog_enabled = high"):
@@ -159,18 +169,8 @@ def main():
                 t = t.replace(a, a.replace("= high", "= false   # ekran qorayishining sababi — o'chirilgan (gen_3v3.py)"))
         if fn == "audio_zones.gd":
             t = t.replace('const INSIDE_BUS := "Interior"', 'const INSIDE_BUS := "Reverb"')
-        if fn == "hud.gd":
-            old = "buy_panel.visible = _buy_open and can_buy"
-            assert old in t
-            t = t.replace(old, "buy_panel.visible = false   # sotib olish menyusi — scripts/buy_menu.gd")
-            t = t.replace("F3 — raund   F4 — grafika sifati\"",
-                          "F3 — raund   F4 — grafika sifati   F7 — mashq nishonlari\\n"
-                          "Shift — sekin yurish (jim)   Ctrl/C — o'tirish   Space — sakrash   Sichqoncha — o'q, o'ng tugma — nishonga olish\\n"
-                          "1/2/3 — asosiy qurol / to'pponcha / pichoq   R — qayta o'qlash   X — o'q rejimi   B — sotib olish (5 ta qurol)\"")
-            assert "F7 — mashq" in t
+
         open(os.path.join(DST, "scripts", fn), "w").write(t)
-        if fn == "game_mode.gd":
-            patch_game_mode(os.path.join(DST, "scripts", fn))
     # xaritaning o'z testlari (52 ta) va auditi — 3v3 sahnasida
     for fn in ("run_tests.gd", "audit.gd"):
         t = fix_paths(open(os.path.join(SRC, "tests", fn)).read()).replace("res://main.tscn", "res://main_3v3.tscn")

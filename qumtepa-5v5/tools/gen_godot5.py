@@ -96,39 +96,11 @@ def plat_h(x, z):
 # ------------------------------------------------------------------ papkalar, v2 dan skriptlar va tovushlar
 for d in ("map", "scripts", "scenes", "audio", "tests", "tools"):
     os.makedirs(f"{OUT}/{d}", exist_ok=True)
-for fn in ("game_mode.gd", "hud.gd", "bomb.gd", "input_setup.gd"):   # player.gd — godot_src dan (8-bosqich)
+for fn in ("bomb.gd", "input_setup.gd"):   # game_mode.gd, hud.gd, bomb.gd, player.gd — godot_src dan (CS2 qoidalari)
     shutil.copy(f"{V2}/scripts/{fn}", f"{OUT}/scripts/{fn}")
-
-
-def patch_game_mode(path):
-    """botlar bilan o'yin: o'lgan o'yinchi bomba o'rnatmaydi, zararsizlantirmaydi va yerdagi bombani olmaydi"""
-    g = open(path).read()
-    for a, b in (("return phase == Phase.LIVE and player.team == \"T\" and player.has_bomb",
-                  "return player.alive and phase == Phase.LIVE and player.team == \"T\" and player.has_bomb"),
-                 ("return phase == Phase.PLANTED and player.team == \"CT\" and bomb != null",
-                  "return player.alive and phase == Phase.PLANTED and player.team == \"CT\" and bomb != null"),
-                 ("if bomb_state != \"dropped\" or bomb == null or player.team != \"T\" or _pickup_cooldown > 0.0:",
-                  "if bomb_state != \"dropped\" or bomb == null or player.team != \"T\" or not player.alive or _pickup_cooldown > 0.0:")):
-        assert a in g, a
-        g = g.replace(a, b)
-    open(path, "w").write(g)
-
-
-patch_game_mode(f"{OUT}/scripts/game_mode.gd")
 for fn in os.listdir(f"{V2}/audio"):
     shutil.copy(f"{V2}/audio/{fn}", f"{OUT}/audio/{fn}")
 shutil.copy(f"{V2}/scenes/bomb.tscn", f"{OUT}/scenes/bomb.tscn")
-# HUD yordam qatoriga 5v5 dagi yangi tugmalar (M, F4, F9)
-_h = open(f"{OUT}/scripts/hud.gd").read()
-_h = _h.replace("F3 — raundni qayta boshlash\"", "F3 — raund   F4 — shom   F7 — mashq nishonlari   F9 — FPS   M — xarita\\n"
-                "Shift — sekin yurish (jim)   Ctrl/C — o'tirish   Space — sakrash   Sichqoncha — o'q, o'ng tugma — nishonga olish\\n"
-                "1/2/3 — asosiy qurol / to'pponcha / pichoq   R — qayta o'qlash   X — o'q rejimi   B — sotib olish (5 ta qurol)\"")
-assert "F9 — FPS" in _h
-# eski (v2) sotib olish paneli o'rniga scripts/buy_menu.gd ishlaydi
-_old_buy = "buy_panel.visible = _buy_open and can_buy"
-assert _old_buy in _h
-_h = _h.replace(_old_buy, "buy_panel.visible = false   # sotib olish menyusi — scripts/buy_menu.gd")
-open(f"{OUT}/scripts/hud.gd", "w").write(_h)
 os.makedirs(f"{OUT}/weapons", exist_ok=True)
 for sub in ("scripts", "tests", "weapons"):
     for fn in os.listdir(f"{SRC}/{sub}"):

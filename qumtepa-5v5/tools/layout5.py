@@ -111,8 +111,8 @@ BOMB_ZONES = {"A": (-45.0, 8.0, -21.0, 27.0), "B": (21.0, 8.0, 45.0, 27.0)}
 BUY_ZONES = {"T": (-15.0, -51.0, 15.0, -43.5), "CT": (-17.0, 35.0, 17.0, 49.0)}
 
 # Raund qoidalari (soniya) — 110 m xarita uchun: T site'ga 17–20 s, CT 12 s da yetadi.
-ROUND = {"freeze": 12.0, "buy_time": 25.0, "round_time": 115.0, "bomb_timer": 40.0,
-         "plant_time": 3.0, "defuse_time": 10.0, "defuse_time_kit": 5.0, "round_end": 6.0, "win_rounds": 13}
+ROUND = {"freeze": 15.0, "buy_time": 20.0, "round_time": 115.0, "bomb_timer": 40.0,
+         "plant_time": 3.2, "defuse_time": 10.0, "defuse_time_kit": 5.0, "round_end": 7.0, "win_rounds": 13}
 
 # ------------------------------------------------------------------ panalar (Qumtepa v2 build.py funksiyalari bilan bir xil)
 # ("stack", x, z, [(dx, dz, y, o'lcham, yashil)], yaw) — qutilar; 2 qavat (≥ 2.3 m) ko'rishni to'sadi

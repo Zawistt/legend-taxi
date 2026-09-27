@@ -3,7 +3,7 @@ extends Resource
 ## Hamma ko'rsatkichlar shu yerda — o'yin kodida qurol raqamlari yozilmaydi. Godot inspektorida tahrirlash mumkin.
 ## Birliklar: tarqalish — radian; tepki naqshi — gradus (har o'q uchun: v — tepaga, h — o'ngga).
 
-enum Kind { RIFLE, PISTOL, KNIFE, SMG, SNIPER, SHOTGUN }
+enum Kind { RIFLE, PISTOL, KNIFE, SMG, SNIPER, SHOTGUN, MG, GRENADE, ZEUS, C4 }
 enum FireMode { SEMI, BURST, AUTO }
 
 @export_group("Nomi")
@@ -12,6 +12,11 @@ enum FireMode { SEMI, BURST, AUTO }
 @export var kind: Kind = Kind.RIFLE
 @export var slot := 1                             ## 1 — asosiy, 2 — to'pponcha, 3 — pichoq
 @export var category_name := "Avtomat"           ## sotib olish menyusida
+@export var buy_category := "rifle"               ## pistol / smg / rifle / heavy (sotib olish menyusidagi bo'lim)
+@export var side := "both"                        ## T / CT / both — kim sotib ola oladi (CS2 dagidek)
+@export var price := 2700
+@export var kill_reward := 300                    ## shu qurol bilan o'ldirgani uchun pul
+@export var move_speed := 1.0                     ## ma'lumot (CS2 dagi tezlik ko'paytuvchisi)
 
 @export_group("Zarar")
 @export var base_damage := 34.0
@@ -22,6 +27,11 @@ enum FireMode { SEMI, BURST, AUTO }
 @export var damage_falloff_multiplier := 0.65     ## effective_range dan uzoqda zarar shu songa ko'paytiriladi
 @export var max_range := 200.0
 @export var projectile_count := 1                 ## bir otishdagi o'qlar (drobovik — 8 ta sochma)
+## CS2 zarar modeli (range_modifier > 0 bo'lsa): zarar = asos × range_modifier^(masofa / 12.7 m) × zona,
+## zona: bosh ×headshot (4), qorin ×1.25, oyoq ×0.75; zirh: tana/qo'l/qorin (kaska bo'lsa bosh ham) — armor_pen ulushi o'tadi
+@export var range_modifier := 0.0
+@export var stomach_multiplier := 1.25
+@export var armor_pen := 0.775
 
 @export_group("Otish")
 @export var fire_rate := 600.0                    ## o'q/daqiqa
@@ -78,11 +88,28 @@ func zone_multiplier(zone: String) -> float:
 			return arm_multiplier
 		"leg":
 			return legshot_multiplier
+		"stomach":
+			return stomach_multiplier if range_modifier > 0.0 else 1.0      # Legend qurollarida qorin — tana
 	return 1.0
 
 
 func damage_at(distance: float, zone: String) -> float:
 	var d := base_damage * zone_multiplier(zone)
+	if range_modifier > 0.0:
+		return d * pow(range_modifier, distance / 12.7)
 	if distance > effective_range:
 		d *= damage_falloff_multiplier
 	return d
+
+
+## zirhni hisobga olgan zarar: [sog'liqqa, zirhga] (CS2 formulasi: zirhga (zarar − sog'liqqa) × 0.5)
+func damage_vs_armor(raw: float, zone: String, armor: float, helmet: bool) -> Array:
+	var covered := armor > 0.0 and (zone != "leg") and (zone != "head" or helmet)
+	if not covered:
+		return [raw, 0.0]
+	var hp := raw * armor_pen
+	var ad := (raw - hp) * 0.5
+	if ad > armor:
+		ad = armor
+		hp = raw - armor * 2.0
+	return [hp, ad]

@@ -53,7 +53,9 @@ var last_attacker: Node3D = null
 var show_label := true             ## o'yinchi bilan o'yinda dushman yozuvi yashiriladi (devor orqali ko'rinmasin)
 var burst := 0                     ## ketma-ket o'qlar (tarqalish o'sadi)
 var clock := 0.0                   ## bot_play vaqti (alert uchun)
-var weapon: Resource = null        ## qurol ma'lumoti (weapons/*.tres); bot_play tanlaydi
+var weapon: Resource = null        ## qo'ldagi qurol (loadout.primary yoki secondary)
+var loadout = preload("res://scripts/loadout.gd").new()   ## CS2: pul, qurollar, zirh, granatalar, statistika
+var blind_until := 0.0             ## flesh ko'r qilgan
 
 var _label: Label3D
 var model: Node3D = null            ## personaj modeli (faqat ko'rinadigan rejimda)
@@ -255,19 +257,19 @@ func step(delta: float, can_move: bool) -> void:
 			_step_t = 0.0
 
 
-## o'yinchi o'qi tekkanda (fp_view.gd, tana zonasi bo'yicha zarar): true — o'ldi.
+## o'q tekkanda (o'yinchi yoki bot): zirh/kaska hisobga olinadi (combat.gd); true — o'ldi.
 ## O'z jamoasiga zarar yo'q. Otilgan bot otuvchi tomonga buriladi.
-func take_hit(amount: float, _zone: String, from: Node) -> bool:
+func take_hit(amount: float, zone: String, from: Node, weapon: Resource = null) -> bool:
 	if not alive or (from and "team" in from and from.team == team):
 		return false
 	if from is Node3D:
 		last_attacker = from
 		alert_look = from.global_position
 		alert_until = clock + 3.0
-	return damage(amount)
+	return preload("res://scripts/combat.gd").hit(self, amount, zone, from, weapon)
 
 
-func damage(amount: float) -> bool:
+func damage(amount: float, _from_pos := Vector3.ZERO) -> bool:
 	hp -= amount
 	_update_label()
 	if hp <= 0.0:
@@ -296,6 +298,8 @@ func die() -> void:
 	collision_layer = 0
 	velocity = Vector3.ZERO
 	busy = ""
+	if loadout:
+		loadout.strip_all()             # CS2: o'lsa qurol, zirh, granatalar yo'qoladi
 
 
 func _update_label() -> void:

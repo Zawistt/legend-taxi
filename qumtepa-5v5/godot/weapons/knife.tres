@@ -28,3 +28,7 @@ spread_bloom_per_shot = 0.0
 max_spread = 0.0
 ads_ready = false
 equip_time = 0.2
+buy_category = ""
+price = 0
+kill_reward = 1500
+move_speed = 1.0

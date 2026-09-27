@@ -1,0 +1,36 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+weapon_id = "zeus"
+weapon_name = "Zeus x27"
+kind = 8
+slot = 3
+category_name = "Zeus"
+buy_category = "gear"
+side = "both"
+price = 200
+kill_reward = 0
+move_speed = 0.88
+base_damage = 500.0
+headshot_multiplier = 1.0
+legshot_multiplier = 1.0
+armor_pen = 1.0
+effective_range = 4.6
+damage_falloff_multiplier = 0.0
+max_range = 4.6
+fire_rate = 30.0
+fire_modes = Array[int]([0])
+magazine_size = 1
+reserve_ammo = 0
+reload_time = 30.0
+empty_reload_time = 30.0
+recoil_pattern_v = PackedFloat32Array()
+recoil_pattern_h = PackedFloat32Array()
+base_spread = 0.0
+spread_bloom_per_shot = 0.0
+max_spread = 0.0
+ads_ready = false
+equip_time = 0.5

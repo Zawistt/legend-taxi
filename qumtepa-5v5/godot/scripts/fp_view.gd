@@ -1,26 +1,22 @@
 extends Node3D
-## Birinchi shaxs: qo'llar va qurol (hozircha low-poly o'rinbosar — character_model.gd) va QUROL TIZIMI.
-## Qurol tizimi Legend Tactical FPS loyihasidan olingan g'oyalar asosida Qumtepa uchun qayta yozilgan:
-##   - ma'lumotga asoslangan qurollar (res://weapons/*.tres, scripts/weapon_data.gd): 1 — asosiy qurol
-##     (LAR-01; sotib olish menyusida (B) AR-44, Spectre-9 SMG, Longbow-50 snayper, Breacher-12 drobovik),
-##     2 — Apex-9 to'pponcha, 3 — pichoq. Almashtirish: 1/2/3 yoki sichqoncha g'ildiragi.
-##   - o'q rejimlari (X): avtomat / 3 talik / bittalik; magazin, zaxira, qayta o'qlash (bo'sh magazin — uzoqroq);
-##   - snayper: zatvor (har o'qdan keyin 1.1 s), ADS da optik nishon; drobovik: bir otishda 8 ta sochma;
-##   - tepki naqshi (har o'q oldindan belgilangan yo'nalishga), otish to'xtaganda nishon joyiga qaytadi;
-##   - tarqalish: har o'qda kengayadi, harakat / sakrash / o'tirish / ADS ga qarab o'zgaradi;
-##   - ADS (sichqoncha o'ng tugmasi): FOV kichrayadi, qurol markazga keladi, sezgirlik va tarqalish kamayadi;
-##   - o'q (hitscan): tana qismlari bo'yicha zarar (bosh / tana / qo'l / oyoq), uzoqda zarar kamayadi;
+## Birinchi shaxs: qo'llar va qurol (low-poly o'rinbosar — character_model.gd) va QUROL TIZIMI (CS2 qoidalari).
+## Qurollar o'yinchining jihozidan (player.loadout — loadout.gd): 1 — asosiy, 2 — to'pponcha, 3 — pichoq / Zeus,
+## 4 — granatalar (qayta bosilsa keyingisi), 5 — bomba (T). Sichqoncha g'ildiragi — almashtirish.
+##   - o'q rejimlari (X), magazin/zaxira, qayta o'qlash; tepki naqshi (CS2 dagidek: avval tepaga, keyin yon tomonga);
+##   - tarqalish: harakatda juda katta (CS2: to'xtab otish kerak), o'tirganda kichik, birinchi o'q eng aniq;
+##   - snayper (AWP, SSG 08): o'ng tugma — optika; boshqa qurollarda (CS2 dagidek) nishonga olish yo'q;
+##   - zarar CS2 formulasi: masofa, bosh ×4 / qorin ×1.25 / oyoq ×0.75, zirh va kaska (combat.gd);
+##   - granata: chap tugma — uzoqqa, o'ng tugma — yaqinga (grenade.gd); Zeus — 4.6 m gacha, 30 s da qayta zaryadlanadi;
 ##   - o'q izi, devorga tegish izi, HUD: tarqalishga mos nishon belgisi, tegish belgisi (boshga — qizil).
-## Ko'z nuqtasi doim kamerada turadi. Model 0.6 marta kichraytirilgan va kameraga yaqinlashtirilgan —
-## ko'rinishi aynan bir xil, lekin devorga kirib ketmaydi. Soya tashlamaydi.
+## Ko'z nuqtasi doim kamerada turadi. Model 0.6 marta kichraytirilgan va kameraga yaqinlashtirilgan. Soya tashlamaydi.
 
 const CharacterModel := preload("res://scripts/character_model.gd")
 const CombatHud := preload("res://scripts/combat_hud.gd")
 const WeaponData := preload("res://scripts/weapon_data.gd")
 const BuyMenu := preload("res://scripts/buy_menu.gd")
-const WEAPON_FILES := ["res://weapons/rifle.tres", "res://weapons/vanguard.tres", "res://weapons/smg.tres",
-	"res://weapons/sniper.tres", "res://weapons/shotgun.tres", "res://weapons/pistol.tres", "res://weapons/knife.tres"]
-const START_PRIMARY := "lar_01"
+const Rules := preload("res://scripts/cs_rules.gd")
+const Combat := preload("res://scripts/combat.gd")
+const Grenade := preload("res://scripts/grenade.gd")
 const SCALE := 0.6
 ## qurol ekranda o'ng pastda: kameraga nisbatan siljish (m, kichraytirishdan oldin), og'ish °, ko'tarilish °
 const TUNE := {
@@ -39,9 +35,10 @@ var player: CharacterBody3D
 var ch: Node3D
 var hud: Control
 var weapons: Array = []                ## hamma WeaponData (weapons/*.tres)
-var owned := {}                        ## slot -> WeaponData (o'yinchi qo'lidagi qurollar)
 var buy_menu: Control
-var current: Resource                  ## hozirgi qurol
+var current: Resource                  ## hozirgi qurol (granata / bomba tanlanganda — null)
+var slot := 2                          ## 1..5
+var nade := ""                         ## 4-slot: tanlangan granata turi
 var ammo := 0
 var reserve := 0
 var shots_fired := 0
@@ -53,7 +50,6 @@ var no_spread := false                 ## testlar uchun: aniq otish
 var bloom := 0.0
 var last_hit := {}
 var last_shot := {}                    ## oxirgi otish: sochmalar soni, tekkanlari, jami zarar
-var _ammo_of := {}                     ## weapon_id -> [magazin, zaxira]
 var _next_shot := 0.0
 var _equip_end := 0.0
 var _last_shot_t := -10.0
@@ -80,12 +76,7 @@ func _ready() -> void:
 	player = get_parent().get_parent() as CharacterBody3D
 	_base_fov = (get_parent() as Camera3D).fov          # o'yinchining @onready cam hali tayyor emas
 	_ensure_input()
-	for f in WEAPON_FILES:
-		var w: Resource = load(f)
-		weapons.append(w)
-		_ammo_of[w.weapon_id] = [w.magazine_size, w.reserve_ammo]
-		if w.slot != 1 or w.weapon_id == START_PRIMARY:
-			owned[w.slot] = w
+	weapons = Rules.catalog().values()
 	ch = CharacterModel.new()
 	ch.first_person = true
 	ch.team = player.team
@@ -127,11 +118,12 @@ func _ready() -> void:
 	_label.add_theme_color_override("font_outline_color", Color.BLACK)
 	_label.add_theme_constant_override("outline_size", 6)
 	layer.add_child(_label)
-	equip(1, true)
+	player.loadout.round_start(player.team)
+	on_round_start()
 
 
 static func _ensure_input() -> void:
-	var keys := {"weapon_1": KEY_1, "weapon_2": KEY_2, "weapon_3": KEY_3, "fire_mode": KEY_X}
+	var keys := {"weapon_1": KEY_1, "weapon_2": KEY_2, "weapon_3": KEY_3, "weapon_4": KEY_4, "weapon_5": KEY_5, "fire_mode": KEY_X}
 	for a in keys:
 		if not InputMap.has_action(a):
 			InputMap.add_action(a)
@@ -146,45 +138,105 @@ static func _ensure_input() -> void:
 
 
 # ------------------------------------------------------------------ qurollar
-func equip(slot: int, instant := false) -> void:
-	var w: Resource = owned.get(slot)
+func _lo():
+	return player.loadout
+
+
+## raund boshida (game_mode.gd -> player.on_round_start): asosiy qurol bo'lsa u, bo'lmasa to'pponcha
+func on_round_start() -> void:
+	current = null
+	_recoil = Vector2.ZERO
+	if _lo().primary:
+		equip(1, true)
+	else:
+		equip(2, true)
+
+
+func weapon_for_slot(s: int) -> Resource:
+	match s:
+		1:
+			return _lo().primary
+		2:
+			return _lo().secondary
+		3:
+			if _lo().zeus and current and current.weapon_id == "combat_knife":
+				return Rules.weapon("zeus")
+			return Rules.weapon("combat_knife")
+	return null
+
+
+func equip(s: int, instant := false) -> void:
+	if s == 4:
+		var g: Array = _lo().grenades
+		if g.is_empty():
+			return
+		var order: Array = []
+		for x in g:
+			if not x in order:
+				order.append(x)
+		var i := order.find(nade) if slot == 4 else -1
+		_save_ammo()
+		nade = order[(i + 1) % order.size()]
+		_select(4, null, instant)
+		ch.set_weapon(7)
+		if player.body:
+			player.body.set_weapon(7)
+		return
+	if s == 5:
+		if not player.has_bomb:
+			return
+		_save_ammo()
+		_select(5, null, instant)
+		ch.set_weapon(9)
+		if player.body:
+			player.body.set_weapon(9)
+		return
+	var w: Resource = weapon_for_slot(s)
 	if w == null or (w == current and not instant):
 		return
-	if current:
-		_ammo_of[current.weapon_id] = [ammo, reserve]
+	_save_ammo()
 	current = w
-	ammo = _ammo_of[w.weapon_id][0]
-	reserve = _ammo_of[w.weapon_id][1]
+	var am: Array = _lo().ammo.get(w.weapon_id, [w.magazine_size, w.reserve_ammo])
+	ammo = am[0]
+	reserve = am[1]
 	fire_mode = int(w.fire_modes[0]) if w.fire_modes.size() else 0
+	_select(s, w, instant)
+	ch.set_weapon(w.kind, w.weapon_id)
+	if player.body and player.body.has_method("set_weapon"):
+		player.body.set_weapon(w.kind, w.weapon_id)
+	_update_sound()
+
+
+func _select(s: int, w: Resource, instant: bool) -> void:
+	slot = s
+	current = w
 	_reload_end = -1.0
 	_burst_left = 0
 	_shot_idx = 0
 	bloom = 0.0
-	_equip_end = _t + (0.0 if instant else w.equip_time)
-	ch.set_weapon(w.kind)
-	if player.body and player.body.has_method("set_weapon"):
-		player.body.set_weapon(w.kind)
-	_update_sound()
+	ads_amt = 0.0
+	_equip_end = _t + (0.0 if instant else (w.equip_time if w else 0.4))
 
 
-## asosiy qurolni sotib olish (sotib olish zonasi va vaqti buy_menu.gd da tekshiriladi): to'liq magazin bilan qo'lga
+func _save_ammo() -> void:
+	if current and current.magazine_size > 0:
+		_lo().ammo[current.weapon_id] = [ammo, reserve]
+
+
+## sotib olingan qurolni qo'lga olish (buy_menu.gd pul va qoidani tekshiradi)
 func buy(weapon_id: String) -> bool:
-	for w in weapons:
-		if w.weapon_id == weapon_id and w.slot == 1:
-			owned[1] = w
-			_ammo_of[w.weapon_id] = [w.magazine_size, w.reserve_ammo]
-			if current and current.slot == 1:
-				current = null
-			equip(1)
-			return true
-	return false
+	var w: Resource = Rules.weapon(weapon_id)
+	if w == null:
+		return false
+	if current and current.slot == w.slot:
+		current = null
+	_lo().give(w)
+	equip(w.slot)
+	return true
 
 
 func weapon_by_id(weapon_id: String) -> Resource:
-	for w in weapons:
-		if w.weapon_id == weapon_id:
-			return w
-	return null
+	return Rules.weapon(weapon_id)
 
 
 func scoped() -> bool:
@@ -208,13 +260,21 @@ func is_knife() -> bool:
 	return current != null and current.kind == WeaponData.Kind.KNIFE
 
 
+func is_zeus() -> bool:
+	return current != null and current.kind == WeaponData.Kind.ZEUS
+
+
+func zeus_ready() -> bool:
+	return Time.get_ticks_msec() / 1000.0 >= _lo().zeus_ready_at
+
+
 func is_reloading() -> bool:
 	return _reload_end > _t
 
 
 ## hozirgi tarqalish (radian): asos + to'plangan tarqalish, holatga ko'paytiriladi
 func current_spread() -> float:
-	if current == null or is_knife():
+	if current == null or is_knife() or is_zeus():
 		return 0.0
 	var m := 1.0
 	var hs := Vector2(player.velocity.x, player.velocity.z).length()
@@ -232,11 +292,26 @@ func current_spread() -> float:
 
 ## o'q uzish (tugma, testlar va boshqalar uchun): qurol tayyor bo'lsa true
 func fire() -> bool:
-	if current == null or player.busy or not player.alive or _t < _equip_end or is_reloading() or _t < _next_shot:
+	if player.busy or not player.alive or _t < _equip_end or is_reloading() or _t < _next_shot:
+		return false
+	if slot == 4:
+		return throw_grenade(true)
+	if current == null:
 		return false
 	if is_knife():
 		_next_shot = _t + current.melee_swing_time
 		ch.fire()
+		_hitscan(current.max_range, 0.0)
+		return true
+	if is_zeus():
+		if not zeus_ready():
+			return false
+		_lo().zeus_ready_at = Time.get_ticks_msec() / 1000.0 + Rules.ZEUS_RECHARGE
+		_next_shot = _t + 1.0
+		ch.fire()
+		_shot.pitch_scale = 2.2
+		_shot.play()
+		player.fired.emit()
 		_hitscan(current.max_range, 0.0)
 		return true
 	if ammo <= 0:
@@ -307,14 +382,14 @@ func _hitscan(max_range: float, spread: float) -> Dictionary:
 			var dmg: float = current.damage_at(dist, zone)
 			var killed := false
 			if rcv:
-				killed = bool(rcv.take_hit(dmg, zone, player))
+				killed = bool(rcv.take_hit(dmg, zone, player, current))
 			res = {"zone": zone, "damage": dmg, "killed": killed, "distance": dist, "target": rcv}
 			last_hit = res
 			hit_confirmed.emit(zone, dmg, killed)
 		else:
 			res = {"zone": "world", "position": hit.position}
 			_impact(hit.position, hit.normal)
-	if not is_knife():
+	if not is_knife() and not is_zeus():
 		_tracer(ch.muzzle_position(), end)
 	return res
 
@@ -359,8 +434,32 @@ func _impact(p: Vector3, n: Vector3) -> void:
 			old.queue_free()
 
 
+## granata tashlash: far — chap tugma (uzoqqa), aks holda o'ng tugma (yaqinga, pastdan)
+func throw_grenade(far: bool) -> bool:
+	if nade == "" or not nade in _lo().grenades:
+		return false
+	var cam: Camera3D = player.cam
+	var dir := -cam.global_transform.basis.z
+	var v := dir * (15.0 if far else 7.5) + Vector3.UP * (1.5 if far else 2.5) + player.velocity * 0.5
+	Grenade.throw(_fx_parent(), nade, cam.global_position + dir * 0.4 - cam.global_transform.basis.y * 0.1, v, player)
+	_lo().grenades.erase(nade)
+	player.fired.emit()
+	_next_shot = _t + 0.6
+	if _lo().grenades.is_empty():
+		nade = ""
+		equip(1 if _lo().primary else 2)
+	else:
+		var keep := nade
+		nade = ""
+		if keep in _lo().grenades:
+			nade = keep
+		else:
+			equip(4, true)
+	return true
+
+
 func reload() -> void:
-	if current == null or is_knife() or ammo >= current.magazine_size or reserve <= 0 or is_reloading():
+	if current == null or is_knife() or is_zeus() or ammo >= current.magazine_size or reserve <= 0 or is_reloading():
 		return
 	ch.reload()
 	if player.body:
@@ -374,9 +473,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			var s: int = current.slot if current else 1
-			s = wrapi(s + (1 if event.button_index == MOUSE_BUTTON_WHEEL_DOWN else -1), 1, 4)
-			equip(s)
+			var s2: int = wrapi(slot + (1 if event.button_index == MOUSE_BUTTON_WHEEL_DOWN else -1), 1, 5)
+			if weapon_for_slot(s2) == null and s2 != 4:
+				s2 = wrapi(s2 + (1 if event.button_index == MOUSE_BUTTON_WHEEL_DOWN else -1), 1, 5)
+			equip(s2)
+		elif event.button_index == MOUSE_BUTTON_RIGHT and slot == 4:
+			throw_grenade(false)
 
 
 func _process(delta: float) -> void:
@@ -385,8 +487,15 @@ func _process(delta: float) -> void:
 		_team = player.team
 		ch.load_model(_team)
 		if current:
-			ch.set_weapon(current.kind)
+			ch.set_weapon(current.kind, current.weapon_id)
 		_update_sound()
+	# bomba 5-slotda: chap tugmani bosib turish ham o'rnatish (game_mode E bilan bir xil)
+	player.c4_fire = slot == 5 and player.has_bomb and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Input.is_action_pressed("fire")
+	if slot == 5 and not player.has_bomb:
+		equip(1 if _lo().primary else 2, true)
+	if (slot == 1 or slot == 2) and weapon_for_slot(slot) == null and player.alive:
+		equip(2 if _lo().secondary else 3, true)
+	player.speed_mult = current.move_speed if current else 0.98
 	if _reload_end > 0.0 and _t >= _reload_end:
 		var need: int = mini(current.magazine_size - ammo, reserve)
 		ammo += need
@@ -394,7 +503,7 @@ func _process(delta: float) -> void:
 		_reload_end = -1.0
 	var captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
 	if captured and not buy_menu.visible:
-		for i in 3:
+		for i in 5:
 			if Input.is_action_just_pressed("weapon_%d" % (i + 1)):
 				equip(i + 1)
 		if Input.is_action_just_pressed("fire_mode"):
@@ -459,8 +568,15 @@ func _process(delta: float) -> void:
 	var r := Basis(Vector3.UP, yaw + _sway.x) * Basis(Vector3.RIGHT, deg_to_rad(tn[2]) + _sway.y)
 	var b := (r * Basis(Vector3.UP, PI)).scaled(Vector3.ONE * SCALE)
 	ch.transform = Transform3D(b, -(b * _eye_s) + (off + bob) * SCALE)
+	if slot == 4:
+		_label.text = "%s  (%d)" % [Rules.GRENADES.get(nade, {}).get("name", nade), _lo().grenade_count(nade)]
+	elif slot == 5:
+		_label.text = "Bomba (C4)"
 	if current:
-		if is_knife():
+		if is_zeus():
+			var left: float = _lo().zeus_ready_at - Time.get_ticks_msec() / 1000.0
+			_label.text = current.weapon_name + ("   tayyor" if left <= 0.0 else "   %d%%" % int(100.0 * (1.0 - left / Rules.ZEUS_RECHARGE)))
+		elif is_knife():
 			_label.text = current.weapon_name
 		else:
 			var mode: String = MODE_NAMES[fire_mode] if current.fire_modes.size() > 1 else current.category_name

@@ -32,7 +32,7 @@ class Target:
 		add_child(label)
 		_update()
 
-	func take_hit(dmg: float, zone: String, _from: Node) -> bool:
+	func take_hit(dmg: float, zone: String, _from: Node, _weapon: Resource = null) -> bool:
 		if hp <= 0.0:
 			return false
 		hp -= dmg

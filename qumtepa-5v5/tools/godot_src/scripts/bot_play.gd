@@ -1,38 +1,40 @@
 extends Node3D
-## Botlar bilan o'yin (5v5 va 3v3): o'yinchi + (N−1) jamoadosh bot va N raqib bot, raund va bomba — game_mode.gd.
+## Botlar bilan o'yin (5v5 va 3v3, CS2 qoidalari): o'yinchi + (N−1) jamoadosh bot va N raqib bot; raund, iqtisod va
+## bomba — game_mode.gd, zarar — combat.gd, granatalar — grenade.gd.
 ##
-## Botlar nima qiladi:
-##   - T: har raund taktika (strategies*.gd): yo'nalishlar, kutish, smoke tashlash, site'ga kirish, bomba o'rnatish,
-##     o'rnatilgandan keyin himoya joylari; bomba yerda qolsa — eng yaqin T olib keladi;
-##   - CT: joylashuv (2-1-2, 3-1-1, ...), site'da T lar ko'rinsa/eshitilsa — aylanib yordamga keladi,
-##     bomba o'rnatilsa — qaytarib olish va zararsizlantirish (to'plam bo'lsa tezroq);
-##   - ko'rish: ~140° maydon, ≤ 70 m, devor va smoke orqali ko'rmaydi (nur bilan tekshiriladi), faqat boshi
-##     ko'rinayotgan nishonga qiyinroq tegadi; o'tirgan o'yinchi pastroq;
-##   - eshitish: o'yinchining qadam tovushi (≤ 20 m; Shift va o'tirish — jim), o'q ovozi (≤ 45 m) —
-##     bot o'sha tomonga qaraydi, CT lar ma'lumotni jamoaga beradi (aylanish);
-##   - xotira: nishon ko'rinmay qolsa, oxirgi ko'rilgan joyga 3 s qarab turadi (qayta chiqsa tezroq javob);
-##   - "trade": jamoadoshi o'lsa, yaqindagilar otuvchi tomonga qaraydi;
-##   - jang: reaksiya 0.18–0.32 s (qiyinlik bo'yicha), birinchi o'q aniqroq, ketma-ket o'qda tarqalish o'sadi,
-##     4–6 o'qdan keyin qisqa pauza; zarar — LAR-01 ma'lumoti va tana zonasi (bosh/tana/qo'l/oyoq), masofa;
-##     o'z jamoasiga o'q uzmaydi.
+## Botlar nima qiladi (CS2 botlariga o'xshab, "professional" darajada):
+##   IQTISOD: har raund pulga qarab sotib oladi — pistol raund (zirh yoki to'pponcha + granata), eco (tejash),
+##     force-buy (SMG/Galil/FAMAS + zirh, ketma-ket yutqazganda), to'liq xarid (AK/M4 + zirh-kaska + granatalar,
+##     CT — to'plam); har jamoada bitta snayperchi (pul yetsa AWP). Tirik qolsa — qurollari keyingi raundga qoladi.
+##   T: taktika (strategies*.gd): yo'nalish, kutish, hujumdan oldin tutun va flesh, site'ga kirish, bomba faqat
+##     aylana ichiga; o'rnatgandan keyin himoya joylari va CT keladigan tomonlarga qarash; bomba yerda — olib keladi.
+##   CT: joylashuv, burchaklarni navbat bilan tekshiradi (har tomondan kelishi mumkin), site'da T ko'rinsa/eshitilsa
+##     aylanib yordamga boradi; bomba o'rnatilsa — kamida ikki kishi yig'ilib qaytarib oladi (vaqt kam bo'lsa — darhol),
+##     umid yo'q bo'lsa (1 ga 3+, vaqt yetmaydi) — qurolni saqlab qoladi; to'plam bo'lsa 5 s da zararsizlantiradi.
+##   KO'RISH/ESHITISH: ~140° maydon, devor/tutun orqali ko'rmaydi; qadam (≤ 20 m) va o'q ovozi (≤ 45 m) tomonga
+##     qaraydi, CT lar ma'lumotni jamoaga beradi; ko'rilgan joyni 3 s eslaydi; jamoadoshi o'lsa otuvchi tomonga qaraydi.
+##   AIM: reaksiya 0.18–0.32 s; nishon oldindan qaralgan joydan chiqsa tezroq va aniqroq; boshga mo'ljal (AWP — tanaga);
+##     xato = mo'ljal xatosi (kuzatgan sari kamayadi) + qurol tarqalishi (harakatda katta — bot to'xtab otadi) +
+##     tepki (80% nazorat); masofaga qarab: yaqinda spray, o'rtada 3–4 lik burst, uzoqda bittalab; har o'q aniq
+##     geometriya bilan (bosh / ko'krak / qorin / qo'l / oyoq) hisoblanadi — "har tomonga" otmaydi; magazin tugasa qayta o'qlaydi.
+##   HOLAT: flesh ko'r qilsa — ko'rmaydi va otmaydi; olovdan chiqib ketadi; jarohatlangan CT orqaroqqa chekinadi.
 ## O'yinchi o'lsa — tirik jamoadoshini kuzatadi (sichqoncha chap tugmasi — keyingisi), raund boshida tiriladi.
 ## Dushman botlar ustidagi yozuv ko'rinmaydi (devor orqali ko'rsatmaslik uchun), jamoadoshlarniki ko'rinadi.
 
 const BotScript := preload("res://scripts/bot.gd")
-const RIFLE := preload("res://weapons/rifle.tres")
-const WEAPONS := {"lar_01": preload("res://weapons/rifle.tres"), "rifle_vanguard": preload("res://weapons/vanguard.tres"),
-	"spectre_smg": preload("res://weapons/smg.tres"), "longbow_50": preload("res://weapons/sniper.tres")}
-const BOMB := preload("res://scenes/bomb.tscn")
-## game_mode.gd dagi Phase qiymatlari (5v5 va 3v3 nusxalarida bir xil)
-const FREEZE := 0
-const LIVE := 1
-const PLANTED := 2
-const ROUND_END := 3
+const Rules := preload("res://scripts/cs_rules.gd")
+const Combat := preload("res://scripts/combat.gd")
+const Grenade := preload("res://scripts/grenade.gd")
 const SMOKE_LAYER := 128
 const VIEW_DIST := 70.0
 const FOV_DOT := 0.34
 const STEP_HEAR := 20.0
 const SHOT_HEAR := 45.0
+const FREEZE := 0
+const LIVE := 1
+const PLANTED := 2
+const ROUND_END := 3
+const NAMES := ["Anvar", "Bobur", "Jasur", "Temur", "Sardor", "Aziz", "Dilshod", "Farrux", "Shoxrux"]
 
 @export var enabled := true
 @export var team_size := 5
@@ -40,7 +42,7 @@ const SHOT_HEAR := 45.0
 @export var map_data_path := "res://scripts/map_data.gd"
 @export var game_path: NodePath = ^"../GameMode"
 @export var player_path: NodePath = ^"../Player"
-@export_range(0.5, 1.5) var difficulty := 1.1     ## 1.0 — oddiy, 1.1 — qiyin (standart), 1.3 — juda qiyin
+@export_range(0.5, 1.5) var difficulty := 1.15     ## 1.0 — oddiy, 1.15 — kuchli (standart), 1.3 — professional
 
 var S: Script
 var M: Script
@@ -55,24 +57,18 @@ var strat: Array
 var setup: Array
 var exec_time := 0.0
 var executed := false
-var smokes: Array = []
 var smokes_thrown := false
+var flashes_thrown := false
 var alert_count := {"A": {}, "B": {}}
 var rotated := {}
 var picker: Node = null
 var kills: Array = []                 ## [vaqt, otuvchi, o'lgan, bosh bilanmi]
 var rounds_seen := 0
 var ready_ok := false
+var buys: Array = []                  ## oxirgi raunddagi xaridlar (sinov/ko'rish uchun): [ism, narsalar]
 var _frame := 0
-var _alive_prev := {}
 var _spec_cam: Camera3D
 var _spec_i := 0
-var _layer: CanvasLayer
-var _feed: Label
-var _hp_lbl: Label
-var _alive_lbl: Label
-var _flash: ColorRect
-var _smoke_mesh: SphereMesh
 var _last_phase := -1
 
 
@@ -91,20 +87,28 @@ func _ready() -> void:
 		var b: CharacterBody3D = BotScript.new()
 		add_child(b)
 		b.setup("T", i, Vector3(0, -50, 0), nav_map, true)
+		b.loadout.name = NAMES[i % NAMES.size()]
 		bots.append(b)
-		_alive_prev[b] = true
+	gm.bots = bots
 	player.footstep.connect(func(_s: String) -> void: _sound(player.global_position, STEP_HEAR, player.team, player))
 	player.fired.connect(func() -> void: _sound(player.global_position, SHOT_HEAR, player.team, player))
 	player.died.connect(_on_player_died)
 	player.damaged.connect(_on_player_damaged)
 	gm.phase_changed.connect(_on_phase)
-	_make_ui()
+	gm.killed.connect(_on_kill_event)
+	_spec_cam = Camera3D.new()
+	_spec_cam.fov = 75.0
+	_spec_cam.current = false
+	add_child(_spec_cam)
 	await get_tree().physics_frame
 	await get_tree().physics_frame
 	NavigationServer3D.map_force_update(nav_map)
 	while NavigationServer3D.map_get_iteration_id(nav_map) == 0:
 		await get_tree().physics_frame
 	ready_ok = true
+	# birinchi raund game_mode._ready da boshlangan — botlar hozir qo'shildi: ularga ham raund boshi
+	for b in bots:
+		b.loadout.reset_match()
 	prepare_round()
 
 
@@ -118,8 +122,7 @@ func enemies() -> Array:
 
 
 func side(team: String) -> Array:
-	var out := bots.filter(func(b): return b.team == team)
-	return out
+	return bots.filter(func(b): return b.team == team)
 
 
 func alive_count(team: String) -> int:
@@ -146,9 +149,7 @@ func prepare_round() -> void:
 	t = 0.0
 	executed = false
 	smokes_thrown = false
-	for s in smokes:
-		s[0].queue_free()
-	smokes = []
+	flashes_thrown = false
 	alert_count = {"A": {}, "B": {}}
 	rotated = {}
 	picker = null
@@ -160,7 +161,10 @@ func prepare_round() -> void:
 	var other := "CT" if my == "T" else "T"
 	var k := 0
 	for b in bots:
-		b.set_team(my if k < team_size - 1 else other)
+		var nt := my if k < team_size - 1 else other
+		if b.team != nt:
+			b.loadout.strip_all()            # jamoasi o'zgardi (yarim vaqt / F2) — qurollar qolmaydi
+		b.set_team(nt)
 		b.show_label = b.team == my
 		k += 1
 	var ts: Array = side("T")
@@ -177,7 +181,8 @@ func prepare_round() -> void:
 		cts[i].idx = i + off_ct
 	for b in bots:
 		b.clock = 0.0
-		_alive_prev[b] = true
+		b.blind_until = 0.0
+		b.loadout.round_start(b.team)
 		b._update_label()
 	# T taktikasi: guruhlar botlarga tartib bilan (o'yinchi T bo'lsa — uning o'rni oxirgisi)
 	strat = S.T_STRATS[rng.randi() % S.T_STRATS.size()]
@@ -187,7 +192,7 @@ func prepare_round() -> void:
 	for g in strat[2]:
 		for n in g[2]:
 			slots.append([g[0], g[1], g[3] and n == 0])
-	# bomba: o'yinchi T bo'lsa — 1/N ehtimol bilan o'yinchida (CS dagidek tasodifiy), aks holda bomba guruhidagi botda
+	# bomba: o'yinchi T bo'lsa — 1/N ehtimol bilan o'yinchida (CS2 dagidek tasodifiy), aks holda bomba guruhidagi botda
 	var bomb_given: bool = my == "T" and (ts.is_empty() or rng.randf() < 1.0 / team_size)
 	if my == "T" and not bomb_given:
 		player.has_bomb = false
@@ -209,7 +214,6 @@ func prepare_round() -> void:
 		ts[0].carrier = true
 	if not player.has_bomb:
 		gm.bomb_state = "carried"
-	_give_weapons(ts, cts)
 	for i in cts.size():
 		var b = cts[i]
 		var spot: Array = S.CT_SPOTS[setup[1][i % setup[1].size()]]
@@ -217,30 +221,102 @@ func prepare_round() -> void:
 		b.mode = "hold"
 		b.set_goal(spot[0])
 		b.hold_look = spot[1]
-		b.has_kit = rng.randf() < 0.5
-
-
-## qurollar: 5v5 da har jamoada bitta snayper (CT — platformadagi, T — Long guruhidagi), rush'dagilar — SMG,
-## qolganlar — LAR-01 yoki AR-44. 3v3 da snayper 50% ehtimol bilan.
-func _give_weapons(ts: Array, cts: Array) -> void:
-	for arr in [ts, cts]:
-		var sniper_ok: bool = team_size >= 5 or rng.randf() < 0.5
-		for b in arr:
-			var w := "lar_01" if rng.randf() < 0.6 else "rifle_vanguard"
-			if sniper_ok and (b.role.begins_with("A platforma") or b.role.begins_with("B platforma") or b.role == "LONG"):
-				w = "longbow_50"
-				sniper_ok = false
-			elif "rush" in str(strat[0]) and b.team == "T" and rng.randf() < 0.5:
-				w = "spectre_smg"
-			b.weapon = WEAPONS[w]
-			if b.model:
-				b.model.set_weapon(b.weapon.kind)
+	_buy_all(ts, cts)
+	for b in bots:
+		_equip_best(b)
 
 
 func _spawns(team: String) -> Array:
 	var arr := get_tree().get_nodes_in_group("spawn_" + team)
 	arr.sort_custom(func(a, b): return str(a.name) < str(b.name))
 	return arr
+
+
+# ------------------------------------------------------------------ iqtisod: botlar xaridi (CS2 bot mantig'i)
+func _buy_all(ts: Array, cts: Array) -> void:
+	buys = []
+	var played: int = gm.score["T"] + gm.score["CT"]
+	var pistol_round: bool = played == 0 or played == gm.half_len or (played >= gm.half_len * 2 and (played - gm.half_len * 2) % Rules.OT_HALF == 0)
+	for arr in [ts, cts]:
+		if arr.is_empty():
+			continue
+		var team: String = arr[0].team
+		var avg := 0.0
+		for b in arr:
+			avg += b.loadout.money
+		avg /= arr.size()
+		var loss_streak: int = gm.loss_count.get(team, 1)
+		var sniper_given := false
+		for i in arr.size():
+			var b = arr[i]
+			var lo = b.loadout
+			var got := []
+			var want_sniper: bool = not sniper_given and (b.role.contains("platforma") or b.role == "LONG" or (i == arr.size() - 1 and team_size >= 5))
+			if pistol_round:
+				if team == "CT" and i == 0 and _buy(b, "kit", got):
+					pass
+				if rng.randf() < 0.55:
+					_buy(b, "kevlar", got)
+				else:
+					_buy(b, "p250" if rng.randf() < 0.6 else ("tec9" if team == "T" else "fiveseven"), got)
+					_buy(b, "flash", got)
+			elif lo.primary != null:
+				# qurol bor (tirik qolgan) — zirh va granata to'ldiriladi
+				_buy(b, "vesthelm", got)
+				_util(b, team, got)
+			else:
+				var rifle := "ak47" if team == "T" else "m4a4"
+				var full: int = lo.price_of(rifle) + Rules.KEVLAR_HELMET + (Rules.KIT if team == "CT" else 0) + 300
+				if want_sniper and lo.money >= Rules.weapon("awp").price + Rules.KEVLAR_HELMET:
+					_buy(b, "awp", got)
+					_buy(b, "vesthelm", got)
+					sniper_given = true
+					_util(b, team, got)
+				elif lo.money >= full:
+					_buy(b, rifle, got)
+					_buy(b, "vesthelm", got)
+					if team == "CT" and not lo.kit:
+						_buy(b, "kit", got)
+					_util(b, team, got)
+				elif avg < 2200 and loss_streak < 3 and lo.money < 3000:
+					# eco: tejash (kichik xarid)
+					if lo.money >= 2000 and rng.randf() < 0.3:
+						_buy(b, "p250", got)
+				else:
+					# force-buy: arzon avtomat / SMG + zirh
+					var cheap := ("galil" if team == "T" else "famas") if lo.money >= 2700 else ("mac10" if team == "T" else "mp9")
+					if want_sniper and lo.money >= 2400:
+						cheap = "ssg08"
+						sniper_given = true
+					_buy(b, cheap, got)
+					_buy(b, "kevlar", got)
+					if lo.money >= 500:
+						_buy(b, "flash", got)
+			buys.append([lo.name, got])
+
+
+func _buy(b, item: String, got: Array) -> bool:
+	if b.loadout.try_buy(item, b.team):
+		got.append(item)
+		return true
+	return false
+
+
+func _util(b, team: String, got: Array) -> void:
+	var order := ["smoke", "flash", "molotov" if team == "T" else "incendiary", "he", "flash"]
+	for g in order:
+		if b.loadout.money < 1200 and g != "smoke" and g != "flash":
+			continue
+		_buy(b, g, got)
+
+
+func _equip_best(b) -> void:
+	var lo = b.loadout
+	b.weapon = lo.primary if lo.primary else lo.secondary
+	if b.weapon and b.model:
+		b.model.set_weapon(b.weapon.kind, b.weapon.weapon_id)
+	b.burst = 0
+	b.set_meta("reload_until", 0.0)
 
 
 # ------------------------------------------------------------------ asosiy sikl
@@ -254,22 +330,21 @@ func _physics_process(delta: float) -> void:
 	for b in bots:
 		b.clock = t
 	_frame += 1
-	_update_smokes()
 	if live:
 		if _frame % 2 == 0:
 			_perceive()
 		_think_t()
 		_think_ct()
+		_sweep_angles()
+		_avoid_fire()
 		_combat()
 	for b in bots:
 		if b.alive:
 			var can_move: bool = live and b.busy == "" and not (b.target != null or t < b.fight_until)
 			b.step(delta, can_move)
-	_process_deaths()
 	if live:
 		_check_end()
 	_update_spectator()
-	_update_ui(delta)
 
 
 # ------------------------------------------------------------------ ko'rish va eshitish
@@ -291,7 +366,7 @@ func _targets_for(b) -> Array:
 func _perceive() -> void:
 	for b in bots:
 		b.visible_enemies = []
-		if not b.alive:
+		if not b.alive or b.blind_until > t:
 			continue
 		for e in _targets_for(b):
 			var to: Vector3 = e.global_position - b.global_position
@@ -310,7 +385,6 @@ func _perceive() -> void:
 			elif _los(eye, head):
 				b.visible_enemies.append([e, true])
 		for ve in b.visible_enemies:
-			# ko'rilgan joyni eslab qoladi; CT lar site'dagi T larni jamoaga aytadi
 			b.alert_look = ve[0].global_position
 			b.alert_until = t + 3.0
 			if b.team == "CT":
@@ -337,21 +411,66 @@ func _sound(pos: Vector3, radius: float, team: String, src: Node3D) -> void:
 				_report(src)
 
 
+## burchaklarni tekshirish: to'xtab turgan bot har 2–4 s da xavfli tomonlardan biriga qaraydi
+func _sweep_angles() -> void:
+	if _frame % 20 != 0:
+		return
+	for b in bots:
+		if not b.alive or b.target != null or b.moving() or b.alert_until > t:
+			continue
+		var pts: Array = []
+		if b.team == "CT" and b.mode == "hold":
+			var spot: Array = S.CT_SPOTS[b.role]
+			pts.append(spot[1])
+			for key in S.T_ENTRY:
+				var e: Array = S.T_ENTRY[key]
+				if b.global_position.distance_to(e[e.size() - 1]) < 26.0:
+					pts.append(e[e.size() - 1])
+		elif b.team == "T" and (b.mode == "post" or b.mode == "site"):
+			pts.append(b.post_look)
+			for h in S.ROTATE_SPOT.get(strat[1], []):
+				pts.append(h[0])
+		if pts.size() > 1 and rng.randf() < 0.35:
+			b.hold_look = pts[rng.randi() % pts.size()]
+
+
+## olovdan qochish
+func _avoid_fire() -> void:
+	var fires := get_tree().get_nodes_in_group("fires")
+	if fires.is_empty():
+		return
+	for b in bots:
+		if not b.alive:
+			continue
+		for f in fires:
+			if f.contains(b.global_position):
+				var away: Vector3 = (b.global_position - f.global_position) * Vector3(1, 0, 1)
+				b._unstick_dir = away.normalized() if away.length() > 0.1 else Vector3.RIGHT
+				b._unstick_left = 0.5
+				b.fight_until = 0.0
+
+
 # ------------------------------------------------------------------ T qarorlari
 func _think_t() -> void:
 	var site: String = strat[1]
-	var plant_p: Vector3 = S.PLANT[site]
+	var plant_p: Vector3 = gm.plant_spots.get(site, S.PLANT[site])
 	if not executed and t >= exec_time:
 		executed = true
 	if executed and not smokes_thrown:
 		smokes_thrown = true
 		for n in strat[3]:
-			if S.SMOKES.has(n):
+			if S.SMOKES.has(n) and _take_nade("T", "smoke"):
 				var sm: Array = S.SMOKES[n]
-				_throw_smoke(sm[1], sm[2])
+				_lineup(sm[1], sm[2], "smoke", null)
+	if executed and not flashes_thrown and t >= exec_time + 1.2:
+		flashes_thrown = true
+		# kirishdan oldin flesh — site ichiga (CT lar ko'r bo'ladi)
+		for b in side("T"):
+			if b.alive and b.mode == "entry" and _take_bot_nade(b, "flash"):
+				_lineup(plant_p + Vector3.UP * 2.0, 0.9, "flash", b)
+				break
 	var planted: bool = gm.bomb_state == "planted"
 	var bomb_pos: Vector3 = gm.bomb.global_position if gm.bomb and is_instance_valid(gm.bomb) else Vector3.ZERO
-	# bomba yerda — eng yaqin tirik T bot olib keladi (o'yinchi T bo'lsa u ham olishi mumkin — game_mode)
 	if gm.bomb_state == "dropped" and (picker == null or not picker.alive):
 		_choose_picker(bomb_pos)
 	for b in side("T"):
@@ -359,7 +478,9 @@ func _think_t() -> void:
 			continue
 		if b.busy == "plant":
 			if t >= b.busy_until and gm.phase == LIVE:
-				_bot_plant(b, site)
+				b.busy = ""
+				b.carrier = false
+				gm.plant_bomb(b, b.global_position, site)
 			continue
 		if gm.bomb_state == "dropped" and b == picker:
 			b.mode = "pickup"
@@ -396,7 +517,8 @@ func _think_t() -> void:
 				b.mode = "site"
 				if b.carrier:
 					b.set_goal(plant_p)
-					if b.at(plant_p, 0.8) and b.visible_enemies.is_empty() and b.is_on_floor():
+					if b.at(plant_p, 0.8) and b.visible_enemies.is_empty() and b.is_on_floor() \
+							and gm.plant_circle_at(b.global_position) != "":
 						b.busy = "plant"
 						b.busy_until = t + gm.R.plant_time
 						b.clear_goal()
@@ -405,7 +527,8 @@ func _think_t() -> void:
 					b.hold_look = b.post_look
 			"post":
 				b.set_goal(b.post_spot)
-				b.hold_look = b.post_look
+				if b.alert_until <= t:
+					b.hold_look = b.post_look
 		if b.mode == "route" and executed:
 			b.mode = "entry"
 
@@ -421,24 +544,9 @@ func _choose_picker(pos: Vector3) -> void:
 				picker = b
 
 
-func _bot_plant(b, site: String) -> void:
-	b.busy = ""
-	b.carrier = false
-	gm._clear_bomb()
-	var bomb: Node3D = BOMB.instantiate()
-	gm.get_parent().add_child(bomb)
-	bomb.global_position = gm._floor_point(b.global_position)
-	bomb.plant(gm.R.bomb_timer)
-	gm.bomb = bomb
-	gm.bomb_state = "planted"
-	gm.planted_site = site
-	gm._set_phase(PLANTED, gm.R.bomb_timer)
-	gm.bomb_event.emit("planted")
-
-
 func _drop_bomb_at(pos: Vector3) -> void:
 	gm._clear_bomb()
-	var bomb: Node3D = BOMB.instantiate()
+	var bomb: Node3D = gm.BombScene.instantiate()
 	gm.get_parent().add_child(bomb)
 	bomb.global_position = gm._floor_point(pos)
 	gm.bomb = bomb
@@ -458,44 +566,108 @@ func _think_ct() -> void:
 		seen[reg] = n
 	var need_mid := 1 if team_size <= 3 else 2
 	var need_far := 2 if team_size <= 3 else 3
-	for b in side("CT"):
+	var cts := side("CT")
+	var alive_ct := alive_count("CT")
+	var alive_t := alive_count("T")
+	for b in cts:
 		if not b.alive:
 			continue
 		if b.busy == "defuse":
 			if t >= b.busy_until and gm.phase == PLANTED:
 				b.busy = ""
-				gm._defuse()
+				gm._defuse(b)
 			continue
 		var spot: Array = S.CT_SPOTS[b.role]
 		var home: String = spot[2]
 		if gm.bomb_state == "planted" and gm.bomb and is_instance_valid(gm.bomb):
 			var bp: Vector3 = gm.bomb.global_position
+			var need: float = gm.R.defuse_time_kit if b.loadout.kit else gm.R.defuse_time
+			var dist: float = b.global_position.distance_to(bp)
+			var arrive: float = dist / 4.2 + need
+			# umid yo'q: yolg'iz 3+ T ga qarshi va vaqt yetmaydi — qurolni saqlash
+			if alive_ct <= 1 and alive_t >= 3 and gm.time_left < arrive:
+				b.mode = "save"
+				b.set_goal(_spawns("CT")[0].global_position)
+				continue
+			# guruh bo'lib qaytarish: yaqinda (≤ 22 m) kamida 2 CT bo'lguncha kutish (vaqt kam bo'lsa — darhol)
+			var near := cts.filter(func(o): return o.alive and o.global_position.distance_to(bp) < 22.0).size()
+			var wait_ok: bool = gm.time_left > arrive + 8.0 and near < mini(2, alive_ct) and dist > 12.0
+			var rot: Array = S.ROTATE_SPOT.get(gm.planted_site, [[bp, bp]])
 			b.mode = "retake"
-			b.set_goal(bp)
-			b.hold_look = bp
-			if b.at(bp, 1.2) and b.visible_enemies.is_empty() and b.is_on_floor():
-				b.busy = "defuse"
-				b.busy_until = t + (gm.R.defuse_time_kit if b.has_kit else gm.R.defuse_time)
-				b.clear_goal()
+			if wait_ok:
+				var hold: Array = rot[b.idx % rot.size()]
+				b.set_goal(hold[0])
+				b.hold_look = bp
+			else:
+				if b.at(bp, 14.0) and b.visible_enemies.is_empty() and not b.get_meta("flashed_retake", false) and _take_bot_nade(b, "flash"):
+					b.set_meta("flashed_retake", true)
+					_lineup(bp + Vector3.UP * 2.2, 0.9, "flash", b)
+				b.set_goal(bp)
+				b.hold_look = bp
+				if b.at(bp, 1.2) and b.visible_enemies.is_empty() and b.is_on_floor():
+					b.busy = "defuse"
+					b.busy_until = t + need
+					b.clear_goal()
 			continue
+		b.set_meta("flashed_retake", false)
+		# jarohatlangan (≤ 35 HP) va dushman ko'rinmayapti — orqaroqqa chekinib ushlab turish
+		if b.hp <= 35.0 and b.visible_enemies.is_empty() and b.mode == "hold" and home in ["A", "B"]:
+			var back: Array = S.ROTATE_SPOT[home][0]
+			b.set_goal(back[0])
+			b.hold_look = back[1]
+			b.mode = "fallback"
+		# site'ga ko'p T kirsa — molotov/yondiruvchi kirish joyiga
+		for reg in ["A", "B"]:
+			if reg == home and seen[reg] >= 2 and b.target == null and b.alert_until > t and not b.get_meta("molly_" + reg, false):
+				if _take_bot_nade(b, "incendiary"):
+					b.set_meta("molly_" + reg, true)
+					_lineup(b.alert_look, 1.0, "incendiary", b)
 		for reg in ["A", "B"]:
 			if reg == home:
 				continue
-			var need := need_mid if home == "M" else need_far
-			if seen[reg] >= need and not rotated.has(b):
+			var need2 := need_mid if home == "M" else need_far
+			if seen[reg] >= need2 and not rotated.has(b):
 				rotated[b] = reg
 		if rotated.has(b):
 			var reg2: String = rotated[b]
 			b.mode = "rotate"
-			var hold: Array = S.ROTATE_SPOT[reg2][b.idx % S.ROTATE_SPOT[reg2].size()]
-			b.set_goal(hold[0])
-			b.hold_look = hold[1]
+			var hold2: Array = S.ROTATE_SPOT[reg2][b.idx % S.ROTATE_SPOT[reg2].size()]
+			b.set_goal(hold2[0])
+			b.hold_look = hold2[1]
 
 
-# ------------------------------------------------------------------ jang
+# ------------------------------------------------------------------ granatalar (botlar)
+func _take_nade(team: String, type: String) -> bool:
+	for b in side(team):
+		if b.alive and _take_bot_nade(b, type):
+			return true
+	return false
+
+
+func _take_bot_nade(b, type: String) -> bool:
+	if type in b.loadout.grenades:
+		b.loadout.grenades.erase(type)
+		return true
+	return false
+
+
+## "lineup": granata belgilangan vaqtdan keyin nishonga tushadi (fizika bilan topilgan smoke lineup'lari —
+## strategies*.gd), keyin haqiqiy granata sifatida ishlaydi (tutun ko'rishni to'sadi, flesh ko'r qiladi, olov yonadi)
+func _lineup(target: Vector3, flight: float, type: String, who) -> void:
+	var tw := get_tree().create_timer(flight)
+	tw.timeout.connect(func() -> void:
+		if not is_inside_tree() or gm.phase == ROUND_END:
+			return
+		Grenade.throw(get_parent(), type, target + Vector3.UP * 0.25, Vector3.DOWN * 2.0, who))
+
+
+# ------------------------------------------------------------------ jang: professional aim modeli
 func _combat() -> void:
 	for b in bots:
 		if not b.alive:
+			continue
+		if b.blind_until > t:
+			b.target = null
 			continue
 		var cur = null
 		var head_only := false
@@ -517,104 +689,136 @@ func _combat() -> void:
 				var react := rng.randf_range(0.18, 0.32) / difficulty
 				if b.moving():
 					react += 0.1
-				# oldindan qaralgan (eshitilgan / oxirgi ko'rilgan / turish) tomondan chiqsa — tezroq
 				var to: Vector3 = cur.global_position - b.global_position
 				var look_pt: Vector3 = b.alert_look if b.alert_until > t else b.hold_look
+				var pre := false
 				if look_pt != Vector3.ZERO and not b.moving():
 					var aim: Vector3 = look_pt - b.global_position
-					if Vector3(aim.x, 0, aim.z).normalized().dot(Vector3(to.x, 0, to.z).normalized()) > 0.9:
+					pre = Vector3(aim.x, 0, aim.z).normalized().dot(Vector3(to.x, 0, to.z).normalized()) > 0.9
+					if pre:
 						react -= 0.08
 				b.react_at = t + maxf(0.1, react)
 				b.burst = 0
+				b.set_meta("track_from", t)
+				b.set_meta("pre_aim", pre)
 		b.target = cur
 		if cur == null:
 			continue
 		b.fight_until = t + 1.0
 		if b.busy != "":
 			b.busy = ""
-		if t < b.react_at or t < b.next_shot:
+		var W: Resource = b.weapon if b.weapon else Rules.weapon("glock")
+		if t < b.react_at or t < b.next_shot or t < float(b.get_meta("reload_until", 0.0)):
 			continue
-		var W: Resource = b.weapon if b.weapon else RIFLE
-		var sniper: bool = W.kind == 4
+		# magazin
+		var am: Array = b.loadout.ammo.get(W.weapon_id, [W.magazine_size, W.reserve_ammo])
+		if am[0] <= 0:
+			if am[1] <= 0 and b.loadout.secondary and W != b.loadout.secondary:
+				b.weapon = b.loadout.secondary                     # o'q tugadi — to'pponchaga
+				if b.model:
+					b.model.set_weapon(b.weapon.kind, b.weapon.weapon_id)
+				continue
+			var n: int = mini(W.magazine_size, am[1])
+			b.loadout.ammo[W.weapon_id] = [n, am[1] - n]
+			b.set_meta("reload_until", t + W.reload_time)
+			b.burst = 0
+			continue
+		am[0] -= 1
+		b.loadout.ammo[W.weapon_id] = am
+		var dist: float = b.global_position.distance_to(cur.global_position)
+		# otish ritmi: yaqinda spray, o'rtada burst, uzoqda bittalab (tepki tiklanadi)
 		b.burst += 1
-		b.next_shot = t + W.shot_interval()
-		if b.burst % rng.randi_range(4, 6) == 0:
-			b.next_shot += 0.18                  # qisqa pauza (nishonni tiklash)
+		var interval: float = W.shot_interval()
+		var sniper: bool = W.kind == 4
+		var auto: bool = W.fire_modes.size() > 0 and int(W.fire_modes[0]) == 2
+		if auto:
+			var max_burst := 30 if dist < 10.0 else (5 if dist < 20.0 else (3 if dist < 35.0 else 1))
+			if W.kind == 3:
+				max_burst = 30 if dist < 18.0 else 4
+			if b.burst >= max_burst:
+				interval += 0.28 if dist >= 20.0 else 0.15
+				b.burst = 0
+		elif W.kind == 1:
+			interval = maxf(interval, 0.22 if dist > 15.0 else 0.14)
+		b.next_shot = t + interval
 		b.on_shot()
 		_sound(b.global_position, SHOT_HEAR, b.team, b)
-		var dist: float = b.global_position.distance_to(cur.global_position)
-		var p := clampf(0.74 - 0.0075 * dist, 0.15, 0.74) * difficulty
-		if sniper:
-			p = clampf(0.88 - 0.002 * dist, 0.6, 0.88) * difficulty    # snayper: masofa deyarli ta'sir qilmaydi
-		elif W.kind == 3:
-			p *= clampf(1.1 - dist / 60.0, 0.5, 1.1)                  # SMG: yaqinda yaxshi, uzoqda yomon
-		if b.moving():
-			p *= 0.2 if sniper else 0.5
-		if head_only:
-			p *= 0.55
-		if cur == player:
-			var sp := Vector2(player.velocity.x, player.velocity.z).length()
-			if sp > 3.0:
-				p *= 0.75
-			if player.crouching:
-				p *= 0.92
-		p *= maxf(0.55, 1.0 - 0.05 * (b.burst - 1))       # ketma-ket o'qlarda tarqalish
-		if b.burst == 1:
-			p = minf(p * 1.15, 0.92)                        # birinchi o'q aniqroq
-		if rng.randf() >= p:
-			continue
-		var zone := "body"
-		if head_only:
-			zone = "head"
-		else:
-			var r := rng.randf()
-			var hc := 0.13 * difficulty
-			if r < hc:
-				zone = "head"
-			elif r < hc + 0.14:
-				zone = "leg"
-			elif r < hc + 0.24:
-				zone = "arm"
-		var dmg: float = W.damage_at(dist, zone)
-		var killed := false
-		if cur == player:
-			killed = player.damage(dmg, b.global_position)
-		else:
-			if cur.target == null:
+		for pellet in W.projectile_count:
+			var zone := _shot_zone(b, cur, W, dist, head_only, sniper)
+			if zone == "":
+				continue
+			var raw: float = W.damage_at(dist, zone)
+			var killed: bool = cur.take_hit(raw, zone, b, W) if cur != player else Combat.hit(player, raw, zone, b, W)
+			if cur != player and cur.target == null:
 				cur.alert_look = b.global_position
 				cur.alert_until = t + 3.0
 				cur.fight_until = t + 1.0
-			cur.last_attacker = b
-			killed = cur.damage(dmg)
-		if killed:
-			_on_kill(b, cur, zone == "head")
+			if killed:
+				break
 
 
-func _on_kill(killer, victim, head: bool) -> void:
-	kills.append([t, killer, victim, head])
-	# "trade": yaqindagi jamoadoshlar otuvchi tomonga qaraydi
+## bitta o'q qayerga tegadi: mo'ljal nuqtasi + burchak xatosi (mo'ljal, qurol tarqalishi, tepki) -> zona yoki "" (tegmadi)
+func _shot_zone(b, cur, W: Resource, dist: float, head_only: bool, sniper: bool) -> String:
+	var tracked: float = t - float(b.get_meta("track_from", t))
+	var pre: bool = b.get_meta("pre_aim", false)
+	var s_aim: float = (0.012 if not pre else 0.006) * exp(-tracked / 0.35) + 0.0022
+	s_aim /= difficulty
+	var tgt_moving: bool = Vector2(cur.velocity.x, cur.velocity.z).length() > 2.5
+	if tgt_moving:
+		s_aim += 0.004 / difficulty
+	var s_w: float = W.base_spread
+	if sniper:
+		s_w *= W.ads_spread_multiplier            # bot har doim optika bilan, to'xtab otadi
+	if b.moving():
+		s_w *= W.spread_walk_mult
+	s_w += W.spread_bloom_per_shot * clampf(b.burst - 1, 0.0, 8.0)
+	var s_r := 0.0
+	if W.recoil_pattern_v.size() > 0 and b.burst > 1:
+		var i: int = mini(b.burst - 1, W.recoil_pattern_v.size() - 1)
+		s_r = deg_to_rad(W.recoil_pattern_v[i] * W.recoil_scale) * 0.2          # 80% tepki nazorati
+	var sig := sqrt(s_aim * s_aim + s_w * s_w + s_r * s_r)
+	var low: bool = cur == player and player.crouching
+	var head_h := 1.2 if low else 1.65
+	var aim_head: bool = head_only or (not sniper and (dist < 35.0 or rng.randf() < 0.6) and rng.randf() < 0.55 * difficulty)
+	var aim_y: float = head_h if aim_head else (0.95 if low else 1.3)
+	var dx := rng.randfn(0.0, sig) * dist
+	var dy := rng.randfn(0.0, sig) * dist
+	var y := aim_y + dy
+	var x := dx
+	if Vector2(x, y - head_h).length() < 0.12:
+		return "head"
+	if head_only:
+		return ""
+	var top := (head_h - 0.18)
+	var bottom := 0.55 if low else 0.95
+	if absf(x) <= 0.2 and y >= bottom and y <= top:
+		return "body" if y > (bottom + top) * 0.5 else "stomach"
+	if absf(x) > 0.2 and absf(x) <= 0.3 and y >= bottom and y <= top:
+		return "arm"
+	if absf(x) <= 0.17 and y >= 0.0 and y < bottom:
+		return "leg"
+	return ""
+
+
+func _on_kill_event(e: Dictionary) -> void:
+	var killer = e.get("attacker")
+	var victim = e.get("victim_node")
+	kills.append([t, killer, victim, e.get("head", false)])
+	if victim == null:
+		return
 	for b in bots:
-		if b.alive and b.team == victim.team and b != victim and b.global_position.distance_to(victim.global_position) < 18.0:
+		if b.alive and b.team == victim.team and b != victim and killer and b.global_position.distance_to(victim.global_position) < 18.0:
 			b.alert_look = killer.global_position
 			b.alert_until = t + 3.0
 	for b in bots:
 		if b.target == victim:
 			b.target = null
-
-
-## botning o'limi (o'yinchi o'qidan ham): bomba tashlanadi, o'ldirilganlar ro'yxati
-func _process_deaths() -> void:
-	for b in bots:
-		if _alive_prev.get(b, true) and not b.alive:
-			_alive_prev[b] = false
-			if not kills.any(func(k): return k[2] == b):
-				var who: Node3D = b.last_attacker if b.last_attacker else player
-				_on_kill(who, b, false)
-			if b.carrier and gm.bomb_state == "carried":
-				b.carrier = false
-				_drop_bomb_at(b.global_position)
-			if b == picker:
-				picker = null
+	if victim in bots:
+		if victim.carrier and gm.bomb_state == "carried":
+			victim.carrier = false
+			_drop_bomb_at(victim.global_position)
+		if victim == picker:
+			picker = null
 
 
 func _on_player_died() -> void:
@@ -627,9 +831,6 @@ func _on_player_died() -> void:
 
 
 func _on_player_damaged(_amount: float, from_pos: Vector3) -> void:
-	if _flash:
-		_flash.color.a = 0.35
-	# o'yinchining jamoadoshlari otuvchi tomonga qaraydi
 	for b in allies():
 		if b.alive and b.target == null and b.global_position.distance_to(player.global_position) < 20.0:
 			b.alert_look = from_pos
@@ -641,44 +842,11 @@ func _check_end() -> void:
 	var ca := alive_count("CT")
 	if gm.phase == LIVE:
 		if ca == 0:
-			gm.end_round("T", "CT lar yo'q qilindi")
+			gm.end_round("T", "CT lar yo'q qilindi", "elim")
 		elif ta == 0:
-			gm.end_round("CT", "T lar yo'q qilindi")
+			gm.end_round("CT", "T lar yo'q qilindi", "elim")
 	elif gm.phase == PLANTED and ca == 0:
-		gm.end_round("T", "CT lar yo'q qilindi")
-
-
-# ------------------------------------------------------------------ smoke
-func _throw_smoke(target: Vector3, flight: float) -> void:
-	var body := StaticBody3D.new()
-	body.collision_layer = SMOKE_LAYER
-	body.collision_mask = 0
-	var cs := CollisionShape3D.new()
-	var sh := SphereShape3D.new()
-	sh.radius = S.SMOKE_R
-	cs.shape = sh
-	body.add_child(cs)
-	add_child(body)
-	body.global_position = target + Vector3.UP * 1.2
-	body.process_mode = Node.PROCESS_MODE_DISABLED
-	var mi := MeshInstance3D.new()
-	mi.mesh = _smoke_mesh
-	body.add_child(mi)
-	body.visible = false
-	smokes.append([body, t + flight, t + flight + S.SMOKE_TIME])
-
-
-func _update_smokes() -> void:
-	var keep := []
-	for s in smokes:
-		if t >= s[2]:
-			s[0].queue_free()
-			continue
-		if t >= s[1] and s[0].process_mode == Node.PROCESS_MODE_DISABLED:
-			s[0].process_mode = Node.PROCESS_MODE_INHERIT
-			s[0].visible = true
-		keep.append(s)
-	smokes = keep
+		gm.end_round("T", "CT lar yo'q qilindi", "elim")
 
 
 # ------------------------------------------------------------------ kuzatish (o'yinchi o'lganda)
@@ -704,68 +872,3 @@ func _update_spectator() -> void:
 	_spec_cam.look_at(b.global_position + Vector3.UP * 1.5 + fwd * 3.0, Vector3.UP)
 	if not _spec_cam.current:
 		_spec_cam.make_current()
-
-
-# ------------------------------------------------------------------ interfeys
-func _make_ui() -> void:
-	_smoke_mesh = SphereMesh.new()
-	_smoke_mesh.radius = S.SMOKE_R
-	_smoke_mesh.height = S.SMOKE_R * 2.0
-	_smoke_mesh.radial_segments = 10
-	_smoke_mesh.rings = 6
-	var sm := StandardMaterial3D.new()
-	sm.albedo_color = Color(0.82, 0.82, 0.8, 0.94)
-	sm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-	_smoke_mesh.material = sm
-	_spec_cam = Camera3D.new()
-	_spec_cam.fov = 75.0
-	_spec_cam.current = false
-	add_child(_spec_cam)
-	_layer = CanvasLayer.new()
-	_layer.layer = 3
-	add_child(_layer)
-	_flash = ColorRect.new()
-	_flash.color = Color(0.8, 0.0, 0.0, 0.0)
-	_flash.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_layer.add_child(_flash)
-	_hp_lbl = _mk_label(34, Vector2(24, -80), Control.PRESET_BOTTOM_LEFT)
-	_alive_lbl = _mk_label(22, Vector2(-180, 124), Control.PRESET_CENTER_TOP)
-	_alive_lbl.custom_minimum_size = Vector2(360, 0)
-	_alive_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_feed = _mk_label(18, Vector2(-460, 150), Control.PRESET_TOP_RIGHT)
-	_feed.custom_minimum_size = Vector2(440, 0)
-	_feed.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-
-
-func _mk_label(size: int, pos: Vector2, preset: int) -> Label:
-	var l := Label.new()
-	l.set_anchors_preset(preset)
-	l.position += pos
-	l.add_theme_font_size_override("font_size", size)
-	l.add_theme_color_override("font_outline_color", Color.BLACK)
-	l.add_theme_constant_override("outline_size", 6)
-	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_layer.add_child(l)
-	return l
-
-
-func _name(n: Node) -> String:
-	if n == player:
-		return "SIZ"
-	return "%s%d" % [n.team, n.idx + 1]
-
-
-func _update_ui(delta: float) -> void:
-	_flash.color.a = maxf(0.0, _flash.color.a - delta * 1.2)
-	_hp_lbl.text = ("+ %d" % int(ceil(player.hp))) if player.alive else "O'LDINGIZ — jamoadoshni kuzatish (sichqoncha: keyingisi)"
-	_hp_lbl.modulate = Color(1, 1, 1) if player.hp > 30 or not player.alive else Color(1, 0.35, 0.3)
-	var dots := func(team: String) -> String:
-		var n := alive_count(team)
-		return "●".repeat(n) + "○".repeat(maxi(0, team_size - n))
-	_alive_lbl.text = "T %s    %s CT" % [dots.call("T"), dots.call("CT")]
-	var s := ""
-	for k in kills.slice(maxi(0, kills.size() - 5)):
-		s += "%s  →  %s%s\n" % [_name(k[1]), _name(k[2]), "  (bosh)" if k[3] else ""]
-	_feed.text = s
-	_layer.visible = player.cam.current or (_spec_cam and _spec_cam.current)

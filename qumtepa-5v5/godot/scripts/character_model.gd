@@ -29,6 +29,10 @@ const WEAPON_KNIFE := 2
 const WEAPON_SMG := 3
 const WEAPON_SNIPER := 4
 const WEAPON_SHOTGUN := 5
+const WEAPON_MG := 6
+const WEAPON_GRENADE := 7
+const WEAPON_ZEUS := 8
+const WEAPON_C4 := 9
 
 ## jamoa ranglari: ko'ylak, jilet, shim, bosh kiyim, qurol yog'ochi
 const COLORS := {
@@ -65,6 +69,7 @@ var _gun: Node3D
 var _chest: Node3D
 var _hand_nodes: Array = []
 var weapon_kind := WEAPON_RIFLE
+var weapon_id := ""                 ## aniq qurol (shakl farqlari: AK/M4, Deagle, AWP, P90)
 var hitboxes: Array = []
 var _crouch_amt := 0.0
 var _step := 0.0
@@ -194,10 +199,11 @@ func receiver() -> Node:
 
 
 ## qo'ldagi qurolni almashtirish (1-shaxs va 3-shaxsda bir xil shakl)
-func set_weapon(kind: int) -> void:
-	if kind == weapon_kind and _gun:
+func set_weapon(kind: int, wid := "") -> void:
+	if kind == weapon_kind and wid == weapon_id and _gun:
 		return
 	weapon_kind = kind
+	weapon_id = wid
 	if model:
 		var was_dead := dead
 		load_model(team)                 # qutilar birlashtirilgan — qo'l va qurol butunlay qayta yig'iladi (arzon)
@@ -254,75 +260,146 @@ func _vc_material() -> StandardMaterial3D:
 ## qo'llar va qurol (3-shaxsda ham, 1-shaxsda ham bir xil joyda): ko'krak suyagi fazosida
 func _build_arms_gun(chest: Node3D, c: Dictionary) -> void:
 	var o := Vector3(0, HIPS_Y + 0.35, 0)            # ko'krak suyagining model fazosidagi joyi (tinch holat)
-	_gun = Node3D.new()
+	var shape: Dictionary = make_weapon_shape(weapon_kind, team, weapon_id)
+	_gun = shape.node
 	_gun.name = "Weapon"
 	chest.add_child(_gun)
-	var grip: Vector3
-	var fore: Vector3
-	match weapon_kind:
-		WEAPON_PISTOL:
-			_gun.position = Vector3(-0.05, 1.36, 0.42) - o
-			_box(_gun, Vector3(0.035, 0.05, 0.2), Vector3(0, 0.02, 0.05), METAL)                    # zatvor
-			_box(_gun, Vector3(0.032, 0.11, 0.05), Vector3(0, -0.05, -0.02), c.wood).rotation.x = -0.25   # dasta
-			grip = _gun.position + Vector3(0, -0.06, -0.03)
-			fore = _gun.position + Vector3(0.04, -0.07, -0.02)
-		WEAPON_KNIFE:
-			_gun.position = Vector3(-0.2, 1.2, 0.34) - o
-			_box(_gun, Vector3(0.03, 0.03, 0.11), Vector3(0, 0, -0.02), c.wood)                     # dasta
-			_box(_gun, Vector3(0.008, 0.035, 0.17), Vector3(0, 0.005, 0.12), Color(0.72, 0.74, 0.76))   # tig'
-			grip = _gun.position + Vector3(0, 0, -0.03)
-			fore = Vector3(0.22, 1.1, 0.12) - o
-		WEAPON_SMG:
-			_gun.position = Vector3(-0.13, 1.37, 0.16) - o
-			_box(_gun, Vector3(0.055, 0.08, 0.32), Vector3(0, 0, 0.2), METAL)                             # quti
-			_box(_gun, Vector3(0.03, 0.03, 0.12), Vector3(0, 0.01, 0.42), METAL)                          # stvol
-			_box(_gun, Vector3(0.035, 0.18, 0.045), Vector3(0, -0.13, 0.26), METAL)                       # uzun magazin
-			_box(_gun, Vector3(0.04, 0.1, 0.05), Vector3(0, -0.08, 0.1), METAL).rotation.x = -0.3        # dasta
-			_box(_gun, Vector3(0.02, 0.05, 0.18), Vector3(0, -0.01, -0.05), METAL)                        # sim qo'ndoq
-			grip = _gun.position + Vector3(0, -0.07, 0.11)
-			fore = _gun.position + Vector3(0, -0.12, 0.26)
-		WEAPON_SNIPER:
-			_gun.position = Vector3(-0.13, 1.37, 0.1) - o
-			_box(_gun, Vector3(0.06, 0.09, 0.5), Vector3(0, 0, 0.26), c.wood)                             # quti
-			_box(_gun, Vector3(0.035, 0.035, 0.6), Vector3(0, 0.02, 0.8), METAL)                          # uzun stvol
-			_box(_gun, Vector3(0.055, 0.055, 0.3), Vector3(0, 0.1, 0.3), METAL)                           # optika
-			_box(_gun, Vector3(0.055, 0.12, 0.26), Vector3(0, -0.03, -0.1), c.wood)                       # qo'ndoq
-			_box(_gun, Vector3(0.04, 0.06, 0.04), Vector3(0.05, 0.03, 0.2), METAL)                        # zatvor dastasi
-			grip = _gun.position + Vector3(0, -0.07, 0.14)
-			fore = _gun.position + Vector3(0, -0.05, 0.46)
-		WEAPON_SHOTGUN:
-			_gun.position = Vector3(-0.13, 1.37, 0.12) - o
-			_box(_gun, Vector3(0.065, 0.1, 0.36), Vector3(0, 0, 0.22), METAL)                             # quti
-			_box(_gun, Vector3(0.045, 0.045, 0.42), Vector3(0, 0.025, 0.6), METAL)                        # yo'g'on stvol
-			_box(_gun, Vector3(0.05, 0.05, 0.3), Vector3(0, -0.035, 0.55), METAL)                         # naycha magazin
-			_box(_gun, Vector3(0.07, 0.07, 0.14), Vector3(0, -0.035, 0.52), c.wood)                       # pompa
-			_box(_gun, Vector3(0.055, 0.11, 0.26), Vector3(0, -0.03, -0.08), c.wood)                      # qo'ndoq
-			grip = _gun.position + Vector3(0, -0.07, 0.14)
-			fore = _gun.position + Vector3(0, -0.05, 0.52)
-		_:
-			_gun.position = Vector3(-0.13, 1.37, 0.12) - o
-			var long_gun := team == "T"                   # T — yog'och qo'ndoqli, CT — qora (M416 ko'rinishida)
-			_box(_gun, Vector3(0.06, 0.09, 0.44), Vector3(0, 0, 0.28), METAL)                            # quti
-			_box(_gun, Vector3(0.03, 0.03, 0.34 if long_gun else 0.3), Vector3(0, 0.02, 0.66), METAL)     # stvol
-			_box(_gun, Vector3(0.065, 0.075, 0.22), Vector3(0, -0.005, 0.5), c.wood)                       # old tutqich
-			_box(_gun, Vector3(0.05, 0.1, 0.24), Vector3(0, -0.02, -0.08), c.wood)                         # qo'ndoq
-			_box(_gun, Vector3(0.045, 0.16, 0.08), Vector3(0, -0.12, 0.34), METAL).rotation.x = 0.35 if long_gun else 0.1   # magazin
-			_box(_gun, Vector3(0.04, 0.1, 0.05), Vector3(0, -0.08, 0.15), METAL).rotation.x = -0.3       # dasta
-			if not long_gun:
-				_box(_gun, Vector3(0.035, 0.05, 0.1), Vector3(0, 0.07, 0.3), METAL)                        # nishon
-			grip = _gun.position + Vector3(0, -0.07, 0.16)
-			fore = _gun.position + Vector3(0, -0.04, 0.5)
-	var muzzle := Node3D.new()
-	muzzle.name = "Muzzle"
-	muzzle.position = Vector3(0, 0.02, {WEAPON_PISTOL: 0.16, WEAPON_KNIFE: 0.2, WEAPON_SMG: 0.48, WEAPON_SNIPER: 1.1,
-		WEAPON_SHOTGUN: 0.81}.get(weapon_kind, 0.82))
-	_gun.add_child(muzzle)
+	_gun.position = shape.at - o
+	var grip: Vector3 = _gun.position + shape.grip
+	var fore: Vector3 = _gun.position + shape.fore if shape.two_hands else Vector3(0.22, 1.1, 0.12) - o
 	# qo'llar: yelka -> tirsak -> musht (ko'krak fazosida)
 	for arm in [[Vector3(-0.22, 1.42, 0) - o, Vector3(-0.3, 1.2, 0.02) - o, grip], [Vector3(0.22, 1.42, 0) - o, Vector3(0.1, 1.22, 0.28) - o, fore]]:
 		if not first_person:
 			_hand_nodes.append(_limb(chest, arm[0], arm[1], 0.1, c.shirt))
 		_hand_nodes.append(_limb(chest, arm[1], arm[2], 0.085, c.shirt if not first_person else c.vest))
 		_hand_nodes.append(_box(chest, Vector3(0.08, 0.09, 0.09), arm[2], Color(0.18, 0.16, 0.14)))   # qo'lqop
+
+
+## qurol shakli (qutilardan): 1-/3-shaxs va sotib olish menyusidagi rasm uchun bir xil.
+## Natija: node (qurol, og'zi +Z), at — model fazosidagi joyi, grip/fore — mushtlar (qurolga nisbatan).
+static func make_weapon_shape(kind: int, team: String, wid := "") -> Dictionary:
+	var g := Node3D.new()
+	var c: Dictionary = COLORS.get(team, COLORS["T"])
+	var wood: Color = c.wood
+	var dark := Color(0.14, 0.14, 0.15)
+	var olive := Color(0.33, 0.37, 0.24)
+	var at := Vector3(-0.13, 1.37, 0.12)
+	var grip := Vector3(0, -0.07, 0.16)
+	var fore := Vector3(0, -0.04, 0.5)
+	var muzzle := 0.82
+	var two := true
+	match kind:
+		WEAPON_PISTOL:
+			var big := wid == "deagle"
+			at = Vector3(-0.05, 1.36, 0.42)
+			_sbox(g, Vector3(0.035, 0.055 if big else 0.05, 0.26 if big else 0.2), Vector3(0, 0.02, 0.05), dark)
+			_sbox(g, Vector3(0.032, 0.11, 0.05), Vector3(0, -0.05, -0.02), wood if wid == "glock" else dark).rotation.x = -0.25
+			grip = Vector3(0, -0.06, -0.03)
+			fore = Vector3(0.04, -0.07, -0.02)
+			muzzle = 0.2 if big else 0.16
+		WEAPON_KNIFE:
+			at = Vector3(-0.2, 1.2, 0.34)
+			_sbox(g, Vector3(0.03, 0.03, 0.11), Vector3(0, 0, -0.02), wood)
+			_sbox(g, Vector3(0.008, 0.035, 0.17), Vector3(0, 0.005, 0.12), Color(0.72, 0.74, 0.76))
+			grip = Vector3(0, 0, -0.03)
+			two = false
+			muzzle = 0.2
+		WEAPON_ZEUS:
+			at = Vector3(-0.08, 1.33, 0.4)
+			_sbox(g, Vector3(0.04, 0.06, 0.18), Vector3(0, 0.02, 0.05), Color(0.95, 0.8, 0.1))
+			_sbox(g, Vector3(0.035, 0.1, 0.05), Vector3(0, -0.05, -0.02), dark).rotation.x = -0.25
+			_sbox(g, Vector3(0.03, 0.02, 0.02), Vector3(0, 0.03, 0.15), Color(0.2, 0.6, 1.0))
+			grip = Vector3(0, -0.06, -0.03)
+			two = false
+			muzzle = 0.16
+		WEAPON_GRENADE:
+			at = Vector3(-0.14, 1.3, 0.36)
+			_sbox(g, Vector3(0.07, 0.11, 0.07), Vector3.ZERO, olive)
+			_sbox(g, Vector3(0.03, 0.03, 0.03), Vector3(0, 0.07, 0), dark)
+			grip = Vector3(0, -0.02, -0.03)
+			two = false
+			muzzle = 0.05
+		WEAPON_C4:
+			at = Vector3(-0.08, 1.25, 0.36)
+			_sbox(g, Vector3(0.2, 0.07, 0.14), Vector3.ZERO, Color(0.36, 0.32, 0.22))
+			_sbox(g, Vector3(0.08, 0.02, 0.06), Vector3(0.02, 0.045, 0.0), Color(0.1, 0.1, 0.1))
+			_sbox(g, Vector3(0.03, 0.01, 0.02), Vector3(0.02, 0.058, 0.0), Color(1, 0.15, 0.1))
+			grip = Vector3(-0.08, -0.03, 0)
+			fore = Vector3(0.09, -0.03, 0)
+			muzzle = 0.1
+		WEAPON_SMG:
+			at = Vector3(-0.13, 1.37, 0.16)
+			var p90 := wid == "p90"
+			_sbox(g, Vector3(0.06, 0.09, 0.42 if p90 else 0.32), Vector3(0, 0, 0.2), dark)
+			_sbox(g, Vector3(0.03, 0.03, 0.12), Vector3(0, 0.01, 0.46 if p90 else 0.42), dark)
+			if p90:
+				_sbox(g, Vector3(0.05, 0.03, 0.3), Vector3(0, 0.06, 0.22), Color(0.2, 0.2, 0.22))
+			else:
+				_sbox(g, Vector3(0.035, 0.18, 0.045), Vector3(0, -0.13, 0.26), dark)
+				_sbox(g, Vector3(0.02, 0.05, 0.18), Vector3(0, -0.01, -0.05), dark)
+			_sbox(g, Vector3(0.04, 0.1, 0.05), Vector3(0, -0.08, 0.1), dark).rotation.x = -0.3
+			grip = Vector3(0, -0.07, 0.11)
+			fore = Vector3(0, -0.12, 0.26)
+			muzzle = 0.52 if p90 else 0.48
+		WEAPON_SNIPER:
+			at = Vector3(-0.13, 1.37, 0.1)
+			var body_col: Color = olive if wid == "awp" else (wood if wid == "longbow_50" else dark)
+			_sbox(g, Vector3(0.06, 0.09, 0.5), Vector3(0, 0, 0.26), body_col)
+			_sbox(g, Vector3(0.035, 0.035, 0.6), Vector3(0, 0.02, 0.8), dark)
+			_sbox(g, Vector3(0.055, 0.055, 0.3), Vector3(0, 0.1, 0.3), dark)
+			_sbox(g, Vector3(0.055, 0.12, 0.26), Vector3(0, -0.03, -0.1), body_col)
+			_sbox(g, Vector3(0.04, 0.06, 0.04), Vector3(0.05, 0.03, 0.2), dark)
+			grip = Vector3(0, -0.07, 0.14)
+			fore = Vector3(0, -0.05, 0.46)
+			muzzle = 1.1
+		WEAPON_SHOTGUN:
+			_sbox(g, Vector3(0.065, 0.1, 0.36), Vector3(0, 0, 0.22), dark)
+			_sbox(g, Vector3(0.045, 0.045, 0.42), Vector3(0, 0.025, 0.6), dark)
+			_sbox(g, Vector3(0.05, 0.05, 0.3), Vector3(0, -0.035, 0.55), dark)
+			_sbox(g, Vector3(0.07, 0.07, 0.14), Vector3(0, -0.035, 0.52), wood)
+			_sbox(g, Vector3(0.055, 0.11, 0.26), Vector3(0, -0.03, -0.08), wood)
+			grip = Vector3(0, -0.07, 0.14)
+			fore = Vector3(0, -0.05, 0.52)
+			muzzle = 0.81
+		WEAPON_MG:
+			_sbox(g, Vector3(0.08, 0.11, 0.5), Vector3(0, 0, 0.26), dark)
+			_sbox(g, Vector3(0.04, 0.04, 0.4), Vector3(0, 0.02, 0.7), dark)
+			_sbox(g, Vector3(0.1, 0.12, 0.12), Vector3(0.02, -0.12, 0.28), olive)
+			_sbox(g, Vector3(0.05, 0.1, 0.24), Vector3(0, -0.02, -0.08), dark)
+			_sbox(g, Vector3(0.012, 0.16, 0.012), Vector3(0.03, -0.08, 0.72), dark).rotation.x = 0.4
+			_sbox(g, Vector3(0.012, 0.16, 0.012), Vector3(-0.03, -0.08, 0.72), dark).rotation.x = 0.4
+			grip = Vector3(0, -0.08, 0.16)
+			fore = Vector3(0, -0.05, 0.5)
+			muzzle = 0.9
+		_:
+			var t_rifle := wid in ["ak47", "galil"] or (wid == "" and team == "T") or wid == "lar_01"
+			_sbox(g, Vector3(0.06, 0.09, 0.44), Vector3(0, 0, 0.28), dark)
+			_sbox(g, Vector3(0.03, 0.03, 0.34 if t_rifle else 0.3), Vector3(0, 0.02, 0.66), dark)
+			_sbox(g, Vector3(0.065, 0.075, 0.22), Vector3(0, -0.005, 0.5), wood if t_rifle else dark)
+			_sbox(g, Vector3(0.05, 0.1, 0.24), Vector3(0, -0.02, -0.08), wood if t_rifle else dark)
+			_sbox(g, Vector3(0.045, 0.16, 0.08), Vector3(0, -0.12, 0.34), dark).rotation.x = 0.35 if t_rifle else 0.1
+			_sbox(g, Vector3(0.04, 0.1, 0.05), Vector3(0, -0.08, 0.15), dark).rotation.x = -0.3
+			if not t_rifle:
+				_sbox(g, Vector3(0.035, 0.05, 0.1), Vector3(0, 0.07, 0.3), dark)
+	var mz := Node3D.new()
+	mz.name = "Muzzle"
+	mz.position = Vector3(0, 0.02, muzzle)
+	g.add_child(mz)
+	return {"node": g, "at": at, "grip": grip, "fore": fore, "two_hands": two}
+
+
+static func _sbox(parent: Node3D, size: Vector3, pos: Vector3, col: Color) -> MeshInstance3D:
+	var mi := MeshInstance3D.new()
+	var bm := BoxMesh.new()
+	bm.size = size
+	mi.mesh = bm
+	var m := StandardMaterial3D.new()
+	m.albedo_color = col
+	m.roughness = 0.9
+	mi.material_override = m
+	mi.position = pos
+	parent.add_child(mi)
+	return mi
 
 
 ## qurol og'zi (dunyo fazosida) — o'q izi shu yerdan chiqadi

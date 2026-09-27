@@ -9,9 +9,9 @@ const CALLOUT_GRID := [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 const GRID := ["#########################", "##,,,,,,,TTTTTTT,,,,,####", "##,,,#,,,TTTTTTT,,,,,####", "##..#####TTTTTTT####,,###", "#...#######,,,######,,###", "#...#####.......####,,###", "#...##,,,.......###,,,###", "#...##,,#.......,,,,,,###", "#...##,,#.......##,,#####", "#...##,,##mmm#####,,#####", "#...##,,##mmm#####,,#####", "#...##,,##mmm#####,,#####", "#AAAAAAAA#mmm###BBBBBBBB#", "#AAAAAAAA#mmmmm#BBBBBBBB#", "#AAAAAAAA#####m#BBBBBBBB#", "#AAAAAAAA##.....BBBBBBBB#", "#AAAAAAAA##..#.#BBBBBBBB#", "#AAAAAAAA##..#.#BBBBBBBB#", "#AAAAAAAA##...##BBBBBBBB#", "####...####,,,####...####", "####,,,,CCCCCCCCC,,,,####", "####,,,,CCCCCCCCC,,,,####", "########CCCCCCCCC########", "#########################", "#########################"]
 ## Raund qoidalari (soniya). 50 m xarita uchun: site'larga 5–9 s da yetiladi.
 const ROUND := {
-	"freeze": 5.0, "buy_time": 20.0, "round_time": 85.0,
-	"bomb_timer": 35.0, "plant_time": 3.0, "defuse_time": 7.0,
-	"defuse_time_kit": 3.5, "round_end": 5.0, "win_rounds": 13,
+	"freeze": 10.0, "buy_time": 20.0, "round_time": 90.0,
+	"bomb_timer": 40.0, "plant_time": 3.2, "defuse_time": 10.0,
+	"defuse_time_kit": 5.0, "round_end": 7.0, "win_rounds": 9,
 }
 
 

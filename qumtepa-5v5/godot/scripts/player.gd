@@ -49,6 +49,16 @@ var hp := 100.0
 var alive := true
 var idx := 0
 var carrier := false
+## CS2: jihozlar va statistika (pul, qurollar, zirh, granatalar, K/D/A) — loadout.gd
+var loadout = preload("res://scripts/loadout.gd").new()
+## qurolga qarab tezlik (CS2: pichoq 1.0, AK 0.86, AWP 0.8) — fp_view.gd
+var speed_mult := 1.0
+## 5-slotda bomba va chap tugma bosib turilgan (game_mode o'rnatish uchun E bilan bir xil ko'radi)
+var c4_fire := false
+## ekran silkinishi (bomba, granata) va flesh (oq ekran) — hud.gd chizadi
+var flash_until := 0.0
+var flash_total := 1.0
+var _shake := 0.0
 
 var walking := false
 var crouching := false
@@ -174,6 +184,7 @@ func _physics_process(delta: float) -> void:
 		s = walk_speed
 	elif allow_sprint and Input.is_action_pressed("sprint"):
 		s = sprint_speed
+	s *= speed_mult
 	velocity.x = dir.x * s
 	velocity.z = dir.z * s
 	var air_vy := velocity.y
@@ -181,6 +192,13 @@ func _physics_process(delta: float) -> void:
 	# kamera balandligi o'tirishga qarab silliq o'zgaradi
 	_eye = lerpf(_eye, EYE_CROUCH if crouching else EYE_STAND, 1.0 - exp(-delta * 12.0))
 	cam.position.y = _eye
+	if _shake > 0.0:
+		_shake = maxf(0.0, _shake - delta * 1.2)
+		cam.h_offset = randf_range(-1.0, 1.0) * _shake * 0.06
+		cam.v_offset = randf_range(-1.0, 1.0) * _shake * 0.06
+	elif cam.h_offset != 0.0:
+		cam.h_offset = 0.0
+		cam.v_offset = 0.0
 	_update_footsteps(delta, air_vy)
 	_update_body()
 
@@ -271,11 +289,15 @@ func damage(amount: float, from_pos := Vector3.ZERO) -> bool:
 	return false
 
 
-## o'q zonasi orqali (masalan boshqa o'yinchi): o'z jamoasiga zarar yo'q
-func take_hit(amount: float, _zone: String, from: Node) -> bool:
-	if from and "team" in from and from.team == team:
-		return false
-	return damage(amount, from.global_position if from is Node3D else Vector3.ZERO)
+## o'q zonasi orqali: zirh va kaska hisobga olinadi (combat.gd), o'z jamoasiga zarar yo'q
+func take_hit(amount: float, zone: String, from: Node, weapon: Resource = null) -> bool:
+	return preload("res://scripts/combat.gd").hit(self, amount, zone, from, weapon)
+
+
+## raund boshi (game_mode.gd): qurol tanlash
+func on_round_start() -> void:
+	if fp_view and fp_view.has_method("on_round_start"):
+		fp_view.on_round_start()
 
 
 func die() -> void:
@@ -286,6 +308,8 @@ func die() -> void:
 	busy = false
 	velocity = Vector3.ZERO
 	collision_layer = 0
+	if loadout:
+		loadout.strip_all()             # CS2: o'lsa qurol, zirh, granatalar yo'qoladi
 	if crouching:
 		_set_crouch(false)
 	if body:
@@ -299,3 +323,22 @@ func revive() -> void:
 	collision_layer = 8
 	if body:
 		body.revive()
+
+
+func shake(amount: float) -> void:
+	_shake = maxf(_shake, amount)
+
+
+## flesh ko'r qildi (grenade.gd): d soniya oq ekran (asta so'nadi)
+func flashed(d: float) -> void:
+	var now := Time.get_ticks_msec() / 1000.0
+	if now + d > flash_until:
+		flash_until = now + d
+		flash_total = d
+
+
+func blind_amount() -> float:
+	var left := flash_until - Time.get_ticks_msec() / 1000.0
+	if left <= 0.0:
+		return 0.0
+	return clampf(left / minf(flash_total, 2.0), 0.0, 1.0)
