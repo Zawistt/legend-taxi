@@ -24,6 +24,7 @@ Nima qilinadi:
 import json, math, os, sys, time
 import numpy as np
 import shapely
+import shapely.ops
 from shapely import box
 from shapely.strtree import STRtree
 import mapbox_earcut as earcut
@@ -51,6 +52,8 @@ MAT = {
     "Tom_Tekis":    ((0.45, 0.44, 0.42), 0.95), "Tom_Shifer":   ((0.60, 0.61, 0.60), 0.8),
     "Tom_Obida":    ((0.72, 0.62, 0.46), 0.9),
     "Balkon":       ((0.80, 0.79, 0.76), 0.85),
+    "Trotuar":      ((0.62, 0.60, 0.56), 0.9),
+    "Yol_Chiziq":   ((0.92, 0.92, 0.88), 0.7),
     "Yol_Asfalt":   ((0.22, 0.23, 0.24), 0.9), "Yol_Mahalla":  ((0.30, 0.30, 0.30), 0.95),
     "Yol_Piyoda":   ((0.66, 0.60, 0.50), 0.9), "Yol_Tuproq":   ((0.55, 0.47, 0.36), 1.0),
     "Temir_Yol":    ((0.32, 0.28, 0.25), 0.95), "Yol_Chegara": ((1.0, 0.0, 1.0), 1.0),
@@ -551,6 +554,167 @@ def devor_chiziq(yg, hh, pastki, yuqori, bx, bz):
     yg.qosh(v, np.zeros((2 * n, 2)), f)
 
 
+# ---------------- 4-bosqich: ko'cha ----------------
+KATTA_SINF = {"motorway", "trunk", "primary", "secondary", "tertiary"}
+HOVLI_UY = {"Devor_Suvoq", "Devor_Gisht", "Devor_Garaj"}
+
+
+def bolak_boyicha_lenta(yig, kalit, R, p, w, yoff, mat):
+    """Uzun chiziqni bo'laklarga (o'rta nuqta bo'yicha) bo'lib, relyefga yotgan lenta."""
+    p = zichla(p, 40.0)
+    for j in range(1, len(p)):
+        k = kalit(*((p[j - 1] + p[j]) / 2))
+        lenta(yig(k, mat), p[j - 1:j + 1], w, yoff, R, k[0] * BOLAK, k[1] * BOLAK)
+
+
+def punktir(line, chiziq=3.0, oraliq=6.0):
+    """LineString -> punktir bo'laklari (numpy massivlar)."""
+    L = line.length
+    ro, t = [], 1.0
+    while t + chiziq < L:
+        b = shapely.ops.substring(line, t, t + chiziq)
+        if b.length > 0.5:
+            ro.append(np.asarray(b.coords))
+        t += chiziq + oraliq
+    return ro
+
+
+def kocha_jihozlari(R, haydash, kenglik, katta, mayda, yol_yuza, bpoly, olib, binolar, yig, kalit, obyektlar, t0):
+    """Trotuar, bordyur, yo'l chiziqlari, zebra va hovli devorlari."""
+    tirik = np.array([j not in olib for j in range(len(bpoly))])
+    bino_birlash = shapely.union_all(bpoly[tirik])
+    vaqt(t0, "binolar birlashtirildi")
+
+    # --- trotuar: katta yo'llar bo'ylab 3 m, 15 sm balandroq ---
+    trotuar = shapely.difference(katta.buffer(3.0, quad_segs=2), yol_yuza)
+    trotuar = shapely.difference(trotuar, bino_birlash).simplify(0.2)
+    tx0, tz0, tx1, tz1 = trotuar.bounds
+    for kx in range(math.floor(tx0 / BOLAK), math.floor(tx1 / BOLAK) + 1):
+        for kz in range(math.floor(tz0 / BOLAK), math.floor(tz1 / BOLAK) + 1):
+            g = shapely.intersection(trotuar, box(kx * BOLAK, kz * BOLAK, (kx + 1) * BOLAK, (kz + 1) * BOLAK))
+            if not g.is_empty:
+                yotqiz(yig((kx, kz), "Trotuar"), g, YOL_Y + 0.15, R, kx * BOLAK, kz * BOLAK)
+    vaqt(t0, "trotuarlar")
+
+    # --- bordyur: katta yo'l va trotuar orasidagi chiziq (MultiMesh) ---
+    bordyur = shapely.intersection(shapely.boundary(katta), trotuar.buffer(0.4))
+    bordyur = shapely.difference(bordyur, mayda.buffer(0.8)).simplify(0.2)
+    nb = 0
+    for ch in chiziqlar(bordyur):
+        p = zichla(np.asarray(ch.coords), 6.0)
+        for j in range(1, len(p)):
+            a, b = p[j - 1], p[j]
+            L = float(np.hypot(*(b - a)))
+            if L < 0.3:
+                continue
+            m = (a + b) / 2
+            k = kalit(*m)
+            y = float(min(R.h(a[0], a[1]), R.h(b[0], b[1]))) + YOL_Y - 0.12
+            yaw = math.atan2(-(b[1] - a[1]), b[0] - a[0])
+            obyektlar.setdefault(k, {}).setdefault("bordyur", []).append(
+                [round(float(m[0] - k[0] * BOLAK), 2), round(y, 2), round(float(m[1] - k[1] * BOLAK), 2), round(yaw, 3), round(L + 0.05, 2)])
+            nb += 1
+    vaqt(t0, f"bordyurlar: {nb}")
+
+    # --- chorrahalar: 3 va undan ko'p yo'l (servis yo'llarsiz) uchrashgan tugunlar ---
+    from collections import defaultdict
+    daraja = defaultdict(int)
+    for sinf, nom, p in haydash:
+        if sinf == "service":
+            continue
+        for j, q in enumerate(p):
+            daraja[(round(q[0] * 2), round(q[1] * 2))] += 1 if j in (0, len(p) - 1) else 2
+    chorraha = np.array([k for k, v in daraja.items() if v >= 3], dtype=float) / 2
+    chorraha_set = {(round(x * 2), round(z * 2)) for x, z in chorraha}
+    zona = shapely.union_all(shapely.buffer(shapely.points(chorraha), 9.0, quad_segs=3))
+    shapely.prepare(zona)
+
+    # --- yo'l chiziqlari va zebra (katta yo'llar) ---
+    ofset = np.concatenate([[0], np.cumsum([len(p) - 1 for _, _, p in haydash])])
+    nz = 0
+    for r, (sinf, nom, p) in enumerate(haydash):
+        if sinf not in KATTA_SINF or len(p) < 2:
+            continue
+        w = float(np.min(kenglik[ofset[r]:ofset[r + 1]]))
+        line = shapely.LineString(p)
+        if line.length < 15:
+            continue
+        chiziqlar_ro = []                               # (offset, punktirmi, eni)
+        if w >= 9:
+            chiziqlar_ro += [(0.15, False, 0.12), (-0.15, False, 0.12), (w / 2 - 0.45, False, 0.15), (-(w / 2 - 0.45), False, 0.15)]
+            if w >= 11:
+                chiziqlar_ro += [(w / 4, True, 0.13), (-w / 4, True, 0.13)]
+        elif w >= 6:
+            chiziqlar_ro += [(0.0, True, 0.13), (w / 2 - 0.4, False, 0.13), (-(w / 2 - 0.4), False, 0.13)]
+        for off, pnk, eni in chiziqlar_ro:
+            try:
+                g = line.offset_curve(off, quad_segs=2) if off else line
+            except Exception:
+                continue
+            g = shapely.difference(g, zona)
+            for ch in chiziqlar(g):
+                qismlar = punktir(ch) if pnk else [np.asarray(ch.coords)]
+                for q in qismlar:
+                    if len(q) >= 2:
+                        bolak_boyicha_lenta(yig, kalit, R, q, eni, YOL_Y + 0.015, "Yol_Chiziq")
+        # zebra: yo'ldagi har bir chorrahadan 11 m narida, ikki tomonga
+        if w < 7:
+            continue
+        for j, q in enumerate(p):
+            if (round(q[0] * 2), round(q[1] * 2)) not in chorraha_set:
+                continue
+            d0 = line.project(shapely.Point(q))
+            for d in (d0 - 11.5, d0 + 11.5):
+                if d < 2 or d > line.length - 2:
+                    continue
+                c = np.asarray(line.interpolate(d).coords)[0]
+                c2 = np.asarray(line.interpolate(min(d + 1.0, line.length)).coords)[0]
+                t = c2 - c
+                t = t / max(np.hypot(*t), 1e-6)
+                n = np.array([-t[1], t[0]])
+                k = kalit(*c)
+                for s_ in np.arange(-w / 2 + 0.8, w / 2 - 0.5, 1.0):
+                    a = c + n * s_ - t * 1.5
+                    b = c + n * s_ + t * 1.5
+                    lenta(yig(k, "Yol_Chiziq"), np.array([a, b]), 0.5, YOL_Y + 0.016, R, k[0] * BOLAK, k[1] * BOLAK)
+                nz += 1
+    vaqt(t0, f"yo'l chiziqlari; zebralar: {nz}")
+
+    # --- hovli devorlari: mahalla ko'chalari bo'ylab, yo'l chetidan 1 m narida ---
+    uylar = [bpoly[j] for j in range(len(bpoly)) if tirik[j] and devor_materiali(binolar[j][1], binolar[j][4], 0)[0] in HOVLI_UY]
+    uy_daraxt = STRtree(np.array(uylar, dtype=object))
+    chiziq = shapely.boundary(yol_yuza.buffer(1.1, quad_segs=2))
+    chiziq = shapely.intersection(chiziq, mayda.buffer(2.2))
+    chiziq = shapely.difference(chiziq, katta.buffer(6.0))
+    chiziq = shapely.difference(chiziq, bino_birlash).simplify(0.3)
+    bolaklar_ = []
+    for ch in chiziqlar(chiziq):
+        p = zichla(np.asarray(ch.coords), 9.0)
+        for j in range(1, len(p)):
+            bolaklar_.append((p[j - 1], p[j]))
+    if bolaklar_:
+        ort = np.array([(a + b) / 2 for a, b in bolaklar_])
+        _, mas = uy_daraxt.query_nearest(shapely.points(ort), return_distance=True, all_matches=False)
+    nd = 0
+    rng = np.random.default_rng(7)
+    for (a, b), m_ in zip(bolaklar_, mas if bolaklar_ else []):
+        L = float(np.hypot(*(b - a)))
+        if L < 0.8 or m_ > 16:
+            continue
+        m = (a + b) / 2
+        k = kalit(*m)
+        ya, yb = float(R.h(a[0], a[1])), float(R.h(b[0], b[1]))
+        y = min(ya, yb) - 0.3
+        h = 2.5 + abs(ya - yb)
+        yaw = math.atan2(-(b[1] - a[1]), b[0] - a[0])
+        darvoza = 1 if (L >= 4.5 and rng.random() < 0.4) else 0
+        obyektlar.setdefault(k, {}).setdefault("hovli_devor", []).append(
+            [round(float(m[0] - k[0] * BOLAK), 2), round(y, 2), round(float(m[1] - k[1] * BOLAK), 2), round(yaw, 3),
+             round(L + 0.2, 2), round(h, 2), round(float(rng.random()), 3), darvoza])
+        nd += 1
+    vaqt(t0, f"hovli devorlari: {nd}")
+
+
 # ---------------- asosiy ----------------
 def main():
     t0 = time.time()
@@ -726,6 +890,9 @@ def main():
             yig(k, tm).qosh(v, pts.copy(), tri, np.tile([[urug, 1.0]], (len(pts), 1)))
     vaqt(t0, f"qiya tomlar: {qiya_soni}")
     vaqt(t0, f"binolar yig'ildi; aniqlik {aniqlik}")
+
+    kocha_jihozlari(R, haydash, kenglik, katta, mayda, yol_yuza, bpoly, olib, binolar,
+                    yig, kalit, obyektlar, t0)
 
     # avtomobil yo'li yuzasi va chegara devorlari — bo'laklarga kesib
     chegara = shapely.simplify(shapely.boundary(yol_yuza), 0.4)

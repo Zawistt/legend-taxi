@@ -55,6 +55,13 @@ const DEVORLAR := {
 	"Obida_Gisht": {"turi": 6, "rang_a": Color(0.86, 0.72, 0.50), "rang_b": Color(0.82, 0.68, 0.46),
 		"rang_c": Color(0.88, 0.76, 0.56), "derazalar": false},
 }
+const YOL_SHADER := preload("res://shaderlar/yol.gdshader")
+const YOLLAR := {
+	"Yol_Asfalt": {"turi": 0, "rang": Color(0.22, 0.225, 0.235)},
+	"Yol_Mahalla": {"turi": 1, "rang": Color(0.3, 0.3, 0.3)},
+	"Trotuar": {"turi": 2, "rang": Color(0.66, 0.63, 0.58)},
+	"Yol_Chiziq": {"turi": 3, "rang": Color(0.93, 0.93, 0.9)},
+}
 const TOMLAR := {
 	"Tom_Shifer": {"turi": 0, "rang": Color(0.60, 0.61, 0.60)},
 	"Tom_Tekis": {"turi": 1, "rang": Color(0.36, 0.35, 0.34)},
@@ -70,6 +77,8 @@ static func ol(nom: String) -> Material:
 		m = _shader(DEVOR_SHADER, DEVORLAR[nom], nom)
 	elif TOMLAR.has(nom):
 		m = _shader(TOM_SHADER, TOMLAR[nom], nom)
+	elif YOLLAR.has(nom):
+		m = _shader(YOL_SHADER, YOLLAR[nom], nom)
 	else:
 		m = _yasa(nom)
 	_kesh[nom] = m
@@ -144,7 +153,7 @@ static func qoy(ildiz: Node) -> void:
 		for i in mi.mesh.get_surface_count():
 			var eski := mi.mesh.surface_get_material(i)
 			var nom := eski.resource_name if eski else ""
-			if TAVSIF.has(nom) or DEVORLAR.has(nom) or TOMLAR.has(nom):
+			if TAVSIF.has(nom) or DEVORLAR.has(nom) or TOMLAR.has(nom) or YOLLAR.has(nom):
 				mi.set_surface_override_material(i, ol(nom))
 		if mi.name.begins_with("Devor_") or mi.name.begins_with("Obida_") or mi.name.begins_with("Tom_"):
 			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
