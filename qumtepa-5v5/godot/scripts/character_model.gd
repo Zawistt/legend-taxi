@@ -130,6 +130,7 @@ func load_model(t: String) -> void:
 			_legs.append(leg)
 	_chest = chest
 	_build_arms_gun(chest, c)
+	_merge_all()
 	hitboxes = []
 	if not first_person and not own_body:
 		_build_hitboxes()
@@ -197,14 +198,57 @@ func set_weapon(kind: int) -> void:
 	if kind == weapon_kind and _gun:
 		return
 	weapon_kind = kind
-	if _chest:
-		for n in _hand_nodes:
-			n.queue_free()
-		_hand_nodes = []
-		if _gun:
-			_gun.queue_free()
-		_build_arms_gun(_chest, COLORS.get(team, COLORS["T"]))
-		_apply_layers()
+	if model:
+		var was_dead := dead
+		load_model(team)                 # qutilar birlashtirilgan — qo'l va qurol butunlay qayta yig'iladi (arzon)
+		if was_dead:
+			die()
+
+
+## optimizatsiya: har bir bo'g'indagi qutilar bitta mesh'ga (vertex rang bilan) birlashtiriladi —
+## personaj ~27 ta chizish o'rniga ~7 ta (10 personajda ~200 kam draw call)
+func _merge_all() -> void:
+	var parents := {}
+	for m in _all(model, "MeshInstance3D"):
+		if (m as MeshInstance3D).mesh is BoxMesh:
+			parents[m.get_parent()] = true
+	for p in parents:
+		_merge(p)
+
+
+func _merge(parent: Node3D) -> void:
+	var boxes := parent.get_children().filter(func(ch): return ch is MeshInstance3D and ch.mesh is BoxMesh)
+	if boxes.size() < 2:
+		return
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for mi in boxes:
+		var arr: Array = (mi.mesh as BoxMesh).get_mesh_arrays()
+		var xf: Transform3D = mi.transform
+		var col: Color = (mi.material_override as StandardMaterial3D).albedo_color
+		var verts: PackedVector3Array = arr[Mesh.ARRAY_VERTEX]
+		var nrm: PackedVector3Array = arr[Mesh.ARRAY_NORMAL]
+		var idx: PackedInt32Array = arr[Mesh.ARRAY_INDEX]
+		for i in idx:
+			st.set_color(col)
+			st.set_normal((xf.basis * nrm[i]).normalized())
+			st.add_vertex(xf * verts[i])
+		parent.remove_child(mi)
+		mi.queue_free()
+	var out := MeshInstance3D.new()
+	out.name = "Merged"
+	out.mesh = st.commit()
+	out.material_override = _vc_material()
+	parent.add_child(out)
+
+
+func _vc_material() -> StandardMaterial3D:
+	if not _mats.has("vc"):
+		var m := StandardMaterial3D.new()
+		m.vertex_color_use_as_albedo = true
+		m.roughness = 0.9
+		_mats["vc"] = m
+	return _mats["vc"]
 
 
 ## qo'llar va qurol (3-shaxsda ham, 1-shaxsda ham bir xil joyda): ko'krak suyagi fazosida

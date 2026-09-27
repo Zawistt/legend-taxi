@@ -103,6 +103,8 @@ func walk_route(wps: Array) -> float:
 
 func _run() -> void:
 	main = load("res://main.tscn").instantiate()
+	if main.get_node_or_null("Bots"):
+		main.get_node("Bots").enabled = false      # botlarsiz: xarita va mexanika sinovi
 	root.add_child(main)
 	gm = main.get_node("GameMode")
 	pl = main.get_node("Player")
@@ -447,8 +449,8 @@ func section_characters() -> void:
 		await frames(2)
 		var nmesh: int = chm.find_children("*", "MeshInstance3D", true, false).size()
 		var gun: Node3D = chm.model.find_child("Weapon", true, false)
-		ok(chm.PLACEHOLDER and nmesh >= 15 and gun != null and chm.skel.find_bone("chest") >= 0,
-			"%s: o'rinbosar manekin (%d quti, qurol ko'krakka bog'langan) — asl qahramon, animatsiya va qurol modellari o'chirilgan" % [key, nmesh])
+		ok(chm.PLACEHOLDER and nmesh >= 5 and nmesh <= 9 and gun != null and chm.skel.find_bone("chest") >= 0,
+			"%s: o'rinbosar manekin (qutilar %d ta mesh'ga birlashtirilgan, qurol ko'krakka bog'langan)" % [key, nmesh])
 		chm.crouching = true
 		await secs(0.6)
 		var e_c: float = chm.eye_point().y

@@ -32,8 +32,8 @@ func apply(new_level: int) -> void:
 	var high := level == Level.HIGH
 	var mid_or_better := level <= Level.MEDIUM
 	if _env:
-		_env.sdfgi_enabled = high
-		_env.volumetric_fog_enabled = high
+		_env.sdfgi_enabled = false   # ekran qorayishining sababi — o'chirilgan (gen_3v3.py)
+		_env.volumetric_fog_enabled = false   # ekran qorayishining sababi — o'chirilgan (gen_3v3.py)
 		_env.ssil_enabled = high
 		_env.ssao_enabled = mid_or_better
 		_env.glow_enabled = mid_or_better

@@ -82,6 +82,7 @@ func walk(from: Vector3, to: Vector3, limit: float = 30.0) -> float:
 
 func _run() -> void:
 	main = load("res://main_3v3.tscn").instantiate()
+	main.get_node("Bots").enabled = false      # botlarsiz: xarita sinovi
 	root.add_child(main)
 	gm = main.get_node("GameMode")
 	pl = main.get_node("Player")

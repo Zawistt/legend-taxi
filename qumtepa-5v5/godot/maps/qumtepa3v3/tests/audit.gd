@@ -29,6 +29,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	main = load("res://main_3v3.tscn").instantiate()
+	main.get_node("Bots").enabled = false      # botlarsiz: xarita sinovi
 	root.add_child(main)
 	pl = main.get_node("Player")
 	pl.set_physics_process(false)

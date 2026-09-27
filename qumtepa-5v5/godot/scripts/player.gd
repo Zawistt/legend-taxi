@@ -14,6 +14,9 @@ extends CharacterBody3D
 ## local_player=false — masofaviy (tarmoqdagi) o'yinchi: 1-shaxs ko'rinishi va klaviatura yo'q, faqat 3-shaxs tana.
 
 signal footstep(surface: String)
+signal fired                 ## o'q uzildi (fp_view.gd) — botlar eshitadi
+signal damaged(amount: float, from_pos: Vector3)
+signal died
 
 @export var speed := 4.5
 @export var walk_speed := 2.3
@@ -41,6 +44,11 @@ var force_walk := false
 var force_crouch := false
 ## sichqoncha sezgirligi ko'paytuvchisi (ADS da kamayadi — fp_view.gd)
 var look_scale := 1.0
+## jang (botlar bilan o'yin — bot_play.gd): sog'liq, o'lim; raund boshida qayta tiriladi
+var hp := 100.0
+var alive := true
+var idx := 0
+var carrier := false
 
 var walking := false
 var crouching := false
@@ -139,7 +147,7 @@ func can_stand() -> bool:
 func _physics_process(delta: float) -> void:
 	if not is_on_floor():
 		velocity.y -= gravity * delta
-	var locked := frozen or busy
+	var locked := frozen or busy or not alive
 	var keyboard := ai_move == Vector3.ZERO and local_player
 	# o'tirish: tugma bosilgan yoki tepada past tom bo'lsa
 	var want_crouch := force_crouch or (keyboard and Input.is_action_pressed("crouch"))
@@ -147,7 +155,7 @@ func _physics_process(delta: float) -> void:
 		if want_crouch or can_stand():
 			_set_crouch(want_crouch)
 	walking = force_walk or (keyboard and Input.is_action_pressed("walk") and not allow_sprint)
-	if keyboard and is_on_floor() and not locked and Input.is_action_just_pressed("jump"):
+	if keyboard and alive and is_on_floor() and not locked and Input.is_action_just_pressed("jump"):
 		velocity.y = jump_velocity
 		if body:
 			body.jump()
@@ -244,3 +252,50 @@ func teleport(xform: Transform3D) -> void:
 	cam.rotation.x = 0.0
 	if crouching:
 		_set_crouch(false)
+
+
+# ------------------------------------------------------------------ jang
+func eye() -> Vector3:
+	return global_position + Vector3.UP * cam.position.y
+
+
+## zarar (botlar o'qi): true — o'ldi
+func damage(amount: float, from_pos := Vector3.ZERO) -> bool:
+	if not alive or amount <= 0.0:
+		return false
+	hp -= amount
+	damaged.emit(amount, from_pos)
+	if hp <= 0.0:
+		die()
+		return true
+	return false
+
+
+## o'q zonasi orqali (masalan boshqa o'yinchi): o'z jamoasiga zarar yo'q
+func take_hit(amount: float, _zone: String, from: Node) -> bool:
+	if from and "team" in from and from.team == team:
+		return false
+	return damage(amount, from.global_position if from is Node3D else Vector3.ZERO)
+
+
+func die() -> void:
+	if not alive:
+		return
+	alive = false
+	hp = 0.0
+	busy = false
+	velocity = Vector3.ZERO
+	collision_layer = 0
+	if crouching:
+		_set_crouch(false)
+	if body:
+		body.die()
+	died.emit()
+
+
+func revive() -> void:
+	alive = true
+	hp = 100.0
+	collision_layer = 8
+	if body:
+		body.revive()

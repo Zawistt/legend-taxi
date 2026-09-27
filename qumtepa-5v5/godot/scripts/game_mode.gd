@@ -148,12 +148,12 @@ func in_buy_zone() -> bool:
 
 # ------------------------------------------------------------------ o'rnatish / zararsizlantirish
 func can_plant() -> bool:
-	return phase == Phase.LIVE and player.team == "T" and player.has_bomb \
+	return player.alive and phase == Phase.LIVE and player.team == "T" and player.has_bomb \
 		and player.is_on_floor() and current_site() != ""
 
 
 func can_defuse() -> bool:
-	return phase == Phase.PLANTED and player.team == "CT" and bomb != null \
+	return player.alive and phase == Phase.PLANTED and player.team == "CT" and bomb != null \
 		and player.is_on_floor() and player.global_position.distance_to(bomb.global_position) < DEFUSE_RANGE
 
 
@@ -244,7 +244,7 @@ func drop_bomb() -> void:
 
 
 func _update_dropped_bomb() -> void:
-	if bomb_state != "dropped" or bomb == null or player.team != "T" or _pickup_cooldown > 0.0:
+	if bomb_state != "dropped" or bomb == null or player.team != "T" or not player.alive or _pickup_cooldown > 0.0:
 		return
 	var d := Vector2(player.global_position.x - bomb.global_position.x, player.global_position.z - bomb.global_position.z)
 	if d.length() < PICKUP_RANGE and absf(player.global_position.y - bomb.global_position.y) < 1.5:

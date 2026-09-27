@@ -98,6 +98,23 @@ for d in ("map", "scripts", "scenes", "audio", "tests", "tools"):
     os.makedirs(f"{OUT}/{d}", exist_ok=True)
 for fn in ("game_mode.gd", "hud.gd", "bomb.gd", "input_setup.gd"):   # player.gd — godot_src dan (8-bosqich)
     shutil.copy(f"{V2}/scripts/{fn}", f"{OUT}/scripts/{fn}")
+
+
+def patch_game_mode(path):
+    """botlar bilan o'yin: o'lgan o'yinchi bomba o'rnatmaydi, zararsizlantirmaydi va yerdagi bombani olmaydi"""
+    g = open(path).read()
+    for a, b in (("return phase == Phase.LIVE and player.team == \"T\" and player.has_bomb",
+                  "return player.alive and phase == Phase.LIVE and player.team == \"T\" and player.has_bomb"),
+                 ("return phase == Phase.PLANTED and player.team == \"CT\" and bomb != null",
+                  "return player.alive and phase == Phase.PLANTED and player.team == \"CT\" and bomb != null"),
+                 ("if bomb_state != \"dropped\" or bomb == null or player.team != \"T\" or _pickup_cooldown > 0.0:",
+                  "if bomb_state != \"dropped\" or bomb == null or player.team != \"T\" or not player.alive or _pickup_cooldown > 0.0:")):
+        assert a in g, a
+        g = g.replace(a, b)
+    open(path, "w").write(g)
+
+
+patch_game_mode(f"{OUT}/scripts/game_mode.gd")
 for fn in os.listdir(f"{V2}/audio"):
     shutil.copy(f"{V2}/audio/{fn}", f"{OUT}/audio/{fn}")
 shutil.copy(f"{V2}/scenes/bomb.tscn", f"{OUT}/scenes/bomb.tscn")
@@ -499,6 +516,9 @@ def main_scene(glb_path, out_name):
       # F7 — mashq nishonlari (qurol va tana zonalarini sinash uchun)
       prs = s.add_ext("Script", "res://scripts/practice.gd", "12_pr")
       s.node("Practice", "Node3D", ".", script=prs)
+      # botlar bilan o'yin: o'yinchi + 4 jamoadosh va 5 raqib (scripts/bot_play.gd)
+      bps = s.add_ext("Script", "res://scripts/bot_play.gd", "13_bp")
+      s.node("Bots", "Node3D", ".", script=bps)
   s.save(f"{OUT}/{out_name}")
 
 

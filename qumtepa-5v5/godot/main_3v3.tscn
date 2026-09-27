@@ -8,6 +8,8 @@
 
 [ext_resource type="Script" path="res://scripts/practice.gd" id="21_pr"]
 
+[ext_resource type="Script" path="res://scripts/bot_play.gd" id="22_bp"]
+
 [ext_resource type="Script" path="res://maps/qumtepa3v3/scripts/game_mode.gd" id="4_gm"]
 
 [ext_resource type="Script" path="res://maps/qumtepa3v3/scripts/hud.gd" id="5_hud"]
@@ -45,12 +47,12 @@ width = 256
 background_mode = 2
 sky = SubResource("sky")
 ambient_light_source = 2
-ambient_light_energy = 2.6
+ambient_light_energy = 1.15
 ambient_light_color = Color(1, 0.90, 0.76, 1)
 ambient_light_sky_contribution = 0.2
 tonemap_mode = 2
 tonemap_exposure = 1.08
-tonemap_white = 1.0
+tonemap_white = 4.0
 ssao_enabled = true
 ssao_radius = 0.8
 ssao_intensity = 1.0
@@ -515,7 +517,7 @@ directional_shadow_max_distance = 95.0
 [node name="Fill" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.64594, 0.00000, -0.76339, -0.35670, 0.88412, -0.30182, 0.67493, 0.46726, 0.57109, 0, 30, 0)
 light_color = Color(1, 0.84, 0.66, 1)
-light_energy = 1.15
+light_energy = 0.6
 light_specular = 0.1
 light_volumetric_fog_energy = 0.2
 shadow_enabled = false
@@ -523,7 +525,7 @@ shadow_enabled = false
 [node name="Bounce" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 30, 0)
 light_color = Color(1, 0.86, 0.68, 1)
-light_energy = 0.85
+light_energy = 0.45
 light_specular = 0.05
 shadow_enabled = false
 
@@ -548,6 +550,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp1" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18, 2.55, -22.61)
@@ -556,6 +561,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp2" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 2.55, -22.61)
@@ -564,6 +572,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp3" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14, 2.55, -22.61)
@@ -572,6 +583,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp4" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.55, -22.61)
@@ -580,6 +594,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp5" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2.55, -22.61)
@@ -588,6 +605,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp6" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.55, -22.61)
@@ -596,6 +616,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp7" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2.55, -22.61)
@@ -604,6 +627,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp8" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 2.55, -22.61)
@@ -612,6 +638,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp9" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 2.55, -22.61)
@@ -620,6 +649,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp10" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.55, -22.61)
@@ -628,6 +660,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp11" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2.55, -22.61)
@@ -636,6 +671,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp12" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2.55, -22.61)
@@ -644,6 +682,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp13" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2.55, -22.61)
@@ -652,6 +693,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp14" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2.55, -22.61)
@@ -660,6 +704,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp15" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.55, -22.61)
@@ -668,6 +715,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp16" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.55, -22.61)
@@ -676,6 +726,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp17" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 2.55, -22.61)
@@ -684,6 +737,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp18" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 2.55, -22.61)
@@ -692,6 +748,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp19" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16, 2.55, -19.39)
@@ -700,6 +759,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp20" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12, 2.55, -19.39)
@@ -708,6 +770,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp21" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 2.55, -19.39)
@@ -716,6 +781,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp22" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.61, 2.55, -18)
@@ -724,6 +792,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp23" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2.55, -19.39)
@@ -732,6 +803,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp24" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.61, 2.55, -18)
@@ -740,6 +814,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp25" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2.55, -19.39)
@@ -748,6 +825,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp26" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.55, -19.39)
@@ -756,6 +836,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp27" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.55, -19.39)
@@ -764,6 +847,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp28" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.39, 2.55, -18)
@@ -772,6 +858,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp29" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14, 2.55, -19.39)
@@ -780,6 +869,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp30" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.61, 2.55, -18)
@@ -788,6 +880,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp31" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.61, 2.55, -12)
@@ -796,6 +891,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp32" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2.55, -10.61)
@@ -804,6 +902,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp33" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 2.55, -10.61)
@@ -812,6 +913,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp34" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.39, 2.55, -12)
@@ -820,6 +924,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp35" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 2.55, -10.61)
@@ -828,6 +935,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp36" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.61, 2.55, -12)
@@ -836,6 +946,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp37" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.61, 2.55, -6)
@@ -844,6 +957,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp38" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.39, 2.55, -6)
@@ -852,6 +968,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp39" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, -6)
@@ -860,6 +979,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp40" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.61, 2.55, -6)
@@ -868,6 +990,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp41" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.39, 2.55, -6)
@@ -876,6 +1001,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp42" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.61, 2.55, -6)
@@ -884,6 +1012,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp43" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.61, 2.55, 0)
@@ -892,6 +1023,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp44" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.61, 2.55, 0)
@@ -900,6 +1034,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp45" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 2.55, 1.39)
@@ -908,6 +1045,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp46" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 2.55, 1.39)
@@ -916,6 +1056,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp47" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.61, 2.55, 18)
@@ -924,6 +1067,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Lamp48" type="OmniLight3D" parent="Lamps"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.61, 2.55, 18)
@@ -932,6 +1078,9 @@ light_energy = 1.5
 light_volumetric_fog_energy = 2.2
 omni_range = 7.0
 omni_attenuation = 1.7
+distance_fade_enabled = true
+distance_fade_begin = 28.0
+distance_fade_length = 6.0
 
 [node name="Zones" type="Node3D" parent="."]
 
@@ -1489,8 +1638,8 @@ text = "CT spawn (rotate, CT)"
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, -21)
 size = Vector3(18, 5, 7)
 interior = true
-enable_shadows = true
-ambient_mode = 1
+enable_shadows = false
+ambient_mode = 0
 ambient_color = Color(0.55, 0.45, 0.33, 1)
 ambient_color_energy = 0.5
 max_distance = 45.0
@@ -1501,8 +1650,8 @@ mesh_lod_threshold = 1.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 20)
 size = Vector3(18, 5, 6)
 interior = true
-enable_shadows = true
-ambient_mode = 1
+enable_shadows = false
+ambient_mode = 0
 ambient_color = Color(0.55, 0.45, 0.33, 1)
 ambient_color_energy = 0.5
 max_distance = 45.0
@@ -1513,8 +1662,8 @@ mesh_lod_threshold = 1.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.4, -2)
 size = Vector3(7, 5.4, 11)
 interior = true
-enable_shadows = true
-ambient_mode = 1
+enable_shadows = false
+ambient_mode = 0
 ambient_color = Color(0.55, 0.45, 0.33, 1)
 ambient_color_energy = 0.5
 max_distance = 45.0
@@ -1525,8 +1674,8 @@ mesh_lod_threshold = 1.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, -11)
 size = Vector3(15, 5, 9)
 interior = true
-enable_shadows = true
-ambient_mode = 1
+enable_shadows = false
+ambient_mode = 0
 ambient_color = Color(0.55, 0.45, 0.33, 1)
 ambient_color_energy = 0.5
 max_distance = 45.0
@@ -1537,8 +1686,8 @@ mesh_lod_threshold = 1.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20, 2, -18)
 size = Vector3(9, 4.4, 11)
 interior = true
-enable_shadows = true
-ambient_mode = 1
+enable_shadows = false
+ambient_mode = 0
 ambient_color = Color(0.55, 0.45, 0.33, 1)
 ambient_color_energy = 0.5
 max_distance = 45.0
@@ -1549,8 +1698,8 @@ mesh_lod_threshold = 1.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19, 2, -14)
 size = Vector3(8, 4.4, 15)
 interior = true
-enable_shadows = true
-ambient_mode = 1
+enable_shadows = false
+ambient_mode = 0
 ambient_color = Color(0.55, 0.45, 0.33, 1)
 ambient_color_energy = 0.5
 max_distance = 45.0
@@ -1561,8 +1710,8 @@ mesh_lod_threshold = 1.0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 9)
 size = Vector3(11, 4.6, 9)
 interior = true
-enable_shadows = true
-ambient_mode = 1
+enable_shadows = false
+ambient_mode = 0
 ambient_color = Color(0.55, 0.45, 0.33, 1)
 ambient_color_energy = 0.5
 max_distance = 45.0
@@ -2049,3 +2198,9 @@ script = ExtResource("11_aud")
 
 [node name="Practice" type="Node3D" parent="."]
 script = ExtResource("21_pr")
+
+[node name="Bots" type="Node3D" parent="."]
+script = ExtResource("22_bp")
+team_size = 3
+strategies_path = "res://maps/qumtepa3v3/scripts/strategies_3v3.gd"
+map_data_path = "res://maps/qumtepa3v3/scripts/map_data.gd"

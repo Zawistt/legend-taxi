@@ -65,6 +65,8 @@ func _decor(n: Node, end: float) -> void:
 
 func _run() -> void:
 	var main: Node = load("res://main.tscn").instantiate()
+	if main.get_node_or_null("Bots"):
+		main.get_node("Bots").enabled = false      # botlarsiz: xarita va mexanika sinovi
 	root.add_child(main)
 	root.size = Vector2i(1600, 900)
 	main.get_node("HUD").visible = false

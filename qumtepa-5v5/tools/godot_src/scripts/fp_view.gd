@@ -232,7 +232,7 @@ func current_spread() -> float:
 
 ## o'q uzish (tugma, testlar va boshqalar uchun): qurol tayyor bo'lsa true
 func fire() -> bool:
-	if current == null or player.busy or _t < _equip_end or is_reloading() or _t < _next_shot:
+	if current == null or player.busy or not player.alive or _t < _equip_end or is_reloading() or _t < _next_shot:
 		return false
 	if is_knife():
 		_next_shot = _t + current.melee_swing_time
@@ -243,6 +243,7 @@ func fire() -> bool:
 		return false
 	ammo -= 1
 	shots_fired += 1
+	player.fired.emit()
 	_next_shot = _t + current.shot_interval()
 	if _t - _last_shot_t > current.recoil_reset_time:
 		_shot_idx = 0
@@ -467,4 +468,4 @@ func _process(delta: float) -> void:
 	# 1-shaxs faqat o'yinchining o'z kamerasi faol bo'lganda (boshqa kamerada o'yinchi 3-shaxs tana bo'lib ko'rinadi)
 	_label.visible = player.cam.current
 	hud.visible = player.cam.current
-	ch.visible = player.cam.current and not scoped()
+	ch.visible = player.cam.current and not scoped() and player.alive

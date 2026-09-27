@@ -20,6 +20,8 @@ var path := PackedVector3Array()
 var path_i := 0
 var _repath_t := 0.0
 var _last_pos := Vector3.ZERO
+var _unstick_left := 0.0
+var _unstick_dir := Vector3.ZERO
 
 var look_dir := Vector3(0, 0, 1)
 var hold_look := Vector3.ZERO      ## to'xtab turganda shu nuqtaga qaraydi (nol — qarash yo'q)
@@ -44,6 +46,14 @@ var busy := ""                     ## "plant" / "defuse"
 var busy_until := 0.0
 var has_kit := false
 var mode := ""                     ## "route", "stage", "entry", "site", "post", "hold", "rotate", "retake", "pickup"
+## sezgi va xotira (bot_play.gd): eshitilgan tovush / oxirgi ko'rilgan dushman tomonga qarash
+var alert_look := Vector3.ZERO
+var alert_until := 0.0
+var last_attacker: Node3D = null
+var show_label := true             ## o'yinchi bilan o'yinda dushman yozuvi yashiriladi (devor orqali ko'rinmasin)
+var burst := 0                     ## ketma-ket o'qlar (tarqalish o'sadi)
+var clock := 0.0                   ## bot_play vaqti (alert uchun)
+var weapon: Resource = null        ## qurol ma'lumoti (weapons/*.tres); bot_play tanlaydi
 
 var _label: Label3D
 var model: Node3D = null            ## personaj modeli (faqat ko'rinadigan rejimda)
@@ -62,7 +72,7 @@ func setup(t: String, i: int, pos: Vector3, map_rid: RID, visual: bool) -> void:
 	collision_mask = 1 | 2
 	var cs := CollisionShape3D.new()
 	var cap := CapsuleShape3D.new()
-	cap.radius = 0.35
+	cap.radius = 0.3              # NavMesh agent radiusidan kichik — burchaklarga ilinmaydi
 	cap.height = 1.8
 	cs.shape = cap
 	cs.position = Vector3(0, 0.9, 0)
@@ -118,15 +128,30 @@ func reset(pos: Vector3) -> void:
 	mode = ""
 	hold_look = Vector3.ZERO
 	look_dir = Vector3(0, 0, 1) if team == "T" else Vector3(0, 0, -1)
+	alert_until = 0.0
+	last_attacker = null
+	burst = 0
 	if model:
 		model.revive()
 	if _label:
-		_label.visible = true
+		_label.visible = show_label
 	_update_label()
 
 
 func eye() -> Vector3:
 	return global_position + Vector3.UP * EYE
+
+
+## jamoani almashtirish (o'yinchi jamoasi o'zgarganda): model rangi, qurol tovushi
+func set_team(t: String) -> void:
+	if t == team:
+		return
+	team = t
+	if model:
+		model.load_model(t)
+	if _gun:
+		_gun.stream = load("res://audio/shot_%s.wav" % ("akm" if t == "T" else "m416"))
+	_update_label()
 
 
 func set_goal(p: Vector3) -> void:
@@ -169,14 +194,21 @@ func step(delta: float, can_move: bool) -> void:
 			dir = Vector3(d.x, 0, d.y).normalized()
 		else:
 			path_i = path.size()
-		# tiqilib qolsa — yo'lni qayta hisoblash
+		# tiqilib qolsa — yo'lni qayta hisoblash va burchakdan chiqish uchun 0.45 s yon tomonga/orqaga qadam
 		_repath_t += delta
 		if _repath_t > 1.5:
 			if global_position.distance_to(_last_pos) < 0.5:
 				path = NavigationServer3D.map_get_path(nav_map, global_position, goal, true)
 				path_i = 1
+				_unstick_left = 0.45
+				var side := Vector3(-dir.z, 0, dir.x) * (1.0 if randf() < 0.5 else -1.0)
+				_unstick_dir = (side - dir * 0.6).normalized() if dir != Vector3.ZERO else side
 			_repath_t = 0.0
 			_last_pos = global_position
+		if _unstick_left > 0.0:
+			_unstick_left -= delta
+			if _unstick_dir != Vector3.ZERO:
+				dir = _unstick_dir
 	velocity.x = dir.x * SPEED
 	velocity.z = dir.z * SPEED
 	if not is_on_floor():
@@ -184,10 +216,20 @@ func step(delta: float, can_move: bool) -> void:
 	else:
 		velocity.y = 0.0
 	move_and_slide()
-	# qarash: nishon > harakat yo'nalishi > turish joyidagi yo'nalish
+	# zinapoya/do'nglik (≤ 0.4 m): NavMesh undan o'tadi, CharacterBody3D esa o'zi chiqmaydi — yuqoriga ko'tarib o'tkazamiz
+	if dir != Vector3.ZERO and is_on_wall() and is_on_floor():
+		var up := Vector3.UP * 0.4
+		var fwd := dir * 0.25
+		if not test_move(global_transform, up) and not test_move(global_transform.translated(up), fwd):
+			global_position += up + fwd
+			velocity.y = 0.0
+	# qarash: nishon > eshitilgan/oxirgi ko'rilgan joy > harakat yo'nalishi > turish joyidagi yo'nalish
 	if target and is_instance_valid(target) and target.alive:
 		var to: Vector3 = target.global_position - global_position
 		look_dir = Vector3(to.x, 0, to.z).normalized()
+	elif alert_until > clock and Vector2(alert_look.x - global_position.x, alert_look.z - global_position.z).length() > 0.5:
+		var ta := alert_look - global_position
+		look_dir = Vector3(ta.x, 0, ta.z).normalized()
 	elif dir != Vector3.ZERO:
 		look_dir = dir
 	elif hold_look != Vector3.ZERO:
@@ -213,9 +255,16 @@ func step(delta: float, can_move: bool) -> void:
 			_step_t = 0.0
 
 
-## o'yinchi o'qi tekkanda (fp_view.gd, tana zonasi bo'yicha zarar): true — o'ldi
-func take_hit(amount: float, _zone: String, _from: Node) -> bool:
-	return alive and damage(amount)
+## o'yinchi o'qi tekkanda (fp_view.gd, tana zonasi bo'yicha zarar): true — o'ldi.
+## O'z jamoasiga zarar yo'q. Otilgan bot otuvchi tomonga buriladi.
+func take_hit(amount: float, _zone: String, from: Node) -> bool:
+	if not alive or (from and "team" in from and from.team == team):
+		return false
+	if from is Node3D:
+		last_attacker = from
+		alert_look = from.global_position
+		alert_until = clock + 3.0
+	return damage(amount)
 
 
 func damage(amount: float) -> bool:

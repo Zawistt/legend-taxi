@@ -82,6 +82,8 @@ func side_at(p: Vector3) -> int:
 
 func _run() -> void:
 	var main: Node = load("res://main.tscn").instantiate()
+	if main.get_node_or_null("Bots"):
+		main.get_node("Bots").enabled = false      # botlarsiz: xarita va mexanika sinovi
 	root.add_child(main)
 	for i in 5:
 		await physics_frame
