@@ -20,9 +20,12 @@ uniform float tokcha = 0.85;                      // deraza tagi, qavat polidan
 uniform bool dokon_qavat = false;                 // 1-qavat vitrina
 uniform bool darvoza = false;                     // hovli darvozasi (keng metall)
 uniform bool garaj = false;
+uniform int debug = 0;                            // 1 — UV, 2 — UV2 ko'rsatish (sinov)
 
 varying vec2 v_uv;
-varying vec2 v_uv2;
+// flat: UV2 butun devor bo'lagi uchun bir xil; interpolyatsiya xatosi (1 ulp) xesh
+// funksiyasida kuchayib, har pikselga boshqa "tasodif" beradi — shuning uchun flat.
+varying flat vec2 v_uv2;
 
 float xesh(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float xesh1(float p) { return fract(sin(p * 91.345) * 47453.5453); }
@@ -41,7 +44,9 @@ float quti(vec2 p, vec2 markaz, vec2 yarim) {
 	vec2 d = abs(p - markaz) - yarim;
 	return max(d.x, d.y);
 }
-float ichida(float d) { float aa = max(fwidth(d), 1e-4); return 1.0 - smoothstep(-aa, aa, d); }
+// aa — piksel o'lchami (metrda). U fragment() boshida, bir xil boshqaruv oqimida hisoblanadi:
+// fwidth() ni if ichida chaqirish aniqlanmagan natija beradi (sepkil).
+float ichida(float d, float aa) { return 1.0 - smoothstep(-aa, aa, d); }
 
 void vertex() {
 	v_uv = UV;
@@ -50,9 +55,11 @@ void vertex() {
 
 void fragment() {
 	float u = v_uv.x, v = v_uv.y;
+	float AA = max(max(fwidth(u), fwidth(v)), 1e-4);
+	float FW_V = fwidth(v);
 	float ax = abs(v_uv2.x);
 	float L = floor(ax) / 100.0;
-	float urug = fract(ax);
+	float urug = floor(fract(ax) * 1000.0 + 0.5) / 1000.0;
 	bool eshik = v_uv2.x < 0.0;
 	float qavat = floor(v_uv2.y / 1000.0 + 0.0001);
 	float Hh = mod(v_uv2.y, 1000.0) / 10.0;
@@ -63,7 +70,7 @@ void fragment() {
 	vec3 alb = asos;
 	float rough = 0.9;
 	float n1 = fbm(vec2(u, v) * 0.7 + urug * 50.0);
-	float n2 = mix(fbm(vec2(u, v) * 6.0), 0.5, smoothstep(0.05, 0.2, fwidth(v)));
+	float n2 = mix(fbm(vec2(u, v) * 6.0), 0.5, smoothstep(0.05, 0.2, FW_V));
 	if (turi == 1 || turi == 6) {
 		// g'isht: 25 x 6.5 sm (obida: 27 x 5.5 sm, sarg'ish)
 		vec2 gs = turi == 6 ? vec2(0.27, 0.06) : vec2(0.25, 0.075);
@@ -71,10 +78,10 @@ void fragment() {
 		float gu = u + mod(qator, 2.0) * gs.x * 0.5;
 		vec2 id = vec2(floor(gu / gs.x), qator);
 		vec2 f = vec2(fract(gu / gs.x) * gs.x, fract(v / gs.y) * gs.y);
-		float chok = 1.0 - ichida(quti(f, gs * 0.5, gs * 0.5 - 0.008));
+		float chok = 1.0 - ichida(quti(f, gs * 0.5, gs * 0.5 - 0.008), AA);
 		vec3 g = asos * (0.82 + 0.3 * xesh(id + urug * 13.0));
 		// uzoqda (bitta pikselga bir nechta g'isht) naqsh o'rtacha rangga o'tadi — miltillamasin
-		float uzoq = smoothstep(0.25, 0.7, fwidth(v) / gs.y);
+		float uzoq = smoothstep(0.25, 0.7, FW_V / gs.y);
 		vec3 ortacha = mix(asos * 0.97, vec3(0.72, 0.69, 0.63), 0.18);
 		alb = mix(mix(g, vec3(0.72, 0.69, 0.63), chok), ortacha, uzoq);
 		rough = mix(mix(0.85, 0.95, chok), 0.88, uzoq);
@@ -118,8 +125,8 @@ void fragment() {
 				if (eshik && fi < 0.5 && abs(u - L * 0.5) < (darvoza ? 2.2 : 1.2)) bor = false;
 				if (bor) {
 					float d = quti(vec2(cx, fv), vec2(0.0, tag + wh * 0.5), vec2(ww, wh) * 0.5);
-					float rom = ichida(d);
-					float oyna = ichida(d + 0.07);
+					float rom = ichida(d, AA);
+					float oyna = ichida(d + 0.07, AA);
 					// o'rta ustun
 					float ustun = 1.0 - smoothstep(0.02, 0.035, abs(cx));
 					oyna *= 1.0 - ustun * (vitrina ? 0.0 : 1.0);
@@ -130,11 +137,11 @@ void fragment() {
 					alb = mix(alb, rom_rang, rom - oyna);
 					rough = mix(rough, 0.4, rom - oyna);
 					alb = mix(alb, oyna_rang, oyna);
-					rough = mix(rough, 0.04, oyna);
-					specular = mix(specular, 1.0, oyna);
-					metall = mix(metall, 0.25, oyna);
+					rough = mix(rough, 0.14, oyna);
+					specular = mix(specular, 0.75, oyna);
+					metall = mix(metall, 0.1, oyna);
 					// deraza tokchasi soyasi
-					float tokcha_soya = ichida(quti(vec2(cx, fv), vec2(0.0, tag - 0.06), vec2(ww * 0.5 + 0.08, 0.04)));
+					float tokcha_soya = ichida(quti(vec2(cx, fv), vec2(0.0, tag - 0.06), vec2(ww * 0.5 + 0.08, 0.04)), AA);
 					alb *= 1.0 - 0.35 * tokcha_soya;
 					// tunda chiroq
 					float yongan = step(wid, vitrina ? 0.85 : 0.42);
@@ -158,7 +165,7 @@ void fragment() {
 		float ew = garaj ? min(L - 0.6, 2.6) : (darvoza ? 3.0 : 1.0);
 		float eh = garaj || darvoza ? 2.4 : 2.2;
 		float d = quti(vec2(u, v), vec2(L * 0.5, eh * 0.5), vec2(ew, eh) * 0.5);
-		float e = ichida(d);
+		float e = ichida(d, AA);
 		if (e > 0.0) {
 			vec3 er;
 			if (darvoza || garaj) {
@@ -172,14 +179,16 @@ void fragment() {
 				er = s3 < 0.5 ? vec3(0.32, 0.19, 0.1) : vec3(0.55, 0.55, 0.55);
 				rough = mix(rough, 0.6, e);
 			}
-			float chiziq = ichida(d + 0.05);
+			float chiziq = ichida(d + 0.05, AA);
 			alb = mix(alb, er * mix(0.7, 1.0, chiziq), e);
 		}
 		// eshik tepasida chiroq (tunda)
-		float lamp = ichida(quti(vec2(u, v), vec2(L * 0.5, eh + 0.35), vec2(0.12, 0.08)));
+		float lamp = ichida(quti(vec2(u, v), vec2(L * 0.5, eh + 0.35), vec2(0.12, 0.08)), AA);
 		nur += lamp * vec3(1.0, 0.8, 0.5) * tun * 6.0;
 	}
 
+	if (debug == 1) { alb = vec3(fract(u), fract(v), 0.0); nur = vec3(0.0); }
+	if (debug == 2) { alb = vec3(fract(L * 0.1), urug, fract(Hh * 0.1)); nur = vec3(0.0); }
 	ALBEDO = alb;
 	ROUGHNESS = rough;
 	METALLIC = metall;

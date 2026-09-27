@@ -7,7 +7,7 @@ uniform int turi = 0;                   // 0 — shifer (to'lqinli), 1 — tekis
 uniform vec3 rang : source_color = vec3(0.6, 0.61, 0.6);
 
 varying vec2 v_uv;
-varying float v_urug;
+varying flat float v_urug;
 
 float xesh(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 float shovqin(vec2 p) {

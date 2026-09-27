@@ -39,6 +39,11 @@ func _ready() -> void:
 			_oddiy = true
 		elif a == "--soyasiz":
 			_soyasiz = true
+		elif a == "--taasiz":
+			get_viewport().use_taa = false
+		elif a.begins_with("--debug="):
+			for nom in Materiallar.DEVORLAR:
+				(Materiallar.ol(nom) as ShaderMaterial).set_shader_parameter("debug", int(a.substr(8)))
 		elif a.begins_with("--kamera_yol=") or a.begins_with("--kamera_havo="):
 			var q := a.split("=")[1].split(",")
 			_kamera_joy = Vector2(float(q[0]), float(q[1]))
