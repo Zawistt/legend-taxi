@@ -15,6 +15,7 @@ signal phase_changed(phase: int)
 signal round_ended(winner: String, reason: String)
 signal bomb_event(event: String)
 signal killed(entry: Dictionary)
+signal weapon_picked(who: Node, weapon: Resource)
 
 enum Phase { FREEZE, LIVE, PLANTED, ROUND_END }
 
@@ -22,6 +23,8 @@ const MapData := preload("res://scripts/map_data.gd")
 const Rules := preload("res://scripts/cs_rules.gd")
 const Loadout := preload("res://scripts/loadout.gd")
 const BombScene := preload("res://scenes/bomb.tscn")
+const WeaponDrop := preload("res://scripts/weapon_drop.gd")
+const PICK_RANGE := 0.9
 const DEFUSE_RANGE := 1.6
 const PICKUP_RANGE := 1.0
 
@@ -111,6 +114,8 @@ func start_round() -> void:
 		_swapped_at = played
 	round_no += 1
 	feed = []
+	for d in get_tree().get_nodes_in_group("dropped_weapons"):
+		d.queue_free()                     # CS2: yangi raundda yerdagi qurollar yo'qoladi
 	_clear_bomb()
 	_cancel_action()
 	planter = null
@@ -230,6 +235,7 @@ func _process(delta: float) -> void:
 				start_round()
 	_update_action(delta)
 	_update_dropped_bomb()
+	_update_pickups()
 	if player.global_position.y < -10.0:
 		_player_fell()
 
@@ -241,7 +247,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		switch_team()
 	elif event.is_action_pressed("debug_restart_round"):
 		start_round()
-	elif event.is_action_pressed("drop_bomb") and player.has_bomb and phase in [Phase.FREEZE, Phase.LIVE]:
+	elif event.is_action_pressed("drop_bomb") and player.has_bomb and phase in [Phase.FREEZE, Phase.LIVE] \
+			and player.get("fp_view") == null:           # o'yinchida fp_view bor — G ni o'sha boshqaradi (qurol yoki bomba)
 		drop_bomb()
 
 
@@ -461,6 +468,86 @@ func _log_kill(attacker: Node, victim: Node, wname: String, head: bool) -> void:
 		"t": Time.get_ticks_msec() / 1000.0, "attacker": attacker, "victim_node": victim}
 	feed.append(e)
 	killed.emit(e)
+
+
+# ------------------------------------------------------------------ qurol tashlash / olish (CS2)
+## qurolni yerga tashlash (G yoki o'lganda)
+func drop_weapon(who: Node, w: Resource, am: Array, pos: Vector3, vel: Vector3) -> Node:
+	if w == null or w.kind in [2, 8]:
+		return null                         # pichoq va Zeus tashlanmaydi
+	return WeaponDrop.spawn(get_parent(), w, am, pos, vel, who)
+
+
+## o'lganda: eng qimmat quroli (asosiy, bo'lmasa to'pponcha) yerga tushadi
+func drop_best(c: Node) -> void:
+	var lo = c.loadout
+	if c == player and player.get("fp_view"):
+		player.fp_view._save_ammo()
+	var w: Resource = lo.primary if lo.primary else lo.secondary
+	if w == null or not c.is_inside_tree():
+		return
+	var am: Array = lo.ammo.get(w.weapon_id, [w.magazine_size, w.reserve_ammo])
+	var fwd: Vector3 = -c.global_transform.basis.z if c == player else Vector3(c.look_dir.x, 0, c.look_dir.z)
+	drop_weapon(c, w, am, c.global_position + Vector3.UP * 1.1, fwd.normalized() * 1.5 + Vector3.UP * 1.0)
+
+
+## qo'lga olish: shu turdagi joy bo'sh bo'lsa
+func give_drop(c: Node, d: Node) -> void:
+	var lo = c.loadout
+	var w: Resource = d.weapon
+	if w.slot == 1:
+		lo.primary = w
+	else:
+		lo.secondary = w
+	lo.ammo[w.weapon_id] = d.ammo.duplicate()
+	d.remove_from_group("dropped_weapons")
+	d.queue_free()
+	weapon_picked.emit(c, w)
+	if c == player and player.get("fp_view"):
+		var fp = player.fp_view
+		if fp.slot == 3 or fp.current == null:
+			fp.equip(w.slot)                 # qo'li bo'sh (pichoq) bo'lsa — olgan qurolini darhol qo'lga oladi
+
+
+## E: qarab turgan qurolni olish — qo'ldagi o'sha turdagi qurol yerga tushadi
+func swap_pickup(c: Node, d: Node) -> void:
+	var lo = c.loadout
+	var w: Resource = d.weapon
+	var old: Resource = lo.primary if w.slot == 1 else lo.secondary
+	if old:
+		if c == player and player.get("fp_view"):
+			player.fp_view._save_ammo()
+		var am: Array = lo.ammo.get(old.weapon_id, [old.magazine_size, old.reserve_ammo])
+		lo.ammo.erase(old.weapon_id)
+		drop_weapon(c, old, am, d.global_position + Vector3.UP * 0.3, Vector3.UP * 1.0)
+		if w.slot == 1:
+			lo.primary = null
+		else:
+			lo.secondary = null
+	give_drop(c, d)
+	if c == player and player.get("fp_view"):
+		player.fp_view.current = null
+		player.fp_view.equip(w.slot, true)
+
+
+func _update_pickups() -> void:
+	var drops := get_tree().get_nodes_in_group("dropped_weapons")
+	if drops.is_empty():
+		return
+	for c in combatants():
+		if not c.alive:
+			continue
+		var lo = c.loadout
+		for d in drops:
+			if not is_instance_valid(d) or d.is_queued_for_deletion() or (d.dropped_by == c and d.age < 1.5) or d.age < 0.4:
+				continue
+			var w: Resource = d.weapon
+			if (w.slot == 1 and lo.primary != null) or (w.slot != 1 and lo.secondary != null):
+				continue
+			var dp: Vector3 = d.global_position
+			if Vector2(c.global_position.x - dp.x, c.global_position.z - dp.z).length() < PICK_RANGE and absf(c.global_position.y + 0.3 - dp.y) < 1.4:
+				give_drop(c, d)
+				break
 
 
 # ------------------------------------------------------------------ bombani tashlash / olish

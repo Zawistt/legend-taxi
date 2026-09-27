@@ -1,5 +1,6 @@
 extends Node3D
-## 3-SHAXS tana — skeletli model va uning animatsiyalari (hozircha T: "Desert Shadow Operative", tools/rig_t_shadow.py).
+## 3-SHAXS tana — skeletli model va uning animatsiyalari (T: "Desert Shadow Operative", CT: "Counter Terrorist Operative";
+## tools/rig_operatives.py).
 ## Faqat boshqalar ko'radigan tana (botlar, o'yinchining o'z soyasi). Birinchi shaxs bu modelga bog'liq emas —
 ## u character_model.gd (first_person=true) ichidagi alohida qo'l va qurol.
 ## character_model.gd shu tugunni yaratadi va API (fire, reload, die, set_weapon, ...) ni shu yerga uzatadi.
@@ -11,7 +12,7 @@ extends Node3D
 ##   -> o'q uzish, qayta o'qlash, harakat (pichoq zarbasi / granata otish) — bir martalik, faqat tananing yuqori qismi.
 ## O'lim — alohida (daraxt to'xtaydi, "death" klipi oxirgi kadrda qoladi).
 
-const SCENES := {"T": "res://characters/t_shadow.glb"}
+const SCENES := {"T": "res://characters/t_shadow.glb", "CT": "res://characters/ct_operative.glb"}
 const SK := "Skeleton/Skeleton3D:"
 const LOOPS := ["idle", "walk_f", "walk_b", "walk_l", "walk_r", "run_f", "run_b", "run_l", "run_r", "crouch_idle",
 	"crouch_f", "crouch_b", "crouch_l", "crouch_r", "jump_air", "plant"]

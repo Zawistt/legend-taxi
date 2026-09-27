@@ -298,6 +298,9 @@ func die() -> void:
 	collision_layer = 0
 	velocity = Vector3.ZERO
 	busy = ""
+	var gm := get_tree().get_first_node_in_group("game_mode") if is_inside_tree() else null
+	if gm and loadout:
+		gm.drop_best(self)              # CS2: eng yaxshi quroli yerga tushadi
 	if loadout:
 		loadout.strip_all()             # CS2: o'lsa qurol, zirh, granatalar yo'qoladi
 

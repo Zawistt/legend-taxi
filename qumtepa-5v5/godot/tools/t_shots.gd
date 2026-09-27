@@ -14,6 +14,9 @@ func _initialize() -> void:
 
 
 func _run() -> void:
+	var args := OS.get_cmdline_user_args()
+	var team: String = args[0] if args.size() > 0 else "T"
+	var pre := "t" if team == "T" else "ct"
 	root.size = Vector2i(1800, 700)
 	var world := Node3D.new()
 	root.add_child(world)
@@ -37,7 +40,7 @@ func _run() -> void:
 	var models := []
 	for i in STATES.size():
 		var m: Node3D = CM.new()
-		m.team = "T"
+		m.team = team
 		world.add_child(m)
 		m.position = Vector3((i - (STATES.size() - 1) * 0.5) * 1.2, 0, 0)
 		var st: Dictionary = STATES[i][1]
@@ -95,7 +98,7 @@ func _run() -> void:
 	cam.look_at(m0.global_position + Vector3(0, 1.1, 0))
 	await process_frame
 	await process_frame
-	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/53_debug.png"))
+	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/%s_debug.png" % pre))
 	for q in models:
 		q.visible = true
 	mk.queue_free()
@@ -106,12 +109,12 @@ func _run() -> void:
 	cam.look_at(Vector3(0, 0.95, 0))
 	await process_frame
 	await process_frame
-	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/50_t_holatlar.png"))
+	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/%s_holatlar.png" % ("50_t" if team == "T" else "54_ct")))
 	cam.position = Vector3(11.0, 1.4, 3.0)
 	cam.look_at(Vector3(0, 0.9, 0))
 	await process_frame
 	await process_frame
-	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/51_t_holatlar_yon.png"))
+	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/%s_holatlar_yon.png" % ("51_t" if team == "T" else "55_ct")))
 	# yaqindan: to'pponcha, pichoq, granata (3/4 burchak)
 	for j in [4, 5, 6, 0]:
 		var mp: Vector3 = models[j].position
@@ -120,6 +123,6 @@ func _run() -> void:
 		cam.look_at(mp + Vector3(0, 1.25, 0))
 		await process_frame
 		await process_frame
-		root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/52_t_yaqin_%d.png" % j))
+		root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/%s_yaqin_%d.png" % [pre, j]))
 	print("saqlandi")
 	quit()

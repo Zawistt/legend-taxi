@@ -96,6 +96,9 @@ func _ready() -> void:
 	player.damaged.connect(_on_player_damaged)
 	gm.phase_changed.connect(_on_phase)
 	gm.killed.connect(_on_kill_event)
+	gm.weapon_picked.connect(func(who: Node, _w: Resource) -> void:
+		if who in bots:
+			_equip_best(who))
 	_spec_cam = Camera3D.new()
 	_spec_cam.fov = 75.0
 	_spec_cam.current = false
@@ -731,18 +734,25 @@ func _combat() -> void:
 					cur = ve[0]
 					head_only = ve[1]
 			if cur != null:
-				var react := rng.randf_range(0.18, 0.32) / difficulty
+				# odamga o'xshash reaksiya: ko'rish + qaror (0.26-0.42 s), qarab turgan tomondan uzoq bo'lsa — burilish (flick),
+				# o'zi yurayotgan bo'lsa — to'xtash (counter-strafe), uzoqdagi / o'tirgan nishon — sezish qiyinroq
+				var react := rng.randf_range(0.26, 0.42) / sqrt(difficulty)
 				if b.moving():
-					react += 0.1
+					react += 0.12
 				var to: Vector3 = cur.global_position - b.global_position
 				var look_pt: Vector3 = b.alert_look if b.alert_until > t else b.hold_look
-				var pre := false
-				if look_pt != Vector3.ZERO and not b.moving():
-					var aim: Vector3 = look_pt - b.global_position
-					pre = Vector3(aim.x, 0, aim.z).normalized().dot(Vector3(to.x, 0, to.z).normalized()) > 0.9
-					if pre:
-						react -= 0.08
-				b.react_at = t + maxf(0.1, react)
+				var ld: Vector3 = b.look_dir if look_pt == Vector3.ZERO else (look_pt - b.global_position)
+				var facing: float = Vector3(ld.x, 0, ld.z).normalized().dot(Vector3(to.x, 0, to.z).normalized())
+				var pre: bool = facing > 0.93 and not b.moving()
+				if pre:
+					react -= 0.07
+				else:
+					react += (1.0 - clampf(facing, -1.0, 1.0)) * 0.14          # 90° burilish ~ +0.14 s, orqaga ~ +0.28 s
+				var dd: float = to.length()
+				react += clampf((dd - 15.0) * 0.004, 0.0, 0.12)
+				if cur == player and player.crouching:
+					react += 0.05
+				b.react_at = t + maxf(0.2, react)
 				b.burst = 0
 				b.set_meta("track_from", t)
 				b.set_meta("pre_aim", pre)
@@ -806,11 +816,12 @@ func _combat() -> void:
 func _shot_zone(b, cur, W: Resource, dist: float, head_only: bool, sniper: bool) -> String:
 	var tracked: float = t - float(b.get_meta("track_from", t))
 	var pre: bool = b.get_meta("pre_aim", false)
-	var s_aim: float = (0.012 if not pre else 0.006) * exp(-tracked / 0.35) + 0.0022
-	s_aim /= difficulty
-	var tgt_moving: bool = Vector2(cur.velocity.x, cur.velocity.z).length() > 2.5
-	if tgt_moving:
-		s_aim += 0.004 / difficulty
+	# mo'ljal xatosi: burilib kelgan birinchi o'qlar ko'pincha tegmaydi, kuzatgan sari aniqlashadi (~0.5 s)
+	var s_aim: float = (0.03 if not pre else 0.014) * exp(-tracked / 0.45) + 0.0035
+	s_aim /= sqrt(difficulty)
+	var tgt_speed: float = Vector2(cur.velocity.x, cur.velocity.z).length()
+	if tgt_speed > 1.0:
+		s_aim += 0.0035 * clampf(tgt_speed / 4.5, 0.0, 1.0) * (1.6 if tracked < 0.4 else 1.0)
 	var s_w: float = W.base_spread
 	if sniper:
 		s_w *= W.ads_spread_multiplier            # bot har doim optika bilan, to'xtab otadi
@@ -824,7 +835,11 @@ func _shot_zone(b, cur, W: Resource, dist: float, head_only: bool, sniper: bool)
 	var sig := sqrt(s_aim * s_aim + s_w * s_w + s_r * s_r)
 	var low: bool = cur == player and player.crouching
 	var head_h := 1.2 if low else 1.65
-	var aim_head: bool = head_only or (not sniper and (dist < 35.0 or rng.randf() < 0.6) and rng.randf() < 0.55 * difficulty)
+	# boshga mo'ljal: faqat birinchi o'qlarda va yaqinda (spray paytida — ko'krakka), uzoqda kamroq
+	var head_p := (0.38 if dist < 15.0 else (0.28 if dist < 30.0 else 0.15)) * difficulty
+	if b.burst > 2:
+		head_p *= 0.4
+	var aim_head: bool = head_only or (not sniper and rng.randf() < head_p)
 	var aim_y: float = head_h if aim_head else (0.95 if low else 1.3)
 	var dx := rng.randfn(0.0, sig) * dist
 	var dy := rng.randfn(0.0, sig) * dist

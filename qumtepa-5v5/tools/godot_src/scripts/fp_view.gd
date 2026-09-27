@@ -66,6 +66,7 @@ var _t := 0.0
 var _reload_end := -1.0
 var _base_fov := 80.0
 var _impacts: Array = []
+var _prev_slot := 2                    ## Q — oldingi qurol
 ## CS2 uslubidagi tabiiy harakat: yurganda qadam tebranishi, sichqoncha burilganda qurolning biroz kechikishi
 var _bob_t := 0.0
 var _sway := Vector2.ZERO
@@ -123,7 +124,7 @@ func _ready() -> void:
 
 
 static func _ensure_input() -> void:
-	var keys := {"weapon_1": KEY_1, "weapon_2": KEY_2, "weapon_3": KEY_3, "weapon_4": KEY_4, "weapon_5": KEY_5, "fire_mode": KEY_X}
+	var keys := {"weapon_1": KEY_1, "weapon_2": KEY_2, "weapon_3": KEY_3, "weapon_4": KEY_4, "weapon_5": KEY_5, "fire_mode": KEY_X, "last_weapon": KEY_Q}
 	for a in keys:
 		if not InputMap.has_action(a):
 			InputMap.add_action(a)
@@ -208,6 +209,8 @@ func equip(s: int, instant := false) -> void:
 
 
 func _select(s: int, w: Resource, instant: bool) -> void:
+	if s != slot:
+		_prev_slot = slot
 	slot = s
 	current = w
 	_reload_end = -1.0
@@ -233,6 +236,54 @@ func buy(weapon_id: String) -> bool:
 	_lo().give(w)
 	equip(w.slot)
 	return true
+
+
+## Q: oldingi qurolga qaytish
+func last_weapon() -> void:
+	equip(_prev_slot)
+
+
+## G: qo'ldagi qurolni tashlash (asosiy / to'pponcha; bomba — game_mode.drop_bomb, 5-slotda)
+func drop_current() -> bool:
+	var gm := get_tree().get_first_node_in_group("game_mode")
+	if gm == null or not player.alive:
+		return false
+	if slot == 5:
+		gm.drop_bomb()
+		return true
+	if not (slot == 1 or slot == 2) or current == null:
+		return false
+	_save_ammo()
+	var w: Resource = current
+	var am: Array = _lo().ammo.get(w.weapon_id, [ammo, reserve])
+	_lo().ammo.erase(w.weapon_id)
+	if slot == 1:
+		_lo().primary = null
+	else:
+		_lo().secondary = null
+	var cam: Camera3D = player.cam
+	var fwd := -cam.global_transform.basis.z
+	gm.drop_weapon(player, w, am, cam.global_position + fwd * 0.5 - Vector3.UP * 0.2, fwd * 4.0 + Vector3.UP * 1.5 + player.velocity)
+	current = null
+	equip(1 if _lo().primary else (2 if _lo().secondary else 3), true)
+	return true
+
+
+## qarab turgan yerdagi qurol (2.2 m ichida, ko'z oldida) — E bilan olish uchun
+func pickup_candidate() -> Node:
+	var cam: Camera3D = player.cam
+	var fwd := -cam.global_transform.basis.z
+	var best: Node = null
+	var bd := 0.8
+	for d in get_tree().get_nodes_in_group("dropped_weapons"):
+		var to: Vector3 = (d.global_position - cam.global_position)
+		if to.length() > 2.4:
+			continue
+		var dot := to.normalized().dot(fwd)
+		if dot > bd:
+			bd = dot
+			best = d
+	return best
 
 
 func weapon_by_id(weapon_id: String) -> Resource:
@@ -508,6 +559,15 @@ func _process(delta: float) -> void:
 				equip(i + 1)
 		if Input.is_action_just_pressed("fire_mode"):
 			cycle_mode()
+		if Input.is_action_just_pressed("last_weapon"):
+			last_weapon()
+		if Input.is_action_just_pressed("drop_bomb"):
+			drop_current()
+		if Input.is_action_just_pressed("interact"):
+			var gm := get_tree().get_first_node_in_group("game_mode")
+			var cand := pickup_candidate()
+			if cand and gm and not gm.can_plant() and not gm.can_defuse():
+				gm.swap_pickup(player, cand)
 		if Input.is_action_just_pressed("reload") or (ammo == 0 and not is_knife() and Input.is_action_just_pressed("fire")):
 			reload()
 		# o'q rejimi: avtomat — bosib turish; 3 talik — bir bosishda 3 o'q; bittalik — har bosishda bitta

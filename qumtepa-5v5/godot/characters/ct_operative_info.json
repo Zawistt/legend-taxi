@@ -1,0 +1,87 @@
+{
+ "gaits": {
+  "walk": {
+   "speed": 2.3,
+   "period": 0.8,
+   "stride_scale": 1.25,
+   "time_scale": 1.31708858124353
+  },
+  "run": {
+   "speed": 4.5,
+   "period": 0.6333333333333333,
+   "stride_scale": 1.153375299561391,
+   "time_scale": 1.153375299561391
+  },
+  "crouch": {
+   "speed": 1.55,
+   "period": 0.7666666666666667,
+   "stride_scale": 1.1400231665191918,
+   "time_scale": 1.1400231665191916
+  }
+ },
+ "mocap": {
+  "idle": "137_41 [600:960]",
+  "walk": "07_01 [121:250]",
+  "run": "09_01 [34:123]",
+  "crouch": "77_30 [486:592]",
+  "jump": "16_01 [95:236]",
+  "plant": "23_03 [250:400]",
+  "death": "23_03 [1:190] + yiqilish"
+ },
+ "steps": {
+  "walk": [
+   0.0,
+   0.5
+  ],
+  "run": [
+   0.0,
+   0.5
+  ],
+  "crouch": [
+   0.0,
+   0.5
+  ]
+ },
+ "reload_time": 2.6666666666666665,
+ "height": 1.8,
+ "weapon_geom": "m416",
+ "grip": [
+  -0.1157335564494133,
+  -0.2070000022649765,
+  1.2821100950241089
+ ],
+ "eye": [
+  0.008901912719011307,
+  -0.06145825237035751,
+  1.6806848049163818
+ ],
+ "anims": [
+  "crouch_b",
+  "crouch_f",
+  "crouch_idle",
+  "crouch_l",
+  "crouch_r",
+  "death",
+  "fire",
+  "hold_c4",
+  "hold_knife",
+  "hold_nade",
+  "hold_pistol",
+  "idle",
+  "jump_air",
+  "jump_land",
+  "jump_start",
+  "plant",
+  "reload",
+  "run_b",
+  "run_f",
+  "run_l",
+  "run_r",
+  "slash",
+  "throw",
+  "walk_b",
+  "walk_f",
+  "walk_l",
+  "walk_r"
+ ]
+}

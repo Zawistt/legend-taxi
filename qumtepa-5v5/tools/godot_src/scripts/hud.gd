@@ -65,7 +65,7 @@ func _ready() -> void:
 	hint_lbl = _label(root, 20, Control.PRESET_CENTER_BOTTOM, Vector2(-400, -150), Vector2(800, 30), HORIZONTAL_ALIGNMENT_CENTER)
 	help_lbl = _label(root, 13, Control.PRESET_BOTTOM_LEFT, Vector2(24, -34), Vector2(1100, 20), HORIZONTAL_ALIGNMENT_LEFT)
 	help_lbl.modulate = Color(1, 1, 1, 0.6)
-	help_lbl.text = "B — sotib olish   TAB — statistika   1/2/3/4/5 — qurol/granata/bomba   G — tashlash   E — bomba   X — o'q rejimi   F7 — mashq   F10 — menyu"
+	help_lbl.text = "B — sotib olish   TAB — statistika   1/2/3/4/5 — qurol/granata/bomba   Q — oldingi qurol   G — qurolni tashlash   E — olish / bomba   X — o'q rejimi   F10 — menyu"
 	hp_lbl = _label(root, 34, Control.PRESET_BOTTOM_LEFT, Vector2(24, -86), Vector2(420, 44), HORIZONTAL_ALIGNMENT_LEFT)
 	money_lbl = _label(root, 30, Control.PRESET_BOTTOM_RIGHT, Vector2(-300, -170), Vector2(280, 40), HORIZONTAL_ALIGNMENT_RIGHT)
 	money_lbl.modulate = Color(0.55, 1.0, 0.55)
@@ -250,6 +250,11 @@ func scoreboard_text() -> String:
 	return s
 
 func _hint() -> String:
+	var fp = player.get("fp_view")
+	if fp and player.alive and gm.phase in [GM.Phase.FREEZE, GM.Phase.LIVE, GM.Phase.PLANTED]:
+		var cand = fp.pickup_candidate()
+		if cand:
+			return "E — %s ni olish ($%d)" % [cand.weapon.weapon_name, cand.weapon.price]
 	match gm.phase:
 		GM.Phase.FREEZE:
 			return "Tayyorlaning…  B — sotib olish menyusi"

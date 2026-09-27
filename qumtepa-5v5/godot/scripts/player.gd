@@ -53,6 +53,7 @@ var carrier := false
 var loadout = preload("res://scripts/loadout.gd").new()
 ## qurolga qarab tezlik (CS2: pichoq 1.0, AK 0.86, AWP 0.8) — fp_view.gd
 var speed_mult := 1.0
+var _tag_until := 0.0                 ## o'q tekkanda sekinlashish (CS2 tagging)
 ## 5-slotda bomba va chap tugma bosib turilgan (game_mode o'rnatish uchun E bilan bir xil ko'radi)
 var c4_fire := false
 ## ekran silkinishi (bomba, granata) va flesh (oq ekran) — hud.gd chizadi
@@ -185,6 +186,10 @@ func _physics_process(delta: float) -> void:
 	elif allow_sprint and Input.is_action_pressed("sprint"):
 		s = sprint_speed
 	s *= speed_mult
+	# CS2 "tagging": o'q tekkandan keyin qisqa vaqt sekinlashadi (0.4 s da asta tiklanadi)
+	var tag_left: float = _tag_until - Time.get_ticks_msec() / 1000.0
+	if tag_left > 0.0:
+		s *= lerpf(1.0, 0.45, clampf(tag_left / 0.4, 0.0, 1.0))
 	velocity.x = dir.x * s
 	velocity.z = dir.z * s
 	var air_vy := velocity.y
@@ -282,6 +287,7 @@ func damage(amount: float, from_pos := Vector3.ZERO) -> bool:
 	if not alive or amount <= 0.0:
 		return false
 	hp -= amount
+	_tag_until = Time.get_ticks_msec() / 1000.0 + 0.4
 	damaged.emit(amount, from_pos)
 	if hp <= 0.0:
 		die()
@@ -308,6 +314,9 @@ func die() -> void:
 	busy = false
 	velocity = Vector3.ZERO
 	collision_layer = 0
+	var gm := get_tree().get_first_node_in_group("game_mode") if is_inside_tree() else null
+	if gm and loadout:
+		gm.drop_best(self)              # CS2: eng yaxshi quroli yerga tushadi
 	if loadout:
 		loadout.strip_all()             # CS2: o'lsa qurol, zirh, granatalar yo'qoladi
 	if crouching:

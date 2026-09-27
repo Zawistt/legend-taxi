@@ -925,6 +925,7 @@ func section_cs2() -> void:
 	main.add_child(enemy_bot)
 	enemy_bot.setup("CT" if pl.team == "T" else "T", 7, pl.global_position + Vector3(0, 0, 6), pl.get_world_3d().navigation_map, true)
 	enemy_bot.loadout.name = "Sinov"
+	enemy_bot.loadout.round_start(enemy_bot.team)
 	gm.bots.append(enemy_bot)
 	await frames(2)
 	ok(hud.has_method("scoreboard_text") and hud.scoreboard_text().contains("K") and hud.scoreboard_text().contains("HS"),
@@ -938,6 +939,50 @@ func section_cs2() -> void:
 			"kill feed: kim kimni, qaysi qurol bilan, boshga — %s [%s] %s" % [gm.feed[-1].killer, gm.feed[-1].weapon, gm.feed[-1].victim])
 		gm.bots.erase(enemy_bot)
 		enemy_bot.queue_free()
+	# qurol tashlash / olish (CS2): G — tashlash, ustidan yurib o'tsa oladi (joyi bo'sh bo'lsa), E — almashtirish, o'lganda tushadi
+	var fpv = pl.get_node("Camera3D/FPView")
+	var drops0: int = get_nodes_in_group("dropped_weapons").size()
+	ok(drops0 >= 1, "o'lgan raqib quroli yerga tushdi (%d ta qurol yerda)" % drops0)
+	gm.start_round()
+	await frames(3)
+	ok(get_nodes_in_group("dropped_weapons").size() == 0, "yangi raundda yerdagi qurollar yo'qoladi")
+	lo.money = 16000
+	fpv.buy_menu.buy_item("ak47")
+	gm.skip_freeze()
+	gm.time_left = 1.0e6
+	put(Vector3(0, 0.1, -24))
+	await secs(1.0)
+	fpv.ammo = 17
+	var dropped: bool = fpv.drop_current()
+	await secs(1.8)
+	var dl := get_nodes_in_group("dropped_weapons")
+	var d_ok: bool = dropped and lo.primary == null and dl.size() == 1 and dl[0].weapon.weapon_id == "ak47" and fpv.current.weapon_id == "glock"
+	var dpos: Vector3 = dl[0].global_position if dl.size() else Vector3.ZERO
+	ok(d_ok and dpos.distance_to(pl.global_position) > 1.0 and dpos.y < 0.5,
+		"G — AK-47 oldinga otildi va yerda yotibdi (%.1f m narida), qo'lda Glock" % dpos.distance_to(pl.global_position))
+	put(Vector3(dpos.x, 0.1, dpos.z))
+	await secs(0.5)
+	ok(lo.primary != null and lo.primary.weapon_id == "ak47" and get_nodes_in_group("dropped_weapons").is_empty() and lo.ammo["ak47"][0] == 17,
+		"ustidan yurib o'tganda oldi (asosiy joy bo'sh edi), magazin saqlandi: %s" % str(lo.ammo.get("ak47", [])))
+	var awp_d = gm.drop_weapon(null, load("res://scripts/cs_rules.gd").weapon("awp"), [5, 30], pl.global_position + Vector3(0, 0.5, 1.0), Vector3.ZERO)
+	await secs(1.0)
+	var auto_skip: bool = lo.primary.weapon_id == "ak47"
+	gm.swap_pickup(pl, awp_d)
+	await secs(0.6)
+	var dl2 := get_nodes_in_group("dropped_weapons")
+	ok(auto_skip and lo.primary.weapon_id == "awp" and fpv.current.weapon_id == "awp" and dl2.size() == 1 and dl2[0].weapon.weapon_id == "ak47",
+		"joy band bo'lsa avtomatik olmaydi; E — AWP olindi, AK-47 yerga tushdi")
+	fpv.equip(2)
+	await secs(0.3)
+	fpv.equip(1)
+	await secs(0.3)
+	fpv.last_weapon()
+	await secs(0.2)
+	ok(fpv.slot == 2, "Q — oldingi qurolga qaytish (slot %d)" % fpv.slot)
+	var hp_t: float = pl.hp
+	pl.damage(1.0)
+	ok(pl._tag_until > Time.get_ticks_msec() / 1000.0, "o'q tekkanda sekinlashish (tagging, 0.4 s)")
+	pl.hp = hp_t
 	# yarim vaqt: 12 raunddan keyin tomonlar almashadi, pul $800
 	gm.score = {"T": 7, "CT": 5}
 	gm._swapped_at = -1
