@@ -182,7 +182,9 @@ def arch_wall(group, axis, line, t, a0, a1, y_top, apex, mat="wall", seg=18, col
     nf = np.array((0, 0, 1)) if axis == "x" else np.array((1, 0, 0))
     for k5 in range(5 if col else 0):
         s0c, s1c = a0 + span * k5 / 5, a0 + span * (k5 + 1) / 5
-        yb = curve((s0c + s1c) / 2)
+        # quti ostki qirrasi — egri chiziqning shu bo'lakdagi ENG BALAND nuqtasi: to'qnashuv ravoq ochig'iga
+        # chiqib turmaydi (ilgari o'rtadagi nuqta edi — ochiqlikda ko'rinmas "pog'onalar" qolardi, vizual audit)
+        yb = curve(min(max(m, s0c), s1c))
         if axis == "x":
             COL.append(("stone", s0c, yb, line - t / 2, s1c, y_top, line + t / 2))
         else:

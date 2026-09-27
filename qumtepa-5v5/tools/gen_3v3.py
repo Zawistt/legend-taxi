@@ -37,6 +37,77 @@ def patch_game_mode(path):
     open(path, "w").write(g)
 
 
+def fix_arches(t):
+    """ravoq ustidagi 5 bo'lakli to'qnashuv (build.py: pastki qirra = bo'lak o'rtasidagi egri nuqta) ravoq ochig'iga
+    pog'ona bo'lib chiqib turardi (o'q/granata ko'rinmas narsaga urilardi). Har bo'lakning pastki qirrasi o'rtaga
+    qarab qo'shni bo'lakniki bilan tenglashtiriladi — to'qnashuv egri chiziqdan pastga tushmaydi."""
+    sizes = {m.group(1): [float(v) for v in m.group(2).split(",")]
+             for m in re.finditer(r'\[sub_resource type="BoxShape3D" id="([^"]+)"\]\nsize = Vector3\(([^)]*)\)', t)}
+    nodes = []
+    for m in re.finditer(r'(\[node name="[^"]+" type="CollisionShape3D" parent="[^"]+"\]\ntransform = Transform3D\(1, 0, 0, 0, 1, 0, 0, 0, 1, ([^)]*)\)\nshape = SubResource\("([^"]+)"\))', t):
+        c = [float(v) for v in m.group(2).split(",")]
+        sz = sizes.get(m.group(3))
+        if sz:
+            nodes.append({"text": m.group(1), "c": c, "s": sz, "id": m.group(3)})
+    def lo(n, a): return n["c"][a] - n["s"][a] / 2
+    def hi(n, a): return n["c"][a] + n["s"][a] / 2
+    cand = [n for n in nodes if lo(n, 1) > 2.0 and n["s"][1] < 4.0]
+    fixed = 0
+    for ax in (0, 2):
+        other = 2 - ax
+        rows = {}
+        for n in cand:
+            key = (round(n["c"][other], 3), round(n["s"][other], 3), round(hi(n, 1), 3))
+            rows.setdefault(key, []).append(n)
+        for row in rows.values():
+            row.sort(key=lambda n: n["c"][ax])
+            i = 0
+            while i + 5 <= len(row):
+                g = row[i:i + 5]
+                cont = all(abs(hi(g[k], ax) - lo(g[k + 1], ax)) < 1e-3 for k in range(4))
+                ys = [lo(n, 1) for n in g]
+                if cont and ys[2] >= max(ys) - 1e-6 and ys[0] < ys[2] and abs(ys[0] - ys[4]) < 1e-3:
+                    newy = [max(ys[0], ys[1]), max(ys[1], ys[2]), ys[2], max(ys[3], ys[2]), max(ys[4], ys[3])]
+                    for n, y0 in zip(g, newy):
+                        if y0 > lo(n, 1) + 1e-6:
+                            top = hi(n, 1)
+                            n["s"][1] = top - y0
+                            n["c"][1] = (top + y0) / 2
+                            n["fix"] = True
+                            fixed += 1
+                    i += 5
+                else:
+                    i += 1
+    # egilgan palma tanalari: to'qnashuv 6 m tik quti, vizual tana yuqorida egiladi -> 2.6 m gacha (o'yinchi yetadigan qism)
+    palms = 0
+    for n in nodes:
+        if abs(n["s"][0] - 0.44) < 1e-3 and abs(n["s"][2] - 0.44) < 1e-3 and n["s"][1] > 5.0 and lo(n, 1) < 0.1:
+            y0 = lo(n, 1)
+            n["s"][1] = 2.6 - y0
+            n["c"][1] = y0 + n["s"][1] / 2
+            n["fix"] = True
+            palms += 1
+    # qum qoplari: to'qnashuv qutisi qoplardan uchlarida 0.3 m uzun edi (ko'rinmas to'siq) -> qoplar uzunligiga qisqartiriladi
+    bags = 0
+    for n in nodes:
+        if abs(n["s"][1] - 0.78) < 1e-3 and lo(n, 1) < 0.01 and "World_cloth" in n["text"]:
+            ax = 0 if n["s"][0] > n["s"][2] else 2
+            if n["s"][ax] > 1.0:
+                n["s"][ax] -= 0.5
+                n["fix"] = True
+                bags += 1
+    print(f"3v3: qum qoplari to'qnashuvi qisqartirildi — {bags} ta")
+    for n in nodes:
+        if n.get("fix"):
+            old_sub = re.search(rf'\[sub_resource type="BoxShape3D" id="{n["id"]}"\]\nsize = Vector3\([^)]*\)', t).group(0)
+            t = t.replace(old_sub, f'[sub_resource type="BoxShape3D" id="{n["id"]}"]\nsize = Vector3({n["s"][0]:g}, {n["s"][1]:.4f}, {n["s"][2]:g})')
+            new_text = re.sub(r"Transform3D\(1, 0, 0, 0, 1, 0, 0, 0, 1, [^)]*\)",
+                              f"Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {n['c'][0]:g}, {n['c'][1]:.4f}, {n['c'][2]:g})", n["text"])
+            t = t.replace(n["text"], new_text)
+    print(f"3v3: ravoq to'qnashuvi tuzatildi — {fixed} ta bo'lak; egilgan palma tanasi — {palms} ta")
+    return t
+
+
 def fix_lighting(t):
     """3v3 da yurganda ekran qorayishi va ortiqcha yorug'lik:
     - ReflectionProbe'lar (spawn, mid, tunnel...) interior + ambient_mode=1 (o'z rangi, 0.5) edi: ichkariga kirganda atrof
@@ -72,7 +143,7 @@ def main():
     for fn in ("desert_map.glb", "collision.tscn", "navmesh.res"):
         dst = os.path.join(DST, "map", fn)
         if fn.endswith(".tscn"):
-            open(dst, "w").write(fix_paths(open(os.path.join(SRC, "map", fn)).read()))
+            open(dst, "w").write(fix_arches(fix_paths(open(os.path.join(SRC, "map", fn)).read())))
         else:
             shutil.copy(os.path.join(SRC, "map", fn), dst)
     for fn in AUDIO:
