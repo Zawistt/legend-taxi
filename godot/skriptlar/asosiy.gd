@@ -14,6 +14,7 @@ var quyosh: DirectionalLight3D
 var _sinov := false
 var _tepa := false
 var _tun := false
+var _soyasiz := false
 var _oddiy := false                    # sinov: SSAO/SSIL/SDFGI/SSR/hajmli tumansiz
 var _kamera_joy := Vector2.INF        # sinov suratlari uchun qo'zg'almas kamera
 var _kamera_havo := false
@@ -36,6 +37,8 @@ func _ready() -> void:
 			_tun = true
 		elif a == "--oddiy":
 			_oddiy = true
+		elif a == "--soyasiz":
+			_soyasiz = true
 		elif a.begins_with("--kamera_yol=") or a.begins_with("--kamera_havo="):
 			var q := a.split("=")[1].split(",")
 			_kamera_joy = Vector2(float(q[0]), float(q[1]))
@@ -172,6 +175,8 @@ func _muhit() -> void:
 	quyosh.shadow_blur = 1.0
 	quyosh.shadow_normal_bias = 1.5
 	add_child(quyosh)
+	if _soyasiz:
+		quyosh.shadow_enabled = false
 	if _tun:                                        # tungi ko'rinish sinovi (8-bosqichda kun/tun sikli)
 		RenderingServer.global_shader_parameter_set("tun", 1.0)
 		quyosh.light_energy = 0.06
