@@ -65,7 +65,27 @@ permissions/internet=false
 permissions/vibrate=true
 CFG
 rm -f "$OUT.unsigned.apk" "$OUT"
-"$GODOT" --headless --export-release "Android" "$OUT.unsigned.apk" 2>&1 | grep -v "^$" | tail -20
+# telefon uchun yengilroq resurslar (faqat eksport vaqtida; keyin asl sozlamalar qaytariladi):
+#   qahramon teksturalari — 1024 px, lossy (WebP) siqish; ovozlar — QOA siqish (~5 marta kichik)
+BK="$(mktemp -d)"
+MOB=()
+for f in characters/*.jpg.import $(find . -name "*.wav.import" -not -path "./.godot/*"); do
+  [ -f "$f" ] || continue
+  mkdir -p "$BK/$(dirname "$f")"; cp "$f" "$BK/$f"; MOB+=("$f")
+  case "$f" in
+    *.jpg.import) sed -i 's/^compress\/mode=0/compress\/mode=1/; s/^process\/size_limit=0/process\/size_limit=1024/' "$f" ;;
+    *.wav.import) sed -i 's/^compress\/mode=0/compress\/mode=2/' "$f" ;;
+  esac
+  grep -o '"res://.godot/imported/[^"]*"' "$f" | tr -d '"' | sed 's|res://||' | xargs -r rm -f
+done
+"$GODOT" --headless --import >/dev/null 2>&1 || true
+"$GODOT" --headless --export-release "Android" "$OUT.unsigned.apk" 2>&1 | grep -v "^$" | tail -4
+for f in "${MOB[@]}"; do
+  cp "$BK/$f" "$f"
+  grep -o '"res://.godot/imported/[^"]*"' "$f" | tr -d '"' | sed 's|res://||' | xargs -r rm -f
+done
+rm -rf "$BK"
+"$GODOT" --headless --import >/dev/null 2>&1 || true
 ls -la "$OUT.unsigned.apk"
 # imzolash (v1+v2+v3) va zipalign — Godot debug kaliti bilan
 TMP="$(mktemp -d)"
