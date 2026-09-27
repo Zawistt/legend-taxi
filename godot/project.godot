@@ -1,0 +1,30 @@
+; Legend Taxi: Samarqand — Godot 4.7 loyihasi
+; Shahar GLB bo'laklari: shahar/ (tools/godot_eksport.py yaratadi)
+
+config_version=5
+
+[application]
+
+config/name="Legend Taxi: Samarqand"
+config/description="Samarqandning real ma'lumotlari asosidagi ochiq dunyo o'yini"
+run/main_scene="res://asosiy.tscn"
+config/features=PackedStringArray("4.7", "Forward Plus")
+
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+window/stretch/mode="disabled"
+
+[physics]
+
+common/physics_ticks_per_second=120
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+anti_aliasing/quality/msaa_3d=2
+anti_aliasing/quality/screen_space_aa=1
+lights_and_shadows/directional_shadow/size=8192
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3
+environment/defaults/default_clear_color=Color(0.62, 0.74, 0.86, 1)
