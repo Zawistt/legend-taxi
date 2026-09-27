@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cqgn7nmhriqbf"
 path.s3tc="res://.godot/imported/awning_b_normal.jpg-c20cb3ce6ea26bb3c85c469d2d765d62.s3tc.ctex"
+path.etc2="res://.godot/imported/awning_b_normal.jpg-c20cb3ce6ea26bb3c85c469d2d765d62.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/awning_b_normal.jpg"
-dest_files=["res://.godot/imported/awning_b_normal.jpg-c20cb3ce6ea26bb3c85c469d2d765d62.s3tc.ctex"]
+dest_files=["res://.godot/imported/awning_b_normal.jpg-c20cb3ce6ea26bb3c85c469d2d765d62.s3tc.ctex", "res://.godot/imported/awning_b_normal.jpg-c20cb3ce6ea26bb3c85c469d2d765d62.etc2.ctex"]
 
 [params]
 

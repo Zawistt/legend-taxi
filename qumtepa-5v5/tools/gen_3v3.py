@@ -228,12 +228,14 @@ def main():
         if head.startswith('[ext_resource type="Script" path="res://scripts/player.gd"'):
             out.append('[ext_resource type="PackedScene" path="res://scenes/player.tscn" id="20_pl"]\n\n'
                        '[ext_resource type="Script" path="res://scripts/practice.gd" id="21_pr"]\n\n'
-                       '[ext_resource type="Script" path="res://scripts/bot_play.gd" id="22_bp"]\n')
+                       '[ext_resource type="Script" path="res://scripts/bot_play.gd" id="22_bp"]\n\n'
+                       '[ext_resource type="Script" path="res://scripts/mobile_controls.gd" id="23_mc"]\n')
             continue
         out.append(b)
     t = "\n".join(out).rstrip() + ('\n\n[node name="Practice" type="Node3D" parent="."]\nscript = ExtResource("21_pr")\n'
          '\n[node name="Bots" type="Node3D" parent="."]\nscript = ExtResource("22_bp")\nteam_size = 3\n'
-         f'strategies_path = "{RES}/scripts/strategies_3v3.gd"\nmap_data_path = "{RES}/scripts/map_data.gd"\n')
+         f'strategies_path = "{RES}/scripts/strategies_3v3.gd"\nmap_data_path = "{RES}/scripts/map_data.gd"\n'
+         '\n[node name="MobileControls" type="CanvasLayer" parent="."]\nscript = ExtResource("23_mc")\n')
     assert skip_player and "20_pl" in t
     open(os.path.join(GODOT, "main_3v3.tscn"), "w").write(t)
     spawns = {k: len(re.findall(rf'groups=\["spawn_{k}"\]', t)) for k in ("T", "CT")}

@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dwva7pvdm1cdn"
 path.s3tc="res://.godot/imported/flagstone_albedo.jpg-463817b471dfc497da57086d18b2c105.s3tc.ctex"
+path.etc2="res://.godot/imported/flagstone_albedo.jpg-463817b471dfc497da57086d18b2c105.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/flagstone_albedo.jpg"
-dest_files=["res://.godot/imported/flagstone_albedo.jpg-463817b471dfc497da57086d18b2c105.s3tc.ctex"]
+dest_files=["res://.godot/imported/flagstone_albedo.jpg-463817b471dfc497da57086d18b2c105.s3tc.ctex", "res://.godot/imported/flagstone_albedo.jpg-463817b471dfc497da57086d18b2c105.etc2.ctex"]
 
 [params]
 

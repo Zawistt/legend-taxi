@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://ce52kuqdyjyaa"
 path.s3tc="res://.godot/imported/majolica_albedo.jpg-967bdee64ec142af7146698c6d8cc88d.s3tc.ctex"
+path.etc2="res://.godot/imported/majolica_albedo.jpg-967bdee64ec142af7146698c6d8cc88d.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/majolica_albedo.jpg"
-dest_files=["res://.godot/imported/majolica_albedo.jpg-967bdee64ec142af7146698c6d8cc88d.s3tc.ctex"]
+dest_files=["res://.godot/imported/majolica_albedo.jpg-967bdee64ec142af7146698c6d8cc88d.s3tc.ctex", "res://.godot/imported/majolica_albedo.jpg-967bdee64ec142af7146698c6d8cc88d.etc2.ctex"]
 
 [params]
 

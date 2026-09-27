@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cw40oponk3mep"
 path.s3tc="res://.godot/imported/sandstone_dk_orm.jpg-e734ed8d43a58116a8f81d7fd5bc959d.s3tc.ctex"
+path.etc2="res://.godot/imported/sandstone_dk_orm.jpg-e734ed8d43a58116a8f81d7fd5bc959d.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/sandstone_dk_orm.jpg"
-dest_files=["res://.godot/imported/sandstone_dk_orm.jpg-e734ed8d43a58116a8f81d7fd5bc959d.s3tc.ctex"]
+dest_files=["res://.godot/imported/sandstone_dk_orm.jpg-e734ed8d43a58116a8f81d7fd5bc959d.s3tc.ctex", "res://.godot/imported/sandstone_dk_orm.jpg-e734ed8d43a58116a8f81d7fd5bc959d.etc2.ctex"]
 
 [params]
 

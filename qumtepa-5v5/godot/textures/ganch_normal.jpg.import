@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://b3ul3x0q8ep46"
 path.s3tc="res://.godot/imported/ganch_normal.jpg-f03855ab7d00d558bb5b027c1cebb661.s3tc.ctex"
+path.etc2="res://.godot/imported/ganch_normal.jpg-f03855ab7d00d558bb5b027c1cebb661.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/ganch_normal.jpg"
-dest_files=["res://.godot/imported/ganch_normal.jpg-f03855ab7d00d558bb5b027c1cebb661.s3tc.ctex"]
+dest_files=["res://.godot/imported/ganch_normal.jpg-f03855ab7d00d558bb5b027c1cebb661.s3tc.ctex", "res://.godot/imported/ganch_normal.jpg-f03855ab7d00d558bb5b027c1cebb661.etc2.ctex"]
 
 [params]
 

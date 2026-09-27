@@ -1,4 +1,4 @@
-[gd_scene load_steps=164 format=3]
+[gd_scene load_steps=165 format=3]
 
 [ext_resource type="PackedScene" path="res://map/qumtepa5v5.glb" id="1_map"]
 
@@ -35,6 +35,8 @@
 [ext_resource type="Script" path="res://scripts/practice.gd" id="12_pr"]
 
 [ext_resource type="Script" path="res://scripts/bot_play.gd" id="13_bp"]
+
+[ext_resource type="Script" path="res://scripts/mobile_controls.gd" id="14_mc"]
 
 [sub_resource type="ProceduralSkyMaterial" id="sky_mat"]
 sky_top_color = Color(0.24, 0.5, 0.84, 1)
@@ -3423,3 +3425,6 @@ script = ExtResource("12_pr")
 
 [node name="Bots" type="Node3D" parent="."]
 script = ExtResource("13_bp")
+
+[node name="MobileControls" type="CanvasLayer" parent="."]
+script = ExtResource("14_mc")

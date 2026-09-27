@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cf86fs6dhxynu"
 path.s3tc="res://.godot/imported/atlas_1_albedo.jpg-655906c5854b61aedfd8738a10dd1396.s3tc.ctex"
+path.etc2="res://.godot/imported/atlas_1_albedo.jpg-655906c5854b61aedfd8738a10dd1396.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/atlas_1_albedo.jpg"
-dest_files=["res://.godot/imported/atlas_1_albedo.jpg-655906c5854b61aedfd8738a10dd1396.s3tc.ctex"]
+dest_files=["res://.godot/imported/atlas_1_albedo.jpg-655906c5854b61aedfd8738a10dd1396.s3tc.ctex", "res://.godot/imported/atlas_1_albedo.jpg-655906c5854b61aedfd8738a10dd1396.etc2.ctex"]
 
 [params]
 

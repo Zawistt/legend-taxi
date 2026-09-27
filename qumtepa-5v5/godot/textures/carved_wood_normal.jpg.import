@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cifgg1yb7alus"
 path.s3tc="res://.godot/imported/carved_wood_normal.jpg-f6a69ca72ed40c799d7c08967c6d8346.s3tc.ctex"
+path.etc2="res://.godot/imported/carved_wood_normal.jpg-f6a69ca72ed40c799d7c08967c6d8346.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/carved_wood_normal.jpg"
-dest_files=["res://.godot/imported/carved_wood_normal.jpg-f6a69ca72ed40c799d7c08967c6d8346.s3tc.ctex"]
+dest_files=["res://.godot/imported/carved_wood_normal.jpg-f6a69ca72ed40c799d7c08967c6d8346.s3tc.ctex", "res://.godot/imported/carved_wood_normal.jpg-f6a69ca72ed40c799d7c08967c6d8346.etc2.ctex"]
 
 [params]
 

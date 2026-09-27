@@ -34,6 +34,12 @@ Godot 4.3, bomba rejimi (T hujum qiladi, CT himoya qiladi).
 
 Godot 4.3 → Import → `qumtepa-5v5/godot/project.godot` → F5 — bosh menyu: 5v5 yoki 3v3, botlar bilan (CS2 qoidalari). Boshqaruv: WASD, Shift — sekin yurish, Ctrl/C — o'tirish, sichqoncha — o'q, R — qayta o'qlash, B — sotib olish, 1/2/3/4/5 — asosiy / to'pponcha / pichoq-Zeus / granata / bomba, E — bomba o'rnatish/zararsizlantirish, G — tashlash, Q — oldingi qurol, G — qurolni tashlash, E — yerdagi qurolni olish, TAB — statistika, X — o'q rejimi, M — xarita, F7 — mashq nishonlari, F10 — menyu. Bosh menyu → 4 — inventar. Batafsil: [STAGE12.md](docs/STAGE12.md), [STAGE13.md](docs/STAGE13.md).
 
+## Telefon (Android)
+
+`tools/export_android.sh` — arm64 APK (Godot 4.3 Android shabloni, Android SDK shart emas; imzolash — uber-apk-signer).
+Telefonda sensor boshqaruv (`scripts/mobile_controls.gd`): chapda joystik, o'ngda barmoq bilan qarash, OTISH (surib qarash ham mumkin),
+NISHON, SAKRASH, O'TIRISH, R, E, 1–5, Q, G, B, TAB, MENYU. Renderer — compatibility (ko'p telefonlarda ishlaydi), gorizontal ekran.
+
 ## Tuzilma
 
 ```

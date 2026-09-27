@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://ccmraq005bggw"
 path.s3tc="res://.godot/imported/ganch_height.jpg-950c5abd2ebf6db7c4e5f0afe762a981.s3tc.ctex"
+path.etc2="res://.godot/imported/ganch_height.jpg-950c5abd2ebf6db7c4e5f0afe762a981.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/ganch_height.jpg"
-dest_files=["res://.godot/imported/ganch_height.jpg-950c5abd2ebf6db7c4e5f0afe762a981.s3tc.ctex"]
+dest_files=["res://.godot/imported/ganch_height.jpg-950c5abd2ebf6db7c4e5f0afe762a981.s3tc.ctex", "res://.godot/imported/ganch_height.jpg-950c5abd2ebf6db7c4e5f0afe762a981.etc2.ctex"]
 
 [params]
 

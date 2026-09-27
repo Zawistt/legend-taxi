@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://c0l22jb8cuf06"
 path.s3tc="res://.godot/imported/vassa_orm.jpg-11e7e6ee9f29f3585f907977bfc97f3f.s3tc.ctex"
+path.etc2="res://.godot/imported/vassa_orm.jpg-11e7e6ee9f29f3585f907977bfc97f3f.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/vassa_orm.jpg"
-dest_files=["res://.godot/imported/vassa_orm.jpg-11e7e6ee9f29f3585f907977bfc97f3f.s3tc.ctex"]
+dest_files=["res://.godot/imported/vassa_orm.jpg-11e7e6ee9f29f3585f907977bfc97f3f.s3tc.ctex", "res://.godot/imported/vassa_orm.jpg-11e7e6ee9f29f3585f907977bfc97f3f.etc2.ctex"]
 
 [params]
 

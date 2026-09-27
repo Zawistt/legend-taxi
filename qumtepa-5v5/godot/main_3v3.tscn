@@ -10,6 +10,8 @@
 
 [ext_resource type="Script" path="res://scripts/bot_play.gd" id="22_bp"]
 
+[ext_resource type="Script" path="res://scripts/mobile_controls.gd" id="23_mc"]
+
 [ext_resource type="Script" path="res://maps/qumtepa3v3/scripts/game_mode.gd" id="4_gm"]
 
 [ext_resource type="Script" path="res://maps/qumtepa3v3/scripts/hud.gd" id="5_hud"]
@@ -2204,3 +2206,6 @@ script = ExtResource("22_bp")
 team_size = 3
 strategies_path = "res://maps/qumtepa3v3/scripts/strategies_3v3.gd"
 map_data_path = "res://maps/qumtepa3v3/scripts/map_data.gd"
+
+[node name="MobileControls" type="CanvasLayer" parent="."]
+script = ExtResource("23_mc")

@@ -53,6 +53,9 @@ var carrier := false
 var loadout = preload("res://scripts/loadout.gd").new()
 ## qurolga qarab tezlik (CS2: pichoq 1.0, AK 0.86, AWP 0.8) — fp_view.gd
 var speed_mult := 1.0
+var touch_active := false            ## telefon: sensor boshqaruv (mobile_controls.gd)
+var touch_move := Vector2.ZERO        ## joystik (x — o'ng, y — orqaga)
+var touch_walk := false
 var _tag_until := 0.0                 ## o'q tekkanda sekinlashish (CS2 tagging)
 ## 5-slotda bomba va chap tugma bosib turilgan (game_mode o'rnatish uchun E bilan bir xil ko'radi)
 var c4_fire := false
@@ -137,6 +140,8 @@ static func _ensure_extra_input() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if not local_player:
 		return
+	if touch_active and (event is InputEventMouseMotion or event is InputEventMouseButton):
+		return                              # telefonda qarash — mobile_controls.gd (sensordan hosil bo'lgan sichqoncha hodisalari e'tiborsiz)
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		rotate_y(-event.relative.x * mouse_sensitivity * look_scale)
 		cam.rotate_x(-event.relative.y * mouse_sensitivity * look_scale)
@@ -165,7 +170,7 @@ func _physics_process(delta: float) -> void:
 	if want_crouch != crouching:
 		if want_crouch or can_stand():
 			_set_crouch(want_crouch)
-	walking = force_walk or (keyboard and Input.is_action_pressed("walk") and not allow_sprint)
+	walking = force_walk or (keyboard and Input.is_action_pressed("walk") and not allow_sprint) or (keyboard and touch_walk)
 	if keyboard and alive and is_on_floor() and not locked and Input.is_action_just_pressed("jump"):
 		velocity.y = jump_velocity
 		if body:
@@ -177,6 +182,8 @@ func _physics_process(delta: float) -> void:
 			dir = Vector3(ai_move.x, 0, ai_move.z).normalized()
 		elif local_player:
 			var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+			if touch_move != Vector2.ZERO:
+				input = touch_move
 			dir = (transform.basis * Vector3(input.x, 0, input.y)).normalized()
 	var s := speed
 	if crouching:

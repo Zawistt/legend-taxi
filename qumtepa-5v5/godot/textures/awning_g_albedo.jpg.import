@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cewd47ro1qkve"
 path.s3tc="res://.godot/imported/awning_g_albedo.jpg-e57fab5f229b4e9b3ff5ec01fd3fad33.s3tc.ctex"
+path.etc2="res://.godot/imported/awning_g_albedo.jpg-e57fab5f229b4e9b3ff5ec01fd3fad33.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/awning_g_albedo.jpg"
-dest_files=["res://.godot/imported/awning_g_albedo.jpg-e57fab5f229b4e9b3ff5ec01fd3fad33.s3tc.ctex"]
+dest_files=["res://.godot/imported/awning_g_albedo.jpg-e57fab5f229b4e9b3ff5ec01fd3fad33.s3tc.ctex", "res://.godot/imported/awning_g_albedo.jpg-e57fab5f229b4e9b3ff5ec01fd3fad33.etc2.ctex"]
 
 [params]
 

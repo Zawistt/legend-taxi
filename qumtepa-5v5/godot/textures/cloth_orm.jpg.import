@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://b275gl4wa1o3a"
 path.s3tc="res://.godot/imported/cloth_orm.jpg-16a40a96bd1d0986cbc85441ffea9804.s3tc.ctex"
+path.etc2="res://.godot/imported/cloth_orm.jpg-16a40a96bd1d0986cbc85441ffea9804.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/cloth_orm.jpg"
-dest_files=["res://.godot/imported/cloth_orm.jpg-16a40a96bd1d0986cbc85441ffea9804.s3tc.ctex"]
+dest_files=["res://.godot/imported/cloth_orm.jpg-16a40a96bd1d0986cbc85441ffea9804.s3tc.ctex", "res://.godot/imported/cloth_orm.jpg-16a40a96bd1d0986cbc85441ffea9804.etc2.ctex"]
 
 [params]
 

@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://dgsf76bt7b1pa"
 path.s3tc="res://.godot/imported/majolica_orm.jpg-9995bcac5a5559291b40844f6de24dca.s3tc.ctex"
+path.etc2="res://.godot/imported/majolica_orm.jpg-9995bcac5a5559291b40844f6de24dca.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/majolica_orm.jpg"
-dest_files=["res://.godot/imported/majolica_orm.jpg-9995bcac5a5559291b40844f6de24dca.s3tc.ctex"]
+dest_files=["res://.godot/imported/majolica_orm.jpg-9995bcac5a5559291b40844f6de24dca.s3tc.ctex", "res://.godot/imported/majolica_orm.jpg-9995bcac5a5559291b40844f6de24dca.etc2.ctex"]
 
 [params]
 

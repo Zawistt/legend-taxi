@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://ci41m4l31nbmd"
 path.s3tc="res://.godot/imported/dome_normal.jpg-be68385f473c13027445014837714b16.s3tc.ctex"
+path.etc2="res://.godot/imported/dome_normal.jpg-be68385f473c13027445014837714b16.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/dome_normal.jpg"
-dest_files=["res://.godot/imported/dome_normal.jpg-be68385f473c13027445014837714b16.s3tc.ctex"]
+dest_files=["res://.godot/imported/dome_normal.jpg-be68385f473c13027445014837714b16.s3tc.ctex", "res://.godot/imported/dome_normal.jpg-be68385f473c13027445014837714b16.etc2.ctex"]
 
 [params]
 

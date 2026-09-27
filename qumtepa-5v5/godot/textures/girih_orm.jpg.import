@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://c1nccik18jl2e"
 path.s3tc="res://.godot/imported/girih_orm.jpg-34b1e37094f510588afd400936b38e5b.s3tc.ctex"
+path.etc2="res://.godot/imported/girih_orm.jpg-34b1e37094f510588afd400936b38e5b.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/girih_orm.jpg"
-dest_files=["res://.godot/imported/girih_orm.jpg-34b1e37094f510588afd400936b38e5b.s3tc.ctex"]
+dest_files=["res://.godot/imported/girih_orm.jpg-34b1e37094f510588afd400936b38e5b.s3tc.ctex", "res://.godot/imported/girih_orm.jpg-34b1e37094f510588afd400936b38e5b.etc2.ctex"]
 
 [params]
 

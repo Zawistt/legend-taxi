@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://cbmw4qu85syvv"
 path.s3tc="res://.godot/imported/sandstone_dk_albedo.jpg-a0a0047224d562920fca028f77791bb4.s3tc.ctex"
+path.etc2="res://.godot/imported/sandstone_dk_albedo.jpg-a0a0047224d562920fca028f77791bb4.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://textures/sandstone_dk_albedo.jpg"
-dest_files=["res://.godot/imported/sandstone_dk_albedo.jpg-a0a0047224d562920fca028f77791bb4.s3tc.ctex"]
+dest_files=["res://.godot/imported/sandstone_dk_albedo.jpg-a0a0047224d562920fca028f77791bb4.s3tc.ctex", "res://.godot/imported/sandstone_dk_albedo.jpg-a0a0047224d562920fca028f77791bb4.etc2.ctex"]
 
 [params]
 

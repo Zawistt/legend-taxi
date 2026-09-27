@@ -495,6 +495,9 @@ def main_scene(glb_path, out_name):
       # botlar bilan o'yin: o'yinchi + 4 jamoadosh va 5 raqib (scripts/bot_play.gd)
       bps = s.add_ext("Script", "res://scripts/bot_play.gd", "13_bp")
       s.node("Bots", "Node3D", ".", script=bps)
+      # telefon: sensor boshqaruv (faqat sensorli ekranda yoqiladi)
+      mcs = s.add_ext("Script", "res://scripts/mobile_controls.gd", "14_mc")
+      s.node("MobileControls", "CanvasLayer", ".", script=mcs)
   s.save(f"{OUT}/{out_name}")
 
 
@@ -766,6 +769,9 @@ config/features=PackedStringArray("4.3", "Forward Plus")
 
 window/size/viewport_width=1600
 window/size/viewport_height=900
+window/stretch/mode.mobile="canvas_items"
+window/stretch/aspect.mobile="expand"
+window/handheld/orientation=4
 
 [layer_names]
 
@@ -787,6 +793,10 @@ buses/default_bus_layout="res://default_bus_layout.tres"
 
 [rendering]
 
+renderer/rendering_method.mobile="gl_compatibility"
+textures/vram_compression/import_etc2_astc=true
+lights_and_shadows/directional_shadow/size.mobile=2048
+anti_aliasing/quality/msaa_3d.mobile=0
 occlusion_culling/use_occlusion_culling=true
 anti_aliasing/quality/msaa_3d=2
 anti_aliasing/quality/screen_space_aa=1

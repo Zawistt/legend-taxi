@@ -520,7 +520,7 @@ func reload() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not player or not player.local_player or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+	if not player or not player.local_player or not (Input.mouse_mode == Input.MOUSE_MODE_CAPTURED or player.touch_active):
 		return
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_WHEEL_UP or event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
@@ -541,7 +541,7 @@ func _process(delta: float) -> void:
 			ch.set_weapon(current.kind, current.weapon_id)
 		_update_sound()
 	# bomba 5-slotda: chap tugmani bosib turish ham o'rnatish (game_mode E bilan bir xil)
-	player.c4_fire = slot == 5 and player.has_bomb and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED and Input.is_action_pressed("fire")
+	player.c4_fire = slot == 5 and player.has_bomb and (Input.mouse_mode == Input.MOUSE_MODE_CAPTURED or player.touch_active) and Input.is_action_pressed("fire")
 	if slot == 5 and not player.has_bomb:
 		equip(1 if _lo().primary else 2, true)
 	if (slot == 1 or slot == 2) and weapon_for_slot(slot) == null and player.alive:
@@ -552,7 +552,7 @@ func _process(delta: float) -> void:
 		ammo += need
 		reserve -= need
 		_reload_end = -1.0
-	var captured := Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+	var captured: bool = Input.mouse_mode == Input.MOUSE_MODE_CAPTURED or player.touch_active
 	if captured and not buy_menu.visible:
 		for i in 5:
 			if Input.is_action_just_pressed("weapon_%d" % (i + 1)):
