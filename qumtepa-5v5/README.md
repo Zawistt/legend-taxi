@@ -28,10 +28,11 @@ Godot 4.3, bomba rejimi (T hujum qiladi, CT himoya qiladi).
 | 10 | Qurol tizimi (Legend Tactical FPS'dan): 3 qurol ma'lumotdan, tepki naqshi, tarqalish, ADS, o'q rejimlari, bosh/tana/qo'l/oyoq zarari, HUD, F7 mashq nishonlari | ✅ ([hisobot](docs/STAGE10.md)) |
 | 11 | Qolgan qurollar (AR-44, Spectre-9 SMG, Longbow-50 snayper, Breacher-12 drobovik), sotib olish menyusi (B), 3v3 xaritasi (Qumtepa v2 low-poly, 50 m), bosh menyu | ✅ ([hisobot](docs/STAGE11.md)) |
 | 12 | Botlar (5v5 va 3v3), vizual audit, 3v3 qorayish; CS2 qoidalari 1 ga 1: $800, g'alaba/mag'lubiyat puli, 20 ta CS2 quroli, sotib olish menyusi (bo'limlar, rasmlar), zirh/kaska, HE/flesh/tutun/molotov, bomba aylanasi va kodi, portlash to'lqini, Zeus, kill feed, TAB, MR12 | ✅ ([hisobot](docs/STAGE12.md)) |
+| 13 | Siz bergan T va CT 3D modellari: har biriga 27 ta 3-shaxs animatsiyasi (mocap + IK), 1-shaxs alohida; CS2 ning 34 quroli, eski qurollar zaxirada, PUBG Mobile 10 qurol, inventar; qurol tashlash/olish (G/E/Q); botlar odamga o'xshash reaksiya va xato; yorug'lik | ✅ ([hisobot](docs/STAGE13.md)) |
 
 ## O'ynash
 
-Godot 4.3 → Import → `qumtepa-5v5/godot/project.godot` → F5 — bosh menyu: 5v5 yoki 3v3, botlar bilan (CS2 qoidalari). Boshqaruv: WASD, Shift — sekin yurish, Ctrl/C — o'tirish, sichqoncha — o'q, R — qayta o'qlash, B — sotib olish, 1/2/3/4/5 — asosiy / to'pponcha / pichoq-Zeus / granata / bomba, E — bomba o'rnatish/zararsizlantirish, G — tashlash, TAB — statistika, X — o'q rejimi, M — xarita, F7 — mashq nishonlari, F10 — menyu. Batafsil: [STAGE12.md](docs/STAGE12.md).
+Godot 4.3 → Import → `qumtepa-5v5/godot/project.godot` → F5 — bosh menyu: 5v5 yoki 3v3, botlar bilan (CS2 qoidalari). Boshqaruv: WASD, Shift — sekin yurish, Ctrl/C — o'tirish, sichqoncha — o'q, R — qayta o'qlash, B — sotib olish, 1/2/3/4/5 — asosiy / to'pponcha / pichoq-Zeus / granata / bomba, E — bomba o'rnatish/zararsizlantirish, G — tashlash, Q — oldingi qurol, G — qurolni tashlash, E — yerdagi qurolni olish, TAB — statistika, X — o'q rejimi, M — xarita, F7 — mashq nishonlari, F10 — menyu. Bosh menyu → 4 — inventar. Batafsil: [STAGE12.md](docs/STAGE12.md), [STAGE13.md](docs/STAGE13.md).
 
 ## Tuzilma
 

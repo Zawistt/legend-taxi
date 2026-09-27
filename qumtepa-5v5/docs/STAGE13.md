@@ -1,7 +1,7 @@
 # 13-bosqich: T va CT 3D modellari (3-shaxs animatsiyalari), inventar, CS2 qurollari, qurol tashlash/olish, botlar
 
-Tekshiruvlar: 5v5 Godot **@@T5@@**, 3v3 xaritaning o'z testlari **@@T3@@**, botlar bilan o'yin 5v5 **@@B5@@**, 3v3 **@@B3@@**,
-3v3 audit **@@A3@@**, smoke **@@SM@@**, 5v5 audit **@@A5@@**. Eski fayllar o'chirilmadi.
+Tekshiruvlar: 5v5 Godot **156/156**, 3v3 xaritaning o'z testlari **52/52**, botlar bilan o'yin 5v5 **16/16**, 3v3 **16/16**,
+3v3 audit **0 muammo**, smoke **10/10**, 5v5 audit **6/6**. Eski fayllar o'chirilmadi.
 
 ![T — holatlar](shots/50_t_holatlar.png)
 ![CT — holatlar](shots/54_ct_holatlar.png)
@@ -76,7 +76,15 @@ Endi odamga o'xshash:
   oldindan qarab turgan burchakda kichikroq (0.014);
 - **boshga mo'ljal kamroq**: yaqinda ~40%, o'rtada ~30%, uzoqda ~15%, spray paytida ko'krakka; harakatlanayotgan nishonga qiyinroq.
 
-@@BOTSTATS@@
+**Sinov (8 raund, `tests/run_botplay.gd`, yangi modellar va aim bilan):**
+
+| | 5v5 | 3v3 |
+|---|---|---|
+| Natija | T 5 : 3 CT | T 7 : 1 CT |
+| Tugash sabablari | CT yo'q qilindi 5, zararsizlantirildi 2, vaqt 1 | bomba portladi 4, CT yo'q qilindi 3, T yo'q qilindi 1 |
+| Bomba aylana ichiga | 5/5 | 4/4 |
+| Granatalar | molotov 16, flesh 11, tutun 10, HE 2, yondiruvchi 1 | flesh 11, tutun 11, molotov 10, HE 7 |
+| Tiqilib qolgan bot | 0 | 0 |
 
 ## 5. Grafika
 

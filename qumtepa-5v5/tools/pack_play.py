@@ -14,7 +14,13 @@ SKIP_DIRS = {".godot", "characters", "textures"}   # low-poly: teksturalar va es
 SKIP_FILES = {"characters/ct_soldier.glb", "characters/ct_soldier.glb.import", "characters/ct_arms.glb", "characters/ct_arms.glb.import"}
 
 
+## 13-bosqich: siz bergan T va CT modellari (3-shaxs, animatsiyalar bilan) — "characters" papkasidan faqat shular
+KEEP_CHARS = {"characters/t_shadow.glb", "characters/t_shadow_info.json", "characters/ct_operative.glb", "characters/ct_operative_info.json"}
+
+
 def skip(rel):
+    if rel in KEEP_CHARS:
+        return False
     if rel.split("/")[0] in SKIP_DIRS or rel in SKIP_FILES:
         return True
     if rel.startswith(("map/", "characters/", "maps/")) and rel.endswith((".png", ".jpg", ".png.import", ".jpg.import")):
@@ -88,7 +94,7 @@ def main(out_zip):
                 shutil.copy(full, dst)
     for f in ("README.md",):
         shutil.copy(os.path.join(HERE, "..", f), os.path.join(tmp, "qumtepa-5v5", f))
-    for f in ("YAKUNIY_HISOBOT.md", "STAGE8.md", "STAGE9.md", "STAGE10.md", "STAGE11.md", "STAGE12.md"):
+    for f in ("YAKUNIY_HISOBOT.md", "STAGE8.md", "STAGE9.md", "STAGE10.md", "STAGE11.md", "STAGE12.md", "STAGE13.md"):
         os.makedirs(os.path.join(tmp, "qumtepa-5v5", "docs"), exist_ok=True)
         shutil.copy(os.path.join(HERE, "..", "docs", f), os.path.join(tmp, "qumtepa-5v5", "docs", f))
     with zipfile.ZipFile(out_zip, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:

@@ -71,38 +71,6 @@ func _run() -> void:
 				if STATES[i][1].get("reload", false):
 					models[i].reload()
 		await process_frame
-	for j in [0, 4, 5, 6]:
-		var sk: Skeleton3D = models[j].skel
-		var wb := sk.get_bone_global_pose(sk.find_bone("weapon"))
-		var hr := sk.get_bone_global_pose(sk.find_bone("hand.R"))
-		print(STATES[j][0], " hips ", sk.get_bone_global_pose(sk.find_bone("hips")).origin, " head ", sk.get_bone_global_pose(sk.find_bone("head")).origin, " skel basis z ", sk.global_transform.basis.z, " weapon pos ", wb.origin, " muzzle-dir ", wb.basis.y, " up ", wb.basis.z, " handR ", hr.origin)
-	var m0 = models[0]
-	var sk0: Skeleton3D = m0.skel
-	print("WORLD model ", m0.global_position, " muzzle ", m0.muzzle_position(), " head ", sk0.to_global(sk0.get_bone_global_pose(sk0.find_bone("head")).origin),
-		" toeL ", sk0.to_global(sk0.get_bone_global_pose(sk0.find_bone("toe.L")).origin), " weapon ", sk0.to_global(sk0.get_bone_global_pose(sk0.find_bone("weapon")).origin),
-		" skel global ", sk0.global_transform)
-	var mk := MeshInstance3D.new()
-	var sm := SphereMesh.new()
-	sm.radius = 0.06
-	sm.height = 0.12
-	mk.mesh = sm
-	world.add_child(mk)
-	mk.global_position = m0.global_position + Vector3(0, 1.2, 0.8)
-	var mk2 := mk.duplicate()
-	world.add_child(mk2)
-	mk2.global_position = sk0.to_global(sk0.get_bone_global_pose(sk0.find_bone("weapon")).origin)
-	for q in models.slice(1):
-		q.visible = false
-	cam.fov = 40
-	cam.position = m0.global_position + Vector3(3.0, 1.3, 0)
-	cam.look_at(m0.global_position + Vector3(0, 1.1, 0))
-	await process_frame
-	await process_frame
-	root.get_texture().get_image().save_png(ProjectSettings.globalize_path("res://../docs/shots/%s_debug.png" % pre))
-	for q in models:
-		q.visible = true
-	mk.queue_free()
-	mk2.queue_free()
 	print("rig: ", models[0].rig != null, " anims: ", models[0].anim.get_animation_list().size() if models[0].anim else 0,
 		" hitboxes: ", models[0].hitboxes.size(), " eye: ", models[0].eye_point())
 	cam.position = Vector3(0, 1.2, 10.5)

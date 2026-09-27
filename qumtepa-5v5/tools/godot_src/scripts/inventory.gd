@@ -205,7 +205,7 @@ func describe(w: Resource) -> String:
 	var dmg := "%d" % int(w.base_damage)
 	if w.projectile_count > 1:
 		dmg = "%d × %d sochma" % [w.projectile_count, int(w.base_damage)]
-	s += "Zarar: [b]%s[/b]  (bosh ×%.2g → %d)\n" % [dmg, w.headshot_multiplier, int(w.base_damage * w.headshot_multiplier)]
+	s += "Zarar: [b]%s[/b]  (boshga ×%s → %d)\n" % [dmg, str(snappedf(w.headshot_multiplier, 0.01)), int(w.base_damage * w.headshot_multiplier)]
 	if w.kind == 2:
 		return s + "Masofa: %.1f m" % w.max_range
 	s += "Zirh teshish: %d%%\n" % int(round(w.armor_pen * 100.0))
