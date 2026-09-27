@@ -6,13 +6,16 @@
 extends Node3D
 
 var shahar: Shahar
+var yollar: Yollar
 var mashina: Mashina
 var kamera: Kamera
 var hud: Label
 var quyosh: DirectionalLight3D
 var _sinov := false
+var _tepa := false
 var _surat := ""
 var _vaqt := 0.0
+var _kocha := ""
 var _yangilash := 0.0
 
 
@@ -23,14 +26,18 @@ func _ready() -> void:
 			_sinov = true
 		elif a.begins_with("--surat="):
 			_surat = a.substr(8)
+		elif a == "--tepa":
+			_tepa = true
 	_muhit()
 	_yer()
 
 	shahar = Shahar.new()
 	add_child(shahar)
 
+	yollar = Yollar.new()
+
 	var b: Dictionary = shahar.malumot["boshlash"]
-	var joy := Vector3(float(b["x"]), 0.6, float(b["z"]))
+	var joy := Vector3(float(b["x"]), float(b["y"]) + 0.5, float(b["z"]))
 	shahar.darhol_yukla(joy, 500.0)
 
 	mashina = Mashina.new()
@@ -43,6 +50,8 @@ func _ready() -> void:
 	add_child(kamera)
 	kamera.global_position = joy + mashina.global_basis.z * -9.0 + Vector3.UP * 4.0
 	kamera.make_current()
+	if _tepa:
+		kamera.rejim = Kamera.Rejim.TEPADAN
 
 	_hud()
 
@@ -121,22 +130,15 @@ func _muhit() -> void:
 	add_child(quyosh)
 
 
-## Tekis yer (2-bosqichda real relyef bilan almashtiriladi).
+## Relyef GLB bo'laklar ichida. Bu yerda faqat pastdagi xavfsizlik tekisligi:
+## mashina qandaydir yo'l bilan tushib ketsa, yo'lga qaytariladi.
 func _yer() -> void:
 	var tana := StaticBody3D.new()
-	tana.name = "Yer"
+	tana.name = "Xavfsizlik"
 	var shakl := CollisionShape3D.new()
 	shakl.shape = WorldBoundaryShape3D.new()
 	tana.add_child(shakl)
-	var mi := MeshInstance3D.new()
-	var p := PlaneMesh.new()
-	p.size = Vector2(40000, 40000)
-	mi.mesh = p
-	var m := Materiallar.ol("Yer_Tuproq").duplicate() as StandardMaterial3D
-	m.uv1_scale = Vector3(40000.0 / 6.0, 40000.0 / 6.0, 1)
-	mi.material_override = m
-	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
-	tana.add_child(mi)
+	tana.position.y = -200.0
 	add_child(tana)
 
 
@@ -159,51 +161,70 @@ func _process(delta: float) -> void:
 		_yangilash = 0.25
 		shahar.yangila(nishon)
 	# soya kaskadlari mashinaga ergashadi (quyosh yo'nalishi o'zgarmaydi)
-	if Input.is_action_just_pressed("qaytish"):
+	if Input.is_action_just_pressed("qaytish") or mashina.global_position.y < -150.0:
 		_yolga_qaytar()
 	var kmh := absf(mashina.tezlik()) * 3.6
-	hud.text = "%d km/soat\nFPS %d   bo'laklar %d (+%d)\nC — kamera   R — qaytish" % [
-		kmh, Engine.get_frames_per_second(), shahar.yuklangan_soni(), shahar.kutilayotgan_soni()]
+	if Engine.get_process_frames() % 10 == 0:
+		var y := yollar.eng_yaqin(mashina.global_position, 25.0)
+		_kocha = y.get("nom", "")
+	hud.text = "%d km/soat   %s\nFPS %d   bo'laklar %d (+%d)\nC — kamera   R — yo'lga qaytish" % [
+		kmh, _kocha, Engine.get_frames_per_second(), shahar.yuklangan_soni(), shahar.kutilayotgan_soni()]
 	if _sinov:
 		_sinov_qadam()
 
 
+## Mashinani eng yaqin avtomobil yo'liga, yo'l bo'ylab qo'yadi.
 func _yolga_qaytar() -> void:
+	var y := yollar.eng_yaqin(mashina.global_position, 400.0)
 	mashina.linear_velocity = Vector3.ZERO
 	mashina.angular_velocity = Vector3.ZERO
-	var r := mashina.rotation
-	mashina.rotation = Vector3(0, r.y, 0)
-	mashina.global_position += Vector3.UP * 1.0
+	if y.is_empty():
+		mashina.global_position += Vector3.UP
+		mashina.rotation = Vector3(0, mashina.rotation.y, 0)
+		return
+	var yon: Vector3 = y["yonalish"]
+	# mashina oldi yo'nalishiga yaqinroq tomonga qaraysin
+	if yon.dot(mashina.global_basis.z) < 0:
+		yon = -yon
+	mashina.global_position = y["nuqta"] + Vector3.UP * 0.6
+	mashina.rotation = Vector3(0, atan2(yon.x, yon.z), 0)
 
 
 # ---------------- avtomatik sinov ----------------
 var _sinov_bosh := Vector3.ZERO
 var _maks_tezlik := 0.0
 var _surat_olindi := false
+var _maks_chetga := 0.0
+var _maks_qiya := 0.0
 var _tugadi := false
 
 
 func _sinov_qadam() -> void:
 	if _vaqt < 0.1:
 		_sinov_bosh = mashina.global_position
-	if _vaqt > 1.0 and _vaqt < 6.0:
+	# 1..10 s gaz; 3..5 s keskin chapga — yo'l chegarasiga urilishi kerak
+	if _vaqt > 1.0 and _vaqt < 10.0:
 		Input.action_press("gaz")
 	else:
 		Input.action_release("gaz")
-	if _vaqt > 3.5 and _vaqt < 4.3:
+	if _vaqt > 3.0 and _vaqt < 5.0:
 		Input.action_press("chap")
 	else:
 		Input.action_release("chap")
 	_maks_tezlik = maxf(_maks_tezlik, absf(mashina.tezlik()))
-	if _surat != "" and _vaqt > 3.2 and not _surat_olindi:
+	if _vaqt > 1.0:
+		var y := yollar.eng_yaqin(mashina.global_position, 80.0)
+		_maks_chetga = maxf(_maks_chetga, y.get("masofa", 99.0))
+		_maks_qiya = maxf(_maks_qiya, rad_to_deg(mashina.global_basis.y.angle_to(Vector3.UP)))
+	if _surat != "" and _vaqt > 2.6 and not _surat_olindi:
 		_surat_olindi = true
 		await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png(_surat)
 		print("SURAT: ", _surat)
-	if _vaqt > 7.0 and not _tugadi:
+	if _vaqt > 11.0 and not _tugadi:
 		_tugadi = true
-		print("SINOV: bo'laklar=%d, bosib o'tildi=%.1f m, maks tezlik=%.1f km/soat, balandlik=%.2f, qiyalik=%.1f°" % [
+		var yer_y := mashina.global_position.y
+		print("SINOV: bo'laklar=%d, yo'l=%.1f m, maks tezlik=%.1f km/soat, y=%.2f, maks qiyalik=%.1f°, yo'l o'qidan eng uzoq=%.1f m, ko'cha=%s" % [
 			shahar.yuklangan_soni(), mashina.global_position.distance_to(_sinov_bosh),
-			_maks_tezlik * 3.6, mashina.global_position.y,
-			rad_to_deg(mashina.global_basis.y.angle_to(Vector3.UP))])
+			_maks_tezlik * 3.6, yer_y, _maks_qiya, _maks_chetga, _kocha])
 		get_tree().quit()
