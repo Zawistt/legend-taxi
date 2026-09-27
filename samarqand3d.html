@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Samarqand 3D</title>
+<!--
+  Samarqand shahrining 3D prototipi (GTA uslubidagi o'yin uchun asos).
+  Ma'lumot: samarqand/*.json (tools/samarqand_tayyorla.py, Overture Maps).
+  - Uylar real shakli bo'yicha ko'tariladi. Balandlik: o'lchangan bo'lsa o'sha,
+    qavatlar soni ma'lum bo'lsa qavat * 3.2 m, aks holda taxmin
+    (📐 tugmasi qaysi uy taxminiy ekanini ko'rsatadi).
+  - Yo'llar real joylashuvi va sinfiga mos kenglikda.
+  - Shahar 400 m lik bo'laklarga bo'lingan, mashina atrofidagilari quriladi.
+  Boshqaruv: W/↑ gaz, S/↓ tormoz/orqaga, A D/← → rul, Probel — qo'l tormozi,
+  C — kamera, R — yo'lga qaytish, H — aniqlik rejimi.
+-->
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+} }
+</script>
+<script src="samarqand/malumot.js"></script>
+<style>
+  :root{
+    --fon:#0E1621; --panel:#17212B; --panel2:#1F2C38;
+    --matn:#EDF2F7; --xira:#7D8B99; --sariq:#F2B705; --chegara:#26333F;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+  html,body{margin:0;height:100%;overflow:hidden;background:#9CC7E8;color:var(--matn);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;touch-action:none}
+  canvas#sahna{display:block;width:100%;height:100%}
+
+  .quti{background:rgba(14,22,33,.82);border:1px solid var(--chegara);border-radius:12px;backdrop-filter:blur(6px)}
+  #yuqori{position:absolute;top:calc(10px + env(safe-area-inset-top));left:10px;right:10px;display:flex;gap:8px;align-items:flex-start;pointer-events:none}
+  #yuqori > *{pointer-events:auto}
+  #nom{padding:8px 12px;font-weight:700;font-size:15px}
+  #nom small{display:block;font-weight:400;font-size:11px;color:var(--xira);margin-top:2px}
+  #tugmalar{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .tugma{height:40px;min-width:40px;padding:0 10px;border-radius:10px;border:1px solid var(--chegara);
+    background:rgba(14,22,33,.85);color:var(--matn);font-size:13px;font-weight:600;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;text-decoration:none}
+  .tugma.faol{background:var(--sariq);color:#111;border-color:var(--sariq)}
+
+  #minixarita{position:absolute;left:12px;bottom:calc(14px + env(safe-area-inset-bottom));width:170px;height:170px;
+    border-radius:50%;border:3px solid rgba(14,22,33,.85);box-shadow:0 2px 10px rgba(0,0,0,.4);background:#1A232C}
+  #tezlik{position:absolute;right:14px;bottom:calc(16px + env(safe-area-inset-bottom));text-align:right;
+    font-weight:800;font-size:40px;line-height:1;text-shadow:0 2px 6px rgba(0,0,0,.6)}
+  #tezlik small{display:block;font-size:12px;font-weight:600;opacity:.8}
+  #kocha{position:absolute;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);
+    padding:8px 16px;font-size:15px;font-weight:700;white-space:nowrap;max-width:calc(100% - 400px);
+    overflow:hidden;text-overflow:ellipsis;transition:opacity .3s}
+  #kocha:empty{opacity:0}
+  #yordam{position:absolute;right:10px;top:calc(60px + env(safe-area-inset-top));padding:10px 12px;font-size:12px;line-height:1.6;color:#C9D3DD}
+  #yordam b{color:var(--sariq)}
+  #joylar{position:absolute;left:10px;top:calc(64px + env(safe-area-inset-top));display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow:auto}
+  #joylar[hidden],#yordam[hidden]{display:none}
+  .joy{background:rgba(14,22,33,.85);border:1px solid var(--chegara);color:var(--matn);border-radius:16px;
+    padding:6px 12px;font-size:12px;cursor:pointer;text-align:left;white-space:nowrap}
+  #aniqlik-izoh{position:absolute;left:50%;top:calc(64px + env(safe-area-inset-top));transform:translateX(-50%);
+    padding:8px 12px;font-size:12px;display:flex;gap:12px;white-space:nowrap}
+  #aniqlik-izoh[hidden]{display:none}
+  #aniqlik-izoh i{display:inline-block;width:12px;height:10px;border-radius:2px;margin-right:5px;vertical-align:middle}
+
+  #yuklash{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    background:var(--fon);gap:14px;z-index:10;transition:opacity .5s}
+  #yuklash.yoq{opacity:0;pointer-events:none}
+  #yuklash .sarlavha{font-size:22px;font-weight:800}
+  #yuklash .sarlavha span{color:var(--sariq)}
+  #yuklash .chiziq{width:220px;height:6px;border-radius:3px;background:#26333F;overflow:hidden}
+  #yuklash .chiziq div{height:100%;width:0;background:var(--sariq);transition:width .2s}
+  #yuklash .matn{font-size:12px;color:var(--xira)}
+
+  /* sensorli boshqaruv */
+  #sensor{position:absolute;inset:auto 0 calc(200px + env(safe-area-inset-bottom)) 0;display:none;justify-content:space-between;padding:0 14px;pointer-events:none}
+  body.sensorli #sensor{display:flex}
+  body.sensorli #yordam{display:none}
+  body.sensorli #kocha{bottom:auto;top:calc(112px + env(safe-area-inset-top));max-width:calc(100% - 40px);font-size:13px;padding:6px 12px}
+  body.sensorli #minixarita{width:140px;height:140px}
+  body.sensorli #sensor{bottom:calc(168px + env(safe-area-inset-bottom))}
+  #sensor .guruh{display:flex;gap:12px;pointer-events:auto}
+  #sensor button{width:72px;height:72px;border-radius:50%;border:2px solid rgba(255,255,255,.35);
+    background:rgba(14,22,33,.55);color:#fff;font-size:26px;font-weight:700}
+  #sensor button.bosildi{background:rgba(242,183,5,.8);color:#111}
+</style>
+</head>
+<body>
+<canvas id="sahna"></canvas>
+
+<div id="yuqori">
+  <div class="quti" id="nom">Samarqand 3D <small id="holat">yuklanmoqda…</small></div>
+  <div id="tugmalar">
+    <button class="tugma" id="t-kamera" title="Kamera (C)">🎥 Orqadan</button>
+    <button class="tugma" id="t-aniqlik" title="Aniqlik rejimi (H)">📐</button>
+    <button class="tugma" id="t-joylar" title="Joylarga o'tish">📍</button>
+    <button class="tugma" id="t-yordam" title="Boshqaruv">?</button>
+    <a class="tugma" href="samarqand.html" title="2D xarita">2D</a>
+  </div>
+</div>
+<div id="joylar" hidden></div>
+<div class="quti" id="yordam">
+  <b>W / ↑</b> gaz &nbsp; <b>S / ↓</b> tormoz, orqaga<br>
+  <b>A D / ← →</b> rul &nbsp; <b>Probel</b> qo'l tormozi<br>
+  <b>C</b> kamera &nbsp; <b>R</b> yo'lga qaytish &nbsp; <b>H</b> aniqlik
+</div>
+<div class="quti" id="aniqlik-izoh" hidden>
+  <span><i style="background:#2FA84F"></i>Balandlik o'lchangan</span>
+  <span><i style="background:#F2B705"></i>Qavatlar soni ma'lum</span>
+  <span><i style="background:#9AA3AD"></i>Taxminiy</span>
+</div>
+<canvas id="minixarita" width="340" height="340"></canvas>
+<div class="quti" id="kocha"></div>
+<div id="tezlik">0<small>km/soat</small></div>
+<div id="sensor">
+  <div class="guruh"><button data-t="chap">◀</button><button data-t="ong">▶</button></div>
+  <div class="guruh"><button data-t="orqa">▼</button><button data-t="old">▲</button></div>
+</div>
+<div id="yuklash">
+  <div class="sarlavha">Samarqand <span>3D</span></div>
+  <div class="chiziq"><div id="yuklash-foiz"></div></div>
+  <div class="matn" id="yuklash-matn">Ma'lumot yuklanmoqda…</div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const SM = window.SamarqandMalumot;
+
+// ---------------- Proyeksiya: Registon markazli metrlar ----------------
+const O_LON = 66.9757, O_LAT = 39.6547;
+const KX = 111320 * Math.cos(O_LAT * Math.PI / 180), KY = 110574;
+// 2D: x — sharq, y — shimol (metr). 3D: X = x, Z = -y, Y — balandlik.
+const px = lon => (lon - O_LON) * KX;
+const py = lat => (lat - O_LAT) * KY;
+
+const BOLAK = 400;                      // qurilish bo'lagi, metr
+const KORISH = 950;                     // shu radiusdagi bo'laklar quriladi
+const OCHIRISH = 1300;                  // bundan uzoqdagisi xotiradan o'chiriladi
+const TOQ = 25;                         // to'qnashuv katagi, metr
+
+const JOYLAR = [
+  { nom:"Registon",             k:[39.6547, 66.9757] },
+  { nom:"Go'ri Amir",           k:[39.6484, 66.9691] },
+  { nom:"Bibixonim masjidi",    k:[39.6607, 66.9797] },
+  { nom:"Siyob bozori",         k:[39.6617, 66.9812] },
+  { nom:"Shohi Zinda",          k:[39.6632, 66.9881] },
+  { nom:"Afrosiyob",            k:[39.6690, 66.9930] },
+  { nom:"Ulug'bek rasadxonasi", k:[39.6747, 67.0058] },
+  { nom:"Shimoliy vokzal",      k:[39.6857, 66.9284], yorliqsiz:true },
+  { nom:"Aeroport",             k:[39.7005, 66.9837] }
+];
+
+// ---------------- Yo'l uslublari ----------------
+const YOL = {
+  motorway:{w:16,c:0x45484C,y:0.12,chiz:1}, trunk:{w:14,c:0x45484C,y:0.12,chiz:1},
+  primary:{w:12,c:0x484B4F,y:0.11,chiz:1},  secondary:{w:10,c:0x4B4E52,y:0.10,chiz:1},
+  tertiary:{w:8,c:0x4E5155,y:0.09},         unclassified:{w:6,c:0x56595D,y:0.08},
+  residential:{w:6,c:0x56595D,y:0.08},      living_street:{w:5,c:0x5E6064,y:0.08},
+  pedestrian:{w:6,c:0xB3A283,y:0.08},       service:{w:4,c:0x5E6064,y:0.07},
+  unknown:{w:4,c:0x5E6064,y:0.07},          track:{w:3,c:0x8C7A5A,y:0.07},
+  footway:{w:2,c:0xB5A588,y:0.06},          path:{w:1.5,c:0xA8977A,y:0.06},
+  steps:{w:2,c:0xC9B999,y:0.06},            cycleway:{w:2,c:0x8A5048,y:0.06},
+  bridleway:{w:2,c:0xA8977A,y:0.06},
+  rail:{w:3,c:0x5A4E44,y:0.13},             tram:{w:2.4,c:0x5A4E44,y:0.13}
+};
+const HAYDASA_BOLADI = new Set(['motorway','trunk','primary','secondary','tertiary','unclassified',
+  'residential','living_street','service','unknown']);
+
+// ---------------- Ranglar ----------------
+const DEVOR = [0xD8CBB0, 0xE3D8C2, 0xCDB894, 0xE8E1D3, 0xC9A983, 0xD2C3A5, 0xBFB29A, 0xDCD0BA];
+const TOM   = [0x8A8378, 0x7B8A7C, 0x9A6F5E, 0x77808A, 0x8E8A80, 0xA09584];
+const TARIXIY_DEVOR = 0xD6B98A, TARIXIY_TOM = 0x2E86C1;
+const ANIQ = [0x9AA3AD, 0xF2B705, 0x2FA84F];             // taxminiy, qavat, o'lchangan
+function xesh(n){ n = (n ^ 61) ^ (n >>> 16); n = n + (n << 3); n ^= n >>> 4; n = Math.imul(n, 0x27d4eb2d); return (n ^ (n >>> 15)) >>> 0; }
+
+// ---------------- Renderer va sahna ----------------
+const kanvas = document.getElementById('sahna');
+const sensorli = matchMedia('(pointer:coarse)').matches;
+if (sensorli) document.body.classList.add('sensorli');
+const renderer = new THREE.WebGLRenderer({ canvas:kanvas, antialias:!sensorli, logarithmicDepthBuffer:true, powerPreference:'high-performance' });
+renderer.setPixelRatio(Math.min(devicePixelRatio, sensorli ? 1.5 : 2));
+renderer.shadowMap.enabled = !sensorli;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+
+const sahna = new THREE.Scene();
+const OSMON = new THREE.Color(0x9CC7E8);
+sahna.background = OSMON;
+sahna.fog = new THREE.Fog(OSMON, 350, KORISH - 50);
+
+const kamera = new THREE.PerspectiveCamera(60, 1, 0.5, KORISH + 200);
+sahna.add(new THREE.HemisphereLight(0xCFE3F5, 0x8A7A60, 1.6));
+const quyosh = new THREE.DirectionalLight(0xFFF1D6, 2.6);
+quyosh.position.set(-120, 220, 90);
+quyosh.castShadow = renderer.shadowMap.enabled;
+quyosh.shadow.mapSize.set(2048, 2048);
+Object.assign(quyosh.shadow.camera, { left:-140, right:140, top:140, bottom:-140, near:10, far:600 });
+quyosh.shadow.bias = -0.0005;
+sahna.add(quyosh, quyosh.target);
+
+function olchamlar(){
+  const w = innerWidth, h = innerHeight;
+  renderer.setSize(w, h, false);
+  kamera.aspect = w / h; kamera.updateProjectionMatrix();
+}
+addEventListener('resize', olchamlar); olchamlar();
+
+// Yer
+const yer = new THREE.Mesh(new THREE.PlaneGeometry(40000, 40000),
+  new THREE.MeshLambertMaterial({ color:0x9C8F74 }));
+yer.rotation.x = -Math.PI / 2; yer.receiveShadow = true;
+sahna.add(yer);
+
+// ---------------- Geometriya yordamchilari ----------------
+class Quruvchi {                // indeksli BufferGeometry yig'uvchi
+  constructor(){ this.p = []; this.n = []; this.c = []; this.c2 = []; this.i = []; }
+  get soni(){ return this.p.length / 3; }
+  nuqta(x, y, z, nx, ny, nz, r, r2){
+    this.p.push(x, y, z); this.n.push(nx, ny, nz);
+    this.c.push(r.r, r.g, r.b); if (r2) this.c2.push(r2.r, r2.g, r2.b);
+  }
+  geometriya(){
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(this.p, 3));
+    g.setAttribute('normal', new THREE.Float32BufferAttribute(this.n, 3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(this.c, 3));
+    if (this.c2.length) g.userData.rang2 = new Float32Array(this.c2);
+    g.setIndex(this.soni > 65535 ? new THREE.Uint32BufferAttribute(this.i, 1) : new THREE.Uint16BufferAttribute(this.i, 1));
+    g.computeBoundingSphere();
+    return g;
+  }
+}
+function maydon2(h){          // ishorali maydon (x, y juftliklari)
+  let s = 0;
+  for (let i = 0, j = h.length - 2; i < h.length; j = i, i += 2) s += h[j] * h[i+1] - h[i] * h[j+1];
+  return s / 2;
+}
+function teskari(h){
+  const r = new Float32Array(h.length);
+  for (let i = 0; i < h.length; i += 2){ r[h.length-2-i] = h[i]; r[h.length-1-i] = h[i+1]; }
+  return r;
+}
+// Tekis ko'pburchak (tom yoki yer qatlami), yuqoriga qaragan
+function tekis(q, halqalar, y, rang, rang2){
+  const kontur = [], teshik = [];
+  halqalar.forEach((h, k) => {
+    const v = [];
+    for (let i = 0; i < h.length; i += 2) v.push(new THREE.Vector2(h[i], h[i+1]));
+    k === 0 ? kontur.push(...v) : teshik.push(v);
+  });
+  if (kontur.length < 3) return;
+  let uch;
+  try { uch = THREE.ShapeUtils.triangulateShape(kontur, teshik); } catch(e){ return; }
+  const hamma = kontur.concat(...teshik);
+  const b = q.soni;
+  for (const v of hamma) q.nuqta(v.x, y, -v.y, 0, 1, 0, rang, rang2);
+  for (const [a, c, d] of uch){
+    const A = hamma[a], C = hamma[c], Dd = hamma[d];
+    const kr = (C.x - A.x) * (Dd.y - A.y) - (C.y - A.y) * (Dd.x - A.x);
+    kr >= 0 ? q.i.push(b + a, b + c, b + d) : q.i.push(b + a, b + d, b + c);
+  }
+}
+
+// ---------------- Ma'lumotni tayyorlash ----------------
+const RANG = new THREE.Color();
+const rangObj = hex => new THREE.Color(hex);
+let bolaklar = new Map();          // kalit -> {uylar:[], yollar:[], mesh..., qurildi}
+let nomliYollar = [];              // ko'cha nomi uchun: {nom, ax, ay, bx, by}
+let nomKatak = new Map();
+const bolakKaliti = (x, y) => Math.floor(x / BOLAK) + ':' + Math.floor(y / BOLAK);
+function bolak(k){
+  let b = bolaklar.get(k);
+  if (!b) bolaklar.set(k, b = { k, uylar:[], yollar:[], qurildi:false, guruh:null, toq:null });
+  return b;
+}
+
+function tayyorla(D){
+  // uylar
+  for (const u of D.uylar){
+    const halqalar = u.r.map(h => {
+      const r = new Float32Array(h.length);
+      for (let i = 0; i < h.length; i += 2){ r[i] = px(h[i]); r[i+1] = py(h[i+1]); }
+      return r;
+    });
+    // tashqi halqa CCW, teshiklar CW (devor normallari tashqariga qarasin)
+    if (maydon2(halqalar[0]) < 0) halqalar[0] = teskari(halqalar[0]);
+    for (let k = 1; k < halqalar.length; k++) if (maydon2(halqalar[k]) > 0) halqalar[k] = teskari(halqalar[k]);
+    const m2 = maydon2(halqalar[0]);
+    if (m2 < 4) continue;
+    const bal = SM.balandlik(u, m2);
+    let cx = 0, cy = 0; const h0 = halqalar[0];
+    for (let i = 0; i < h0.length; i += 2){ cx += h0[i]; cy += h0[i+1]; }
+    cx /= h0.length / 2; cy /= h0.length / 2;
+    bolak(bolakKaliti(cx, cy)).uylar.push({ h:halqalar, bal:bal.m, aniq:bal.aniq, t:u.t, id:bolaklar.size * 7919 + h0.length + Math.round(cx * 13 + cy * 7) });
+  }
+  // yo'llar — har bir bo'lak (segment) o'rtasi tushgan bo'lakka
+  for (const y of D.yollar){
+    const u = YOL[y.s] || YOL.unknown, k = y.k;
+    for (let i = 2; i < k.length; i += 2){
+      const ax = px(k[i-2]), ay = py(k[i-1]), bx = px(k[i]), by = py(k[i+1]);
+      const s = { s:y.s, u, ax, ay, bx, by, nom:y.nom };
+      bolak(bolakKaliti((ax + bx) / 2, (ay + by) / 2)).yollar.push(s);
+      if (y.nom || HAYDASA_BOLADI.has(y.s)){
+        nomliYollar.push(s);
+        const kk = Math.floor((ax + bx) / 2 / 60) + ':' + Math.floor((ay + by) / 2 / 60);
+        let r = nomKatak.get(kk); if (!r) nomKatak.set(kk, r = []); r.push(s);
+      }
+    }
+  }
+}
+
+// Yer qatlamlari (bog'lar, suv) va chegara — bir marta, butun shahar
+const YER_RANG = { park:0x6E9A55, grass:0x7AA35E, garden:0x6E9A55, cemetery:0x8A8C6E, farmland:0x9AA461,
+  orchard:0x7E9A55, pitch:0x5C9A58, stadium:0x6E8F66, playground:0xA88E6A, forest:0x4F7A45 };
+function yerQatlamlari(D){
+  const q = new Quruvchi();
+  const lok = h => { const r = new Float32Array(h.length); for (let i = 0; i < h.length; i += 2){ r[i] = px(h[i]); r[i+1] = py(h[i+1]); } return r; };
+  for (const e of D.yer){
+    const c = YER_RANG[e.s] || YER_RANG[e.tur];
+    if (!c) continue;
+    tekis(q, e.r.map(lok), 0.02, rangObj(c));
+  }
+  const suvRang = rangObj(0x3A7CA5);
+  for (const s of D.suvP) tekis(q, s.r.map(lok), 0.04, suvRang);
+  for (const s of D.suvCh){
+    const w = { river:14, canal:6, stream:3, drain:2, ditch:1.5 }[s.s] || 2;
+    const k = lok(s.k);
+    for (let i = 2; i < k.length; i += 2) lenta(q, k[i-2], k[i-1], k[i], k[i+1], w, 0.04, suvRang);
+  }
+  const m = new THREE.Mesh(q.geometriya(), new THREE.MeshLambertMaterial({ vertexColors:true }));
+  m.receiveShadow = true;
+  sahna.add(m);
+
+  // shahar chegarasi — yarim shaffof sariq devor
+  const cq = new Quruvchi(), sariq = rangObj(0xF2B705);
+  for (const p of D.chegara){
+    const h = lok(p[0]);
+    for (let i = 0; i < h.length; i += 2){
+      const j = (i + 2) % h.length;
+      devor(cq, h[i], h[i+1], h[j], h[j+1], 0, 6, sariq);
+    }
+  }
+  const cm = new THREE.Mesh(cq.geometriya(), new THREE.MeshBasicMaterial({ vertexColors:true, transparent:true, opacity:0.22, side:THREE.DoubleSide, depthWrite:false }));
+  sahna.add(cm);
+}
+
+function lenta(q, ax, ay, bx, by, w, y, rang, uzaytir){
+  let dx = bx - ax, dy = by - ay;
+  const L = Math.hypot(dx, dy); if (L < 0.01) return;
+  dx /= L; dy /= L;
+  const e = uzaytir ?? w * 0.45;              // burilishdagi bo'shliqni yopish uchun
+  ax -= dx * e; ay -= dy * e; bx += dx * e; by += dy * e;
+  const nx = -dy * w / 2, ny = dx * w / 2;
+  const b = q.soni;
+  q.nuqta(ax - nx, y, -(ay - ny), 0, 1, 0, rang);
+  q.nuqta(bx - nx, y, -(by - ny), 0, 1, 0, rang);
+  q.nuqta(bx + nx, y, -(by + ny), 0, 1, 0, rang);
+  q.nuqta(ax + nx, y, -(ay + ny), 0, 1, 0, rang);
+  q.i.push(b, b + 1, b + 2, b, b + 2, b + 3);
+}
+function devor(q, ax, ay, bx, by, y0, y1, rang, rang2){
+  const dx = bx - ax, dy = by - ay, L = Math.hypot(dx, dy); if (L < 0.01) return;
+  const nx = dy / L, nz = dx / L;              // 3D normal (x, z) = (dy, dx)/L — tashqariga
+  const b = q.soni;
+  q.nuqta(ax, y0, -ay, nx, 0, nz, rang, rang2);
+  q.nuqta(bx, y0, -by, nx, 0, nz, rang, rang2);
+  q.nuqta(bx, y1, -by, nx, 0, nz, rang, rang2);
+  q.nuqta(ax, y1, -ay, nx, 0, nz, rang, rang2);
+  q.i.push(b, b + 1, b + 2, b, b + 2, b + 3);
+}
+
+// ---------------- Bo'lak qurish ----------------
+const uyMat = new THREE.MeshLambertMaterial({ vertexColors:true });
+const yolMat = new THREE.MeshLambertMaterial({ vertexColors:true });
+const chiziqMat = new THREE.MeshBasicMaterial({ color:0xEDEDED });
+let aniqlikRejimi = false;
+
+function bolakQur(b){
+  const guruh = new THREE.Group();
+  // uylar
+  const q = new Quruvchi();
+  const toq = new Map();                     // to'qnashuv: katak -> [ax, ay, bx, by, ...]
+  const tc = new THREE.Color(), rc = new THREE.Color(), ac = new THREE.Color(), acTom = new THREE.Color();
+  for (const u of b.uylar){
+    const x = xesh(u.id);
+    tc.setHex(u.t ? TARIXIY_DEVOR : DEVOR[x % DEVOR.length]);
+    rc.setHex(u.t ? TARIXIY_TOM : TOM[(x >>> 8) % TOM.length]);
+    ac.setHex(ANIQ[u.aniq]); acTom.copy(ac).multiplyScalar(0.8);
+    const H = u.bal;
+    for (const h of u.h){
+      for (let i = 0; i < h.length; i += 2){
+        const j = (i + 2) % h.length;
+        devor(q, h[i], h[i+1], h[j], h[j+1], 0, H, tc, ac);
+        // to'qnashuv chetlari — chet qutisi tegadigan barcha kataklarga (+1 zaxira)
+        const x0 = Math.floor(Math.min(h[i], h[j]) / TOQ) - 1, x1 = Math.floor(Math.max(h[i], h[j]) / TOQ) + 1;
+        const y0 = Math.floor(Math.min(h[i+1], h[j+1]) / TOQ) - 1, y1 = Math.floor(Math.max(h[i+1], h[j+1]) / TOQ) + 1;
+        for (let a = x0; a <= x1; a++) for (let c = y0; c <= y1; c++){
+          const kk = a + ':' + c;
+          let r = toq.get(kk); if (!r) toq.set(kk, r = []);
+          r.push(h[i], h[i+1], h[j], h[j+1]);
+        }
+      }
+    }
+    tekis(q, u.h, H, rc, acTom);
+  }
+  if (q.soni){
+    const g = q.geometriya();
+    g.userData.rang1 = g.getAttribute('color').array.slice();
+    if (aniqlikRejimi) g.getAttribute('color').array.set(g.userData.rang2);
+    const m = new THREE.Mesh(g, uyMat);
+    m.castShadow = m.receiveShadow = true;
+    m.userData.uylar = true;
+    guruh.add(m);
+  }
+  // yo'llar
+  const yq = new Quruvchi(), cq = new Quruvchi();
+  const oq = new THREE.Color(0xEDEDED);
+  for (const s of b.yollar){
+    lenta(yq, s.ax, s.ay, s.bx, s.by, s.u.w, s.u.y, rangObj(s.u.c));
+    if (s.u.chiz){                             // o'rta punktir chiziq
+      const L = Math.hypot(s.bx - s.ax, s.by - s.ay);
+      const dx = (s.bx - s.ax) / L, dy = (s.by - s.ay) / L;
+      for (let t = 1; t + 3 < L; t += 9)
+        lenta(cq, s.ax + dx * t, s.ay + dy * t, s.ax + dx * (t + 3), s.ay + dy * (t + 3), 0.18, s.u.y + 0.01, oq, 0);
+    }
+  }
+  if (yq.soni){
+    const m = new THREE.Mesh(yq.geometriya(), yolMat); m.receiveShadow = true; guruh.add(m);
+  }
+  if (cq.soni) guruh.add(new THREE.Mesh(cq.geometriya(), chiziqMat));
+  sahna.add(guruh);
+  b.guruh = guruh; b.toq = toq; b.qurildi = true;
+}
+function bolakOchir(b){
+  b.guruh.traverse(o => o.geometry && o.geometry.dispose());
+  sahna.remove(b.guruh);
+  b.guruh = null; b.toq = null; b.qurildi = false;
+}
+function aniqlikQoy(yoq){
+  aniqlikRejimi = yoq;
+  for (const b of bolaklar.values()) if (b.guruh) b.guruh.traverse(o => {
+    if (!o.userData.uylar) return;
+    const a = o.geometry.getAttribute('color');
+    a.array.set(yoq ? o.geometry.userData.rang2 : o.geometry.userData.rang1);
+    a.needsUpdate = true;
+  });
+  document.getElementById('t-aniqlik').classList.toggle('faol', yoq);
+  document.getElementById('aniqlik-izoh').hidden = !yoq;
+}
+
+// Kerakli bo'laklarni kadr sayin oz-ozdan qurish
+function bolaklarniYangila(cx, cy, byudjetMs){
+  const t0 = performance.now();
+  const kerak = [];
+  const r = Math.ceil(KORISH / BOLAK);
+  const bx = Math.floor(cx / BOLAK), by = Math.floor(cy / BOLAK);
+  for (let a = -r; a <= r; a++) for (let c = -r; c <= r; c++){
+    const b = bolaklar.get((bx + a) + ':' + (by + c));
+    if (!b || b.qurildi) continue;
+    const m = Math.hypot((bx + a + 0.5) * BOLAK - cx, (by + c + 0.5) * BOLAK - cy);
+    if (m < KORISH + BOLAK * 0.7) kerak.push([m, b]);
+  }
+  kerak.sort((a, b) => a[0] - b[0]);
+  for (const [, b] of kerak){
+    bolakQur(b);
+    if (performance.now() - t0 > byudjetMs) break;
+  }
+  for (const b of bolaklar.values()){
+    if (!b.qurildi) continue;
+    const [kx, ky] = b.k.split(':').map(Number);
+    if (Math.hypot((kx + 0.5) * BOLAK - cx, (ky + 0.5) * BOLAK - cy) > OCHIRISH) bolakOchir(b);
+  }
+  return kerak.length;
+}
+
+// ---------------- Mashina ----------------
+function mashinaYasa(){
+  const g = new THREE.Group();
+  const kuzov = new THREE.MeshLambertMaterial({ color:0xF2B705 });
+  const qora = new THREE.MeshLambertMaterial({ color:0x1A1A1A });
+  const oyna = new THREE.MeshLambertMaterial({ color:0x24323F });
+  const b1 = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.7, 4.3), kuzov); b1.position.y = 0.65;
+  const b2 = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.6, 2.2), oyna);  b2.position.set(0, 1.3, 0.2);
+  const tom = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.08, 1.9), kuzov); tom.position.set(0, 1.62, 0.25);
+  // "TAXI" belgisi — Legend Taxi
+  const belgi = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.22, 0.3), new THREE.MeshBasicMaterial({ color:0xFFFFFF }));
+  belgi.position.set(0, 1.77, 0.3);
+  g.add(b1, b2, tom, belgi);
+  const gildirak = new THREE.CylinderGeometry(0.36, 0.36, 0.3, 14); gildirak.rotateZ(Math.PI / 2);
+  g.gildiraklar = [];
+  for (const [x, z] of [[-0.85, -1.35], [0.85, -1.35], [-0.85, 1.35], [0.85, 1.35]]){
+    const w = new THREE.Mesh(gildirak, qora); w.position.set(x, 0.36, z); g.add(w); g.gildiraklar.push(w);
+  }
+  const chiroq = new THREE.MeshBasicMaterial({ color:0xFFF6C8 }), stop = new THREE.MeshBasicMaterial({ color:0xB0201A });
+  for (const x of [-0.6, 0.6]){
+    const c = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.18, 0.05), chiroq); c.position.set(x, 0.75, -2.16); g.add(c);
+    const s = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.18, 0.05), stop);   s.position.set(x, 0.75, 2.16);  g.add(s);
+  }
+  g.traverse(o => { if (o.isMesh) o.castShadow = true; });
+  return g;
+}
+const mashina = mashinaYasa();
+sahna.add(mashina);
+const M = { x:0, y:0, yon:0, tez:0, rul:0 };      // yon: 0 = shimol, soat mili bo'yicha
+
+// ---------------- To'qnashuv ----------------
+// Uy bo'lakka markazi bo'yicha tushadi, lekin qo'shni bo'lakka chiqib turishi mumkin —
+// shuning uchun atrofdagi 3x3 bo'lak tekshiriladi
+function itar(cx, cy, r){
+  let urildi = false, sx = 0, sy = 0;
+  const kalit = Math.floor(cx / TOQ) + ':' + Math.floor(cy / TOQ);
+  const bx = Math.floor(cx / BOLAK), by = Math.floor(cy / BOLAK);
+  for (let a = -1; a <= 1; a++) for (let c = -1; c <= 1; c++){
+  const b = bolaklar.get((bx + a) + ':' + (by + c));
+  const e = b && b.toq && b.toq.get(kalit);
+  if (!e) continue;
+  for (let i = 0; i < e.length; i += 4){
+    const ax = e[i], ay = e[i+1], dx = e[i+2] - ax, dy = e[i+3] - ay;
+    const t = Math.max(0, Math.min(1, ((cx - ax) * dx + (cy - ay) * dy) / (dx * dx + dy * dy || 1)));
+    const qx = cx - (ax + t * dx), qy = cy - (ay + t * dy), m = Math.hypot(qx, qy);
+    if (m < r && m > 1e-4){ sx += qx / m * (r - m); sy += qy / m * (r - m); urildi = true; }
+  }
+  }
+  return urildi ? [sx, sy] : null;
+}
+
+// ---------------- Boshqaruv ----------------
+const tugma = { old:false, orqa:false, chap:false, ong:false, qol:false };
+const KALIT = { KeyW:'old', ArrowUp:'old', KeyS:'orqa', ArrowDown:'orqa', KeyA:'chap', ArrowLeft:'chap',
+  KeyD:'ong', ArrowRight:'ong', Space:'qol' };
+addEventListener('keydown', e => {
+  if (KALIT[e.code]){ tugma[KALIT[e.code]] = true; e.preventDefault(); }
+  if (e.code === 'KeyC') kameraAlmashtir();
+  if (e.code === 'KeyH') aniqlikQoy(!aniqlikRejimi);
+  if (e.code === 'KeyR') yolgaQaytar();
+});
+addEventListener('keyup', e => { if (KALIT[e.code]) tugma[KALIT[e.code]] = false; });
+addEventListener('blur', () => Object.keys(tugma).forEach(k => tugma[k] = false));
+document.querySelectorAll('#sensor button').forEach(b => {
+  const t = b.dataset.t;
+  const on = v => e => { e.preventDefault(); tugma[t] = v; b.classList.toggle('bosildi', v); };
+  b.addEventListener('pointerdown', on(true));
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(n => b.addEventListener(n, on(false)));
+});
+
+// ---------------- Kamera ----------------
+const KAMERALAR = [['orqa', '🎥 Orqadan'], ['tepa', '🎥 Tepadan'], ['erkin', '🎥 Erkin']];
+let kameraI = 0;
+const orbita = new OrbitControls(kamera, kanvas);
+orbita.enabled = false; orbita.maxPolarAngle = Math.PI / 2.05; orbita.minDistance = 5; orbita.maxDistance = 600;
+function kameraAlmashtir(){
+  kameraI = (kameraI + 1) % KAMERALAR.length;
+  document.getElementById('t-kamera').textContent = KAMERALAR[kameraI][1];
+  orbita.enabled = KAMERALAR[kameraI][0] === 'erkin';
+  if (orbita.enabled){ orbita.target.set(M.x, 1, -M.y); orbita.update(); }
+}
+document.getElementById('t-kamera').onclick = kameraAlmashtir;
+document.getElementById('t-aniqlik').onclick = () => aniqlikQoy(!aniqlikRejimi);
+document.getElementById('t-yordam').onclick = () => { const y = document.getElementById('yordam'); y.hidden = !y.hidden; };
+document.getElementById('t-joylar').onclick = () => { const j = document.getElementById('joylar'); j.hidden = !j.hidden; };
+
+const kamPoz = new THREE.Vector3(), kamNishon = new THREE.Vector3();
+function kameraYangila(dt){
+  const fx = Math.sin(M.yon), fy = Math.cos(M.yon);
+  const rejim = KAMERALAR[kameraI][0];
+  if (rejim === 'erkin'){ orbita.target.set(M.x, 1, -M.y); orbita.update(); return; }
+  const k = 1 - Math.exp(-dt * (rejim === 'orqa' ? 5 : 3));
+  if (rejim === 'orqa'){
+    const orqa = 10 + Math.abs(M.tez) * 0.12;
+    kamPoz.lerp(new THREE.Vector3(M.x - fx * orqa, 4.2 + Math.abs(M.tez) * 0.04, -(M.y - fy * orqa)), k);
+    kamNishon.set(M.x + fx * 4, 1.4, -(M.y + fy * 4));
+  } else {
+    const bal = 70 + Math.abs(M.tez) * 2.2;
+    kamPoz.lerp(new THREE.Vector3(M.x, bal, -(M.y) + bal * 0.25), k);
+    kamNishon.set(M.x, 0, -M.y);
+  }
+  kamera.position.copy(kamPoz);
+  kamera.lookAt(kamNishon);
+}
+
+// ---------------- Minixarita va ko'cha nomi ----------------
+const mini = document.getElementById('minixarita'), mctx = mini.getContext('2d');
+function miniChiz(){
+  const W = mini.width, R = W / 2, s = W / 2 / 220;          // 220 m radius
+  mctx.save();
+  mctx.clearRect(0, 0, W, W);
+  mctx.beginPath(); mctx.arc(R, R, R, 0, Math.PI * 2); mctx.clip();
+  mctx.fillStyle = '#1A232C'; mctx.fillRect(0, 0, W, W);
+  mctx.translate(R, R); mctx.rotate(-M.yon);                // mashina yo'nalishi doim tepaga
+  mctx.lineCap = 'round';
+  const bx = Math.floor(M.x / BOLAK), by = Math.floor(M.y / BOLAK);
+  for (let a = -1; a <= 1; a++) for (let c = -1; c <= 1; c++){
+    const b = bolaklar.get((bx + a) + ':' + (by + c)); if (!b) continue;
+    for (const u of b.uylar){
+      const h = u.h[0];
+      if (Math.abs(h[0] - M.x) > 260 || Math.abs(h[1] - M.y) > 260) continue;
+      mctx.beginPath();
+      for (let i = 0; i < h.length; i += 2){
+        const x = (h[i] - M.x) * s, y = -(h[i+1] - M.y) * s;
+        i ? mctx.lineTo(x, y) : mctx.moveTo(x, y);
+      }
+      mctx.fillStyle = u.t ? '#8A6D1E' : '#33404D'; mctx.fill();
+    }
+    for (const y of b.yollar){
+      if (y.u.w < 3) continue;
+      mctx.beginPath();
+      mctx.moveTo((y.ax - M.x) * s, -(y.ay - M.y) * s); mctx.lineTo((y.bx - M.x) * s, -(y.by - M.y) * s);
+      mctx.strokeStyle = y.u.chiz ? '#E8C766' : '#8FA0B0'; mctx.lineWidth = Math.max(2, y.u.w * s); mctx.stroke();
+    }
+  }
+  mctx.restore();
+  // mashina belgisi
+  mctx.fillStyle = '#F2B705'; mctx.strokeStyle = '#111'; mctx.lineWidth = 2;
+  mctx.beginPath(); mctx.moveTo(R, R - 12); mctx.lineTo(R + 8, R + 9); mctx.lineTo(R, R + 4); mctx.lineTo(R - 8, R + 9); mctx.closePath();
+  mctx.fill(); mctx.stroke();
+  // shimol
+  mctx.save(); mctx.translate(R, R); mctx.rotate(-M.yon);
+  mctx.fillStyle = '#E0453A'; mctx.font = 'bold 22px sans-serif'; mctx.textAlign = 'center'; mctx.textBaseline = 'middle';
+  mctx.fillText('N', 0, -R + 18); mctx.restore();
+}
+function engYaqinYol(x, y, radius, faqatHaydaladigan){
+  let eng = null, engM = radius, ex = 0, ey = 0;
+  const kx = Math.floor(x / 60), ky = Math.floor(y / 60), r = Math.ceil(radius / 60);
+  for (let a = -r; a <= r; a++) for (let c = -r; c <= r; c++){
+    for (const s of nomKatak.get((kx + a) + ':' + (ky + c)) || []){
+      if (faqatHaydaladigan && !HAYDASA_BOLADI.has(s.s)) continue;
+      const dx = s.bx - s.ax, dy = s.by - s.ay;
+      const t = Math.max(0, Math.min(1, ((x - s.ax) * dx + (y - s.ay) * dy) / (dx * dx + dy * dy || 1)));
+      const qx = s.ax + t * dx, qy = s.ay + t * dy, m = Math.hypot(x - qx, y - qy);
+      if (m < engM){ engM = m; eng = s; ex = qx; ey = qy; }
+    }
+  }
+  return eng ? { s:eng, x:ex, y:ey, m:engM } : null;
+}
+const kochaEl = document.getElementById('kocha');
+let oxirgiKocha = '';
+function kochaNomi(){
+  let nom = '';
+  const y = engYaqinYol(M.x, M.y, 25);
+  if (y && y.s.nom) nom = y.s.nom;
+  if (nom !== oxirgiKocha){ kochaEl.textContent = nom; oxirgiKocha = nom; }
+}
+
+// ---------------- Joylar va yorliqlar ----------------
+function yorliq(matn){
+  const c = document.createElement('canvas'); const x = c.getContext('2d');
+  x.font = 'bold 44px -apple-system,Segoe UI,Roboto,sans-serif';
+  const w = Math.ceil(x.measureText(matn).width) + 40;
+  c.width = w; c.height = 72;
+  x.font = 'bold 44px -apple-system,Segoe UI,Roboto,sans-serif';
+  x.fillStyle = 'rgba(14,22,33,.8)'; x.beginPath(); x.roundRect(0, 0, w, 72, 18); x.fill();
+  x.fillStyle = '#F2B705'; x.textBaseline = 'middle'; x.fillText(matn, 20, 38);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const s = new THREE.Sprite(new THREE.SpriteMaterial({ map:t, depthTest:false, fog:false, sizeAttenuation:false }));
+  s.scale.set(w / 72 * 0.045, 0.045, 1);
+  s.renderOrder = 10;
+  return s;
+}
+function joyQur(){
+  const el = document.getElementById('joylar');
+  for (const j of JOYLAR){
+    const x = px(j.k[1]), y = py(j.k[0]);
+    if (!j.yorliqsiz){
+      const s = yorliq(j.nom); s.position.set(x, 45, -y); sahna.add(s);
+    }
+    const b = document.createElement('button');
+    b.className = 'joy'; b.textContent = j.nom;
+    b.onclick = () => { joyga(x, y); el.hidden = true; };
+    el.appendChild(b);
+  }
+}
+function joyga(x, y){
+  const yol = engYaqinYol(x, y, 400, true);
+  if (yol){
+    M.x = yol.x; M.y = yol.y;
+    M.yon = Math.atan2(yol.s.bx - yol.s.ax, yol.s.by - yol.s.ay);
+  } else { M.x = x; M.y = y; }
+  M.tez = 0; M.rul = 0;
+  kamPoz.set(M.x - Math.sin(M.yon) * 12, 6, -(M.y - Math.cos(M.yon) * 12));
+}
+function yolgaQaytar(){ joyga(M.x, M.y); }
+
+// ---------------- Fizika ----------------
+const MAKS = 26, ORQA_MAKS = 7, TEZLANISH = 7, TORMOZ = 16, BAZA = 2.7;
+function fizika(dt){
+  const t = tugma;
+  if (t.old){
+    M.tez += (M.tez < 0 ? TORMOZ : TEZLANISH * (1 - Math.max(0, M.tez) / MAKS * 0.6)) * dt;
+  } else if (t.orqa){
+    M.tez -= (M.tez > 0.5 ? TORMOZ : 4) * dt;
+  } else {
+    M.tez -= Math.sign(M.tez) * Math.min(Math.abs(M.tez), 2.2 * dt);
+  }
+  if (t.qol) M.tez -= Math.sign(M.tez) * Math.min(Math.abs(M.tez), 12 * dt);
+  M.tez = Math.max(-ORQA_MAKS, Math.min(MAKS, M.tez - M.tez * 0.08 * dt));
+
+  const maqsad = (t.chap ? -1 : 0) + (t.ong ? 1 : 0);
+  const maksRul = 0.6 / (1 + Math.abs(M.tez) / 12);
+  M.rul += (maqsad * maksRul - M.rul) * Math.min(1, dt * 8);
+  M.yon += M.tez / BAZA * Math.tan(M.rul) * dt * (t.qol ? 1.6 : 1);
+
+  M.x += Math.sin(M.yon) * M.tez * dt;
+  M.y += Math.cos(M.yon) * M.tez * dt;
+
+  // ikki doira (old va orqa) bilan to'qnashuv
+  const fx = Math.sin(M.yon), fy = Math.cos(M.yon);
+  for (const d of [1.3, -1.3]){
+    const s = itar(M.x + fx * d, M.y + fy * d, 1.05);
+    if (s){
+      M.x += s[0]; M.y += s[1];
+      const zarba = Math.abs(s[0] * fx + s[1] * fy) / (Math.hypot(s[0], s[1]) || 1);
+      if (zarba > 0.4) M.tez *= -0.25; else M.tez *= 0.97;
+    }
+  }
+
+  mashina.position.set(M.x, 0.12, -M.y);
+  mashina.rotation.y = -M.yon;
+  const aylan = M.tez * dt / 0.36;
+  mashina.gildiraklar.forEach((g, i) => {
+    g.rotation.x -= aylan;
+    if (i < 2) g.rotation.y = -M.rul;
+  });
+}
+
+// ---------------- Asosiy sikl ----------------
+const holatEl = document.getElementById('holat');
+const tezlikEl = document.getElementById('tezlik');
+let oldingi = performance.now(), kadr = 0;
+function sikl(t){
+  const dt = Math.min(0.05, (t - oldingi) / 1000); oldingi = t;
+  // 4 ta kichik qadam — tezlikda devordan o'tib ketmaslik uchun
+  for (let i = 0; i < 4; i++) fizika(dt / 4);
+  kameraYangila(dt);
+  const nishon = KAMERALAR[kameraI][0] === 'erkin' ? { x:orbita.target.x, y:-orbita.target.z } : M;
+  const qoldi = bolaklarniYangila(nishon.x, nishon.y, 6);
+  quyosh.position.set(M.x - 120, 220, -M.y + 90);
+  quyosh.target.position.set(M.x, 0, -M.y);
+  renderer.render(sahna, kamera);
+  if (kadr++ % 3 === 0){
+    miniChiz(); kochaNomi();
+    tezlikEl.firstChild.textContent = Math.round(Math.abs(M.tez) * 3.6);
+    holatEl.textContent = qoldi ? 'uylar qurilmoqda…' : (aniqlikRejimi ? 'aniqlik rejimi' : 'real ma\'lumot · OSM + Overture');
+  }
+  requestAnimationFrame(sikl);
+}
+
+// ---------------- Ishga tushirish ----------------
+const foiz = document.getElementById('yuklash-foiz'), ymatn = document.getElementById('yuklash-matn');
+(async function(){
+  try{
+    foiz.style.width = '15%';
+    const D = await SM.yukla('samarqand/');
+    foiz.style.width = '55%'; ymatn.textContent = D.statistika.jami.toLocaleString('ru-RU') + ' ta uy tayyorlanmoqda…';
+    await new Promise(r => setTimeout(r, 30));
+    tayyorla(D);
+    yerQatlamlari(D);
+    joyQur();
+    foiz.style.width = '75%'; ymatn.textContent = 'Registon atrofi qurilmoqda…';
+    await new Promise(r => setTimeout(r, 30));
+    joyga(px(66.9757), py(39.6535));             // Registon ko'chasi
+    bolaklarniYangila(M.x, M.y, 1500);
+    foiz.style.width = '100%';
+    document.getElementById('yuklash').classList.add('yoq');
+    if (sensorli) document.getElementById('yordam').hidden = true;
+    oldingi = performance.now();
+    requestAnimationFrame(sikl);
+  }catch(e){
+    console.error(e);
+    ymatn.textContent = 'Xato: ' + e.message;
+  }
+})();
+</script>
+</body>
+</html>
