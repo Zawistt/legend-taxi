@@ -244,13 +244,16 @@ def sky_env_lowpoly(s, full=True):
     s.add_sub("Sky", "sky", sky_material='SubResource("sky_mat")', radiance_size="1")
     props = dict(background_mode="2", sky='SubResource("sky")', ambient_light_source="3", ambient_light_color="Color(0.8, 0.76, 0.7, 1)",
                  ambient_light_sky_contribution="0.7", ambient_light_energy="0.75", reflected_light_source="2",
-                 tonemap_mode="2", tonemap_exposure="0.85", tonemap_white="6.0",
-                 fog_enabled="true", fog_light_color="Color(0.82, 0.84, 0.86, 1)", fog_density="0.0015", fog_sky_affect="0.1",
-                 volumetric_fog_density="0.0")
+                 tonemap_mode="2", tonemap_exposure="0.86", tonemap_white="6.0",
+                 fog_enabled="true", fog_light_color="Color(0.86, 0.84, 0.8, 1)", fog_density="0.0018", fog_sky_affect="0.12",
+                 fog_aerial_perspective="0.35", volumetric_fog_density="0.0")
     if full:
-        props.update(ssao_enabled="true", ssao_radius="1.2", ssao_intensity="1.6", ssao_detail="0.3", ssil_enabled="true", ssil_intensity="0.6",
-                     glow_enabled="true", glow_intensity="0.35", glow_bloom="0.03", glow_hdr_threshold="1.3",
-                     adjustment_enabled="true", adjustment_saturation="1.12", adjustment_contrast="1.04")
+        # 13-bosqich: realistikroq yorug'lik — burchak/devor tagidagi soyalar (SSAO) kuchliroq,
+        # quyoshdan qaytgan iliq yorug'lik (SSIL), yorqin sirtlarda yengil nur (glow), uzoqlik havosi
+        props.update(ssao_enabled="true", ssao_radius="1.0", ssao_intensity="2.2", ssao_power="1.6", ssao_detail="0.5",
+                     ssao_light_affect="0.15", ssil_enabled="true", ssil_radius="4.0", ssil_intensity="0.9",
+                     glow_enabled="true", glow_intensity="0.45", glow_bloom="0.04", glow_hdr_threshold="1.1", glow_blend_mode="1",
+                     adjustment_enabled="true", adjustment_saturation="1.06", adjustment_contrast="1.08")
     s.add_sub("Environment", "env", **props)
 
 
@@ -412,7 +415,8 @@ def main_scene(glb_path, out_name):
   s.node("Main", "Node3D")
   s.node("WorldEnvironment", "WorldEnvironment", ".", environment='SubResource("env")')
   s.node("Sun", "DirectionalLight3D", ".", transform=T(0, 40, 0), rotation_degrees=SUN_ROT, light_color="Color(1, 0.9, 0.74, 1)",
-         light_energy="0.95", shadow_enabled="true", shadow_blur="1.5", directional_shadow_max_distance="80.0", directional_shadow_mode="1")
+         light_energy="1.05", light_angular_distance="0.6", shadow_enabled="true", shadow_blur="1.0", shadow_normal_bias="1.2",
+         directional_shadow_max_distance="90.0", directional_shadow_mode="1", directional_shadow_blend_splits="true")
   s.node("Map", parent=".", instance=glb)
   s.node("Navigation", "NavigationRegion3D", ".", navigation_mesh=nm)
   s.node("Collision", parent="Navigation", instance=col)

@@ -39,12 +39,13 @@ ambient_light_sky_contribution = 0.7
 ambient_light_energy = 0.75
 reflected_light_source = 2
 tonemap_mode = 2
-tonemap_exposure = 0.85
+tonemap_exposure = 0.86
 tonemap_white = 6.0
 fog_enabled = true
-fog_light_color = Color(0.82, 0.84, 0.86, 1)
-fog_density = 0.0015
-fog_sky_affect = 0.1
+fog_light_color = Color(0.86, 0.84, 0.8, 1)
+fog_density = 0.0018
+fog_sky_affect = 0.12
+fog_aerial_perspective = 0.35
 volumetric_fog_density = 0.0
 
 [sub_resource type="BoxOccluder3D" id="oc0"]
