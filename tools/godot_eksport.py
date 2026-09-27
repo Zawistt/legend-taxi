@@ -18,7 +18,7 @@ Nima qilinadi:
   * Yo'l chegarasi: avtomobil yo'li yuzasining chetiga ko'rinmas devor
     (`Yol_Chegara-colonly`) — mashina faqat yo'lda yuradi.
 
-    pip install numpy scipy shapely trimesh mapbox-earcut rasterio requests
+    pip install numpy scipy shapely mapbox-earcut rasterio requests
     python3 tools/godot_eksport.py
 """
 import json, math, os, sys, time
@@ -27,9 +27,6 @@ import shapely
 from shapely import box
 from shapely.strtree import STRtree
 import mapbox_earcut as earcut
-import trimesh
-from trimesh.visual.material import PBRMaterial
-from trimesh.visual import TextureVisuals
 from scipy import ndimage
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -52,7 +49,8 @@ MAT = {
     "Devor_Jamoat": ((0.88, 0.84, 0.74), 0.85), "Devor_Garaj":  ((0.62, 0.60, 0.57), 0.95),
     "Obida_Gisht":  ((0.84, 0.70, 0.49), 0.9),
     "Tom_Tekis":    ((0.45, 0.44, 0.42), 0.95), "Tom_Shifer":   ((0.60, 0.61, 0.60), 0.8),
-    "Tom_Obida":    ((0.18, 0.52, 0.76), 0.5),
+    "Tom_Obida":    ((0.72, 0.62, 0.46), 0.9),
+    "Balkon":       ((0.80, 0.79, 0.76), 0.85),
     "Yol_Asfalt":   ((0.22, 0.23, 0.24), 0.9), "Yol_Mahalla":  ((0.30, 0.30, 0.30), 0.95),
     "Yol_Piyoda":   ((0.66, 0.60, 0.50), 0.9), "Yol_Tuproq":   ((0.55, 0.47, 0.36), 1.0),
     "Temir_Yol":    ((0.32, 0.28, 0.25), 0.95), "Yol_Chegara": ((1.0, 0.0, 1.0), 1.0),
@@ -60,14 +58,6 @@ MAT = {
     "Yer_Dala":     ((0.50, 0.52, 0.30), 1.0), "Yer_Qabr":     ((0.52, 0.52, 0.42), 1.0),
     "Suv":          ((0.16, 0.34, 0.45), 0.1),
 }
-_mat_kesh = {}
-def material(nom):
-    if nom not in _mat_kesh:
-        rang, rough = MAT[nom]
-        _mat_kesh[nom] = PBRMaterial(name=nom, baseColorFactor=[*rang, 1.0],
-                                     metallicFactor=0.0, roughnessFactor=rough)
-    return _mat_kesh[nom]
-
 # avtomobil yo'llari: odatiy kenglik, eng kam kenglik (m), material
 HAYDASA = {
     "motorway": (16, 10, "Yol_Asfalt"), "trunk": (14, 9, "Yol_Asfalt"),
@@ -105,10 +95,11 @@ def devor_materiali(sinf, tarixiy, xesh):
 
 
 def balandlik(sinf, h, f, maydon):
+    """-> (balandlik m, aniqlik 0/1/2, qavatlar soni)"""
     if h:
-        return h, 2
+        return h, 2, max(1, round((h - 0.8) / QAVAT_M))
     if f:
-        return f * QAVAT_M + 1, 1
+        return f * QAVAT_M + 1, 1, int(f)
     q = 1
     if sinf in ("apartments", "dormitory"): q = 5
     elif sinf in ("hotel", "hospital", "university", "office"): q = 4
@@ -116,7 +107,7 @@ def balandlik(sinf, h, f, maydon):
     elif sinf in ("garage", "shed", "carport", "greenhouse", "roof", "barn"): q = 1
     elif maydon > 1200: q = 3
     elif maydon > 350: q = 2
-    return q * QAVAT_M + (-0.6 if sinf in ("roof", "carport") else 0.8), 0
+    return q * QAVAT_M + (-0.6 if sinf in ("roof", "carport") else 0.8), 0, q
 
 
 def ochish(kod, o, q):
@@ -223,18 +214,78 @@ class Relyef:
 
 # ---------------- geometriya yig'uvchi ----------------
 class Yiguvchi:
+    """Bir material uchun uchburchaklar. uv2 ixtiyoriy (bo'lmagan qismlar uchun 0)."""
     def __init__(self):
-        self.v, self.uv, self.f, self.n = [], [], [], 0
+        self.v, self.uv, self.uv2, self.f, self.n = [], [], [], [], 0
+        self.uv2_bor = False
 
-    def qosh(self, v, uv, f):
+    def qosh(self, v, uv, f, uv2=None):
         if len(f) == 0:
             return
         self.v.append(np.asarray(v, np.float32)); self.uv.append(np.asarray(uv, np.float32))
+        if uv2 is not None:
+            self.uv2_bor = True
+            self.uv2.append(np.asarray(uv2, np.float32))
+        else:
+            self.uv2.append(np.zeros((len(v), 2), np.float32))
         self.f.append(np.asarray(f, np.int64) + self.n); self.n += len(v)
 
-    def mesh(self, nom):
-        return trimesh.Trimesh(vertices=np.concatenate(self.v), faces=np.concatenate(self.f), process=False,
-                               visual=TextureVisuals(uv=np.concatenate(self.uv), material=material(nom)))
+
+def glb_yoz(yol, tugunlar):
+    """Minimal GLB yozuvchi. tugunlar: [(tugun_nomi, material_nomi, Yiguvchi)].
+    POSITION, TEXCOORD_0, (TEXCOORD_1), indekslar (uint16 yoki uint32). Normal
+    yozilmaydi — Godot o'zi hisoblaydi (devorlar tugunlari alohida — tekis soya)."""
+    import struct
+    bufer = bytearray()
+    views, accs, meshes, nodes, mats, mat_ix = [], [], [], [], [], {}
+
+    def qosh_view(data, target):
+        while len(bufer) % 4:
+            bufer.append(0)
+        views.append({"buffer": 0, "byteOffset": len(bufer), "byteLength": len(data), "target": target})
+        bufer.extend(data)
+        return len(views) - 1
+
+    def qosh_acc(arr, turi, comp, target, minmax=False):
+        v = qosh_view(arr.tobytes(), target)
+        a = {"bufferView": v, "componentType": comp, "count": int(arr.shape[0]), "type": turi}
+        if minmax:
+            a["min"] = arr.min(0).tolist(); a["max"] = arr.max(0).tolist()
+        accs.append(a)
+        return len(accs) - 1
+
+    for tugun, mnom, yg in tugunlar:
+        V = np.concatenate(yg.v).astype(np.float32)
+        UV = np.concatenate(yg.uv).astype(np.float32)
+        F = np.concatenate(yg.f)
+        attr = {"POSITION": qosh_acc(V, "VEC3", 5126, 34962, True),
+                "TEXCOORD_0": qosh_acc(UV, "VEC2", 5126, 34962)}
+        if yg.uv2_bor:
+            attr["TEXCOORD_1"] = qosh_acc(np.concatenate(yg.uv2).astype(np.float32), "VEC2", 5126, 34962)
+        if len(V) < 65536:
+            idx = qosh_acc(F.astype(np.uint16).reshape(-1), "SCALAR", 5123, 34963)
+        else:
+            idx = qosh_acc(F.astype(np.uint32).reshape(-1), "SCALAR", 5125, 34963)
+        if mnom not in mat_ix:
+            rang, rough = MAT[mnom]
+            mat_ix[mnom] = len(mats)
+            mats.append({"name": mnom, "pbrMetallicRoughness": {
+                "baseColorFactor": [*rang, 1.0], "metallicFactor": 0.0, "roughnessFactor": rough}})
+        meshes.append({"name": mnom, "primitives": [{"attributes": attr, "indices": idx, "material": mat_ix[mnom]}]})
+        nodes.append({"name": tugun, "mesh": len(meshes) - 1})
+    while len(bufer) % 4:
+        bufer.append(0)
+    js = {"asset": {"version": "2.0", "generator": "legend-taxi godot_eksport.py"},
+          "scene": 0, "scenes": [{"nodes": list(range(len(nodes)))}], "nodes": nodes, "meshes": meshes,
+          "materials": mats, "accessors": accs, "bufferViews": views, "buffers": [{"byteLength": len(bufer)}]}
+    jb = json.dumps(js, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    jb += b" " * ((4 - len(jb) % 4) % 4)
+    jami = 12 + 8 + len(jb) + 8 + len(bufer)
+    with open(yol, "wb") as f:
+        f.write(struct.pack("<III", 0x46546C67, 2, jami))
+        f.write(struct.pack("<II", len(jb), 0x4E4F534A)); f.write(jb)
+        f.write(struct.pack("<II", len(bufer), 0x004E4942)); f.write(bufer)
+    return jami
 
 
 def yuqoriga(p, tri):
@@ -376,6 +427,119 @@ def devor_halqa(yg, h, pastki, yuqori, bx, bz, ikki_tomon=False, v0=0.0):
     yg.qosh(v.reshape(-1, 3), uv.reshape(-1, 2), f)
 
 
+TOM_QIYALIK = math.radians(22)
+
+
+def bino_devorlari(yg, h, asos, yuqori, ming, bx, bz, qavat, Hh, urug, eshik=-1):
+    """Bino halqasi (yopiq, (N,2)) bo'ylab devorlar. UV: (u — devor bo'lagi bo'ylab 0..L,
+    v — eng past yer sathidan balandlik). UV2 (shader uchun):
+      x = ±(round(L*100) + urug)   (manfiy — shu bo'lakda eshik bor)
+      y = qavat*1000 + round(Hh*10) (Hh — eng past yerdan bo'g'otgacha, m)"""
+    a = h[:-1]; b = h[1:]
+    L = np.hypot(*(b - a).T)
+    ok = L > 0.05
+    idx = np.nonzero(ok)[0]
+    if not len(idx):
+        return
+    a, b, L = a[ok], b[ok], L[ok]
+    n = len(a)
+    v = np.empty((n, 4, 3))
+    v[:, 0] = np.stack([a[:, 0] - bx, np.full(n, asos), a[:, 1] - bz], 1)
+    v[:, 1] = np.stack([b[:, 0] - bx, np.full(n, asos), b[:, 1] - bz], 1)
+    v[:, 2] = np.stack([b[:, 0] - bx, np.full(n, yuqori), b[:, 1] - bz], 1)
+    v[:, 3] = np.stack([a[:, 0] - bx, np.full(n, yuqori), a[:, 1] - bz], 1)
+    uv = np.empty((n, 4, 2))
+    uv[:, 0] = np.stack([np.zeros(n), np.full(n, asos - ming)], 1)
+    uv[:, 1] = np.stack([L, np.full(n, asos - ming)], 1)
+    uv[:, 2] = np.stack([L, np.full(n, yuqori - ming)], 1)
+    uv[:, 3] = np.stack([np.zeros(n), np.full(n, yuqori - ming)], 1)
+    x = np.round(L * 100) + urug
+    x = np.where(idx == eshik, -x, x) if eshik >= 0 else x
+    y = np.full(n, qavat * 1000 + round(Hh * 10))
+    uv2 = np.repeat(np.stack([x, y], 1)[:, None, :], 4, axis=1)
+    k = np.arange(n)[:, None] * 4
+    f = np.concatenate([k + [0, 1, 2], k + [0, 2, 3]])
+    yg.qosh(v.reshape(-1, 3), uv.reshape(-1, 2), f, uv2.reshape(-1, 2))
+
+
+def tom_yuzi(yg, pts3, uv, urug, bx, bz):
+    """Qavariq ko'pburchak yuz (tom qiyaligi) — yelpig'ich, yuqoriga qaragan."""
+    n = len(pts3)
+    f = np.array([[0, i, i + 1] for i in range(1, n - 1)])
+    p2 = pts3[:, [0, 2]]
+    a, b, c = p2[f[:, 0]], p2[f[:, 1]], p2[f[:, 2]]
+    y = (b - a)[:, 1] * (c - a)[:, 0] - (b - a)[:, 0] * (c - a)[:, 1]
+    f[y < 0] = f[y < 0][:, [0, 2, 1]]
+    v = pts3 - np.array([bx, 0, bz])
+    yg.qosh(v, uv, f, np.tile([[urug, 0.0]], (n, 1)))
+
+
+def qiya_tom(yg, p, tepa, urug, bx, bz):
+    """To'rtburchakka yaqin uyga to'rt qiyalikli (shifer) tom. True — yasaldi."""
+    r = p.minimum_rotated_rectangle
+    if r.geom_type != "Polygon" or r.area <= 0 or p.area / r.area < 0.8:
+        return False
+    c = np.asarray(r.exterior.coords)[:4]
+    if np.hypot(*(c[1] - c[0])) < np.hypot(*(c[2] - c[1])):
+        c = np.roll(c, -1, axis=0)
+    e0 = c[1] - c[0]; e1 = c[3] - c[0]
+    L = np.hypot(*e0); W = np.hypot(*e1)
+    if W < 3 or L < 3:
+        return False
+    ax = e0 / L; ay = e1 / W
+    o = 0.4                                         # tom chiqib turishi
+    A = c[0] - ax * o - ay * o; B = c[1] + ax * o - ay * o
+    C = c[2] + ax * o + ay * o; D = c[3] - ax * o + ay * o
+    W2 = W + 2 * o; L2 = L + 2 * o
+    tg = math.tan(TOM_QIYALIK)
+    ye = tepa - o * tg                               # bo'g'ot (chiqib turgan qirra)
+    yr = tepa + (W / 2) * tg                         # tizma (ridge)
+    if L2 - W2 < 0.2:                                # kvadrat — piramida
+        R1 = R2 = (A + C) / 2
+    else:
+        R1 = A + ay * W2 / 2 + ax * W2 / 2
+        R2 = B + ay * W2 / 2 - ax * W2 / 2
+    P = lambda q, y: np.array([q[0], y, q[1]])
+    kos = math.cos(TOM_QIYALIK)
+    def uvlar(nuqtalar, ox, oy, bosh):
+        return np.array([[np.dot(q - bosh, ox), np.dot(q - bosh, oy) / kos] for q in nuqtalar])
+    # old va orqa trapetsiya, yon uchburchaklar
+    yuzlar = [([A, B, R2, R1], [ye, ye, yr, yr], ax, ay, A),
+              ([C, D, R1, R2], [ye, ye, yr, yr], -ax, -ay, C),
+              ([D, A, R1], [ye, ye, yr], -ay, ax, D),
+              ([B, C, R2], [ye, ye, yr], ay, -ax, B)]
+    for q2, ys, ox, oy, bosh in yuzlar:
+        if len(q2) == 4 and np.allclose(q2[2], q2[3]):
+            q2, ys = q2[:3], ys[:3]
+        pts3 = np.array([P(q, y) for q, y in zip(q2, ys)])
+        tom_yuzi(yg, pts3, uvlar(q2, ox, oy, bosh), urug, bx, bz)
+    return True
+
+
+def balkonlar(ro, tashqi, ming, Hh, qavat, bx, bz, urug):
+    """Ko'p qavatli panel uy balkonlari joylashuvi (devor.gdshader bilan bir xil:
+    deraza oralig'i 3.0 m), 2-qavatdan, har ikkinchi ustunda. Godot'da MultiMesh
+    bilan chiziladi. Yozuv: [x, y, z, burilish, tur] (tur 0 — ochiq, 1 — oynavand)."""
+    oraliq = 3.0
+    fh = max((Hh - 0.5) / qavat, 2.6)
+    for j in range(len(tashqi) - 1):
+        a, b = tashqi[j], tashqi[j + 1]
+        L = float(np.hypot(*(b - a)))
+        if L < 8:
+            continue
+        ox = (b - a) / L
+        nx = np.array([-ox[1], ox[0]])                 # exterior_cw halqada tashqariga
+        yaw = math.atan2(nx[0], nx[1])
+        n = int((L - 0.6) // oraliq)
+        chet = (L - n * oraliq) / 2
+        for wi in range(0, n, 2):
+            m = a + ox * (chet + (wi + 0.5) * oraliq)
+            for fi in range(1, qavat):
+                y = ming + 0.3 + fi * fh
+                tur = 1 if ((int(urug * 1000) * 7 + wi * 13 + fi * 31) % 10) < 4 else 0
+                ro.append([round(float(m[0] - bx), 2), round(y, 2), round(float(m[1] - bz), 2), round(yaw, 3), tur])
+
+
 def devor_chiziq(yg, hh, pastki, yuqori, bx, bz):
     """Faqat to'qnashuv uchun ingichka devor: har nuqtada 2 ta tugun, ikki tomonlama."""
     n = len(hh)
@@ -489,6 +653,7 @@ def main():
 
     # ---- bo'laklarga yig'ish ----
     bolaklar = {}
+    obyektlar = {}                                     # (kx, kz) -> {tur: [[x, y, z, burilish, ...]]}
 
     def yig(k, nom):
         bl = bolaklar.setdefault(k, {})
@@ -500,8 +665,11 @@ def main():
         return (math.floor(x / BOLAK), math.floor(z / BOLAK))
 
 
-    # binolar
+    # binolar — eshik yo'lga eng yaqin devorda
+    yol_daraxt = STRtree(seg)
     aniqlik = [0, 0, 0]
+    qiya_soni = 0
+    PARAPET = ("Devor_Panel", "Devor_Dokon", "Devor_Jamoat", "Obida_Gisht")
     for j, (p0, sinf, h, f, t, i, m) in enumerate(binolar):
         if j in olib:
             continue
@@ -509,21 +677,54 @@ def main():
         c = p.centroid
         k = kalit(c.x, c.y)
         bx, bz = k[0] * BOLAK, k[1] * BOLAK
-        H, a = balandlik(sinf, h, f, p.area)
-        aniqlik[a] += 1
+        H, a_, qavat = balandlik(sinf, h, f, p.area)
+        aniqlik[a_] += 1
         tashqi = np.asarray(p.exterior.coords)
         yer = R.h(tashqi[:, 0], tashqi[:, 1])
-        asos = float(yer.min()) - 0.4
+        ming = float(yer.min())
+        asos = ming - 0.4
         tepa = float(yer.max()) + H
-        dm, tm = devor_materiali(sinf, t, (i * 2654435761) & 0xffffffff)
-        for r in [p.exterior, *p.interiors]:
-            hh = np.asarray(r.coords)
-            n = len(hh)
-            devor_halqa(yig(k, dm), hh, np.full(n, asos), np.full(n, tepa), bx, bz, v0=asos + 0.4)
-        pts, tri = uchburchakla(p)
+        Hh = tepa - ming
+        xesh = (i * 2654435761) & 0xffffffff
+        urug = (xesh % 997) / 1000.0
+        dm, tm = devor_materiali(sinf, t, xesh)
+        # eshik: o'rta nuqtasi avtomobil yo'liga eng yaqin devor bo'lagi
+        orta = (tashqi[:-1] + tashqi[1:]) / 2
+        uzun = np.hypot(*(tashqi[1:] - tashqi[:-1]).T)
+        _, mas = yol_daraxt.query_nearest(shapely.points(orta), return_distance=True, all_matches=False)
+        mas = np.where(uzun >= (3.2 if dm in ("Devor_Suvoq", "Devor_Gisht", "Devor_Garaj") else 1.4), mas, np.inf)
+        eshik = int(np.argmin(mas)) if np.isfinite(mas).any() else -1
+        qiya = (dm in ("Devor_Suvoq", "Devor_Gisht", "Devor_Garaj") and qavat <= 2 and 25 < p.area < 450
+                and qiya_tom(yig(k, tm), p, tepa, urug, bx, bz))
+        qiya_soni += qiya
+        parapet = 0.7 if (not qiya and dm in PARAPET) else 0.0
+        bino_devorlari(yig(k, dm), tashqi, asos, tepa + parapet, ming, bx, bz, qavat, Hh, urug, eshik)
+        if dm == "Devor_Panel" and qavat >= 4:
+            balkonlar(obyektlar.setdefault(k, {}).setdefault("balkon", []), tashqi, ming, Hh, qavat, bx, bz, urug)
+        for r in p.interiors:
+            bino_devorlari(yig(k, dm), np.asarray(r.coords), asos, tepa + parapet, ming, bx, bz, qavat, Hh, urug)
+        if qiya:
+            continue
+        tom = p
+        if parapet:
+            ich = p.buffer(-0.3, join_style="mitre")
+            ich = max(poligonlar(ich), key=lambda x: x.area, default=None)
+            if ich is not None and ich.area > 0.3 * p.area:
+                ich = shapely.orient_polygons(ich, exterior_cw=False)       # normal ichkariga
+                ih = np.asarray(ich.exterior.coords)
+                bino_devorlari(yig(k, dm), ih, tepa - 0.05, tepa + parapet, ming, bx, bz, 0, 0, urug)
+                qopqoq = p.difference(ich)
+                for qp in poligonlar(qopqoq):
+                    pts, tri = uchburchakla(qp)
+                    if pts is not None:
+                        v = np.stack([pts[:, 0] - bx, np.full(len(pts), tepa + parapet), pts[:, 1] - bz], 1)
+                        yig(k, dm).qosh(v, pts.copy(), tri, np.zeros((len(pts), 2)))
+                tom = ich
+        pts, tri = uchburchakla(tom)
         if pts is not None:
             v = np.stack([pts[:, 0] - bx, np.full(len(pts), tepa), pts[:, 1] - bz], 1)
-            yig(k, tm).qosh(v, pts.copy(), tri)
+            yig(k, tm).qosh(v, pts.copy(), tri, np.tile([[urug, 1.0]], (len(pts), 1)))
+    vaqt(t0, f"qiya tomlar: {qiya_soni}")
     vaqt(t0, f"binolar yig'ildi; aniqlik {aniqlik}")
 
     # avtomobil yo'li yuzasi va chegara devorlari — bo'laklarga kesib
@@ -622,11 +823,11 @@ def main():
     # ---- yozish ----
     os.makedirs(CHIQ, exist_ok=True)
     for f in os.listdir(CHIQ):
-        if f.startswith("bolak_") and f.endswith(".glb"):
+        if f.startswith("bolak_") and (f.endswith(".glb") or f.endswith(".obyektlar.json")):
             os.remove(os.path.join(CHIQ, f))
     indeks, jami = [], 0
     for (kx, kz), bl in sorted(bolaklar.items()):
-        sahna = trimesh.Scene()
+        tugunlar = []
         for nom, yg in sorted(bl.items()):
             if not yg.n:
                 continue
@@ -636,12 +837,15 @@ def main():
                 tugun = nom + "-col"
             else:
                 tugun = nom
-            sahna.add_geometry(yg.mesh(nom), node_name=tugun, geom_name=nom)
+            tugunlar.append((tugun, nom, yg))
         fayl = f"bolak_{kx}_{kz}.glb"
-        data = sahna.export(file_type="glb")
-        open(os.path.join(CHIQ, fayl), "wb").write(data)
-        jami += len(data)
-        indeks.append({"fayl": fayl, "x": kx * BOLAK, "z": kz * BOLAK})
+        jami += glb_yoz(os.path.join(CHIQ, fayl), tugunlar)
+        yozuv = {"fayl": fayl, "x": kx * BOLAK, "z": kz * BOLAK}
+        if (kx, kz) in obyektlar:
+            of = f"bolak_{kx}_{kz}.obyektlar.json"
+            json.dump(obyektlar[(kx, kz)], open(os.path.join(CHIQ, of), "w"), separators=(",", ":"))
+            yozuv["obyektlar"] = of
+        indeks.append(yozuv)
 
     _, sx, sz, yon = boshlash
     json.dump({

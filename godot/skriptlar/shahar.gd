@@ -87,5 +87,9 @@ func _qosh(b: Dictionary, ps: PackedScene) -> void:
 	var n := ps.instantiate() as Node3D
 	n.position = Vector3(float(b["x"]), 0.0, float(b["z"]))
 	Materiallar.qoy(n)
+	if b.has("obyektlar"):
+		var d = JSON.parse_string(FileAccess.get_file_as_string("res://shahar/" + b["obyektlar"]))
+		if d is Dictionary:
+			Obyektlar.qosh(n, d)
 	add_child(n)
 	_yuklangan[b["fayl"]] = n

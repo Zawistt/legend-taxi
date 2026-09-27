@@ -31,14 +31,57 @@ const TAVSIF := {
 	"Yer_Qabr":     [Color(0.50, 0.50, 0.41), 1.00, 3.0, 0.50],
 	"Yer_Tuproq":   [Color(0.58, 0.52, 0.42), 1.00, 6.0, 0.50],
 	"Suv":          [Color(0.10, 0.24, 0.30), 0.05, 8.0, 0.30],
+	"Balkon":       [Color(0.80, 0.79, 0.76), 0.85, 1.0, 0.25],
+}
+
+
+const DEVOR_SHADER := preload("res://shaderlar/devor.gdshader")
+const TOM_SHADER := preload("res://shaderlar/tom.gdshader")
+
+# Devorlar (devor.gdshader): turi, 3 ta rang (bino urug'i bo'yicha tanlanadi), deraza o'lchamlari
+const DEVORLAR := {
+	"Devor_Suvoq": {"turi": 0, "rang_a": Color(0.90, 0.85, 0.74), "rang_b": Color(0.93, 0.80, 0.62),
+		"rang_c": Color(0.86, 0.87, 0.84), "deraza_eni": 1.3, "deraza_boyi": 1.5, "oraliq": 3.6, "darvoza": true},
+	"Devor_Gisht": {"turi": 1, "rang_a": Color(0.66, 0.40, 0.27), "rang_b": Color(0.78, 0.60, 0.42),
+		"rang_c": Color(0.62, 0.50, 0.40), "deraza_eni": 1.3, "deraza_boyi": 1.5, "oraliq": 3.6, "darvoza": true},
+	"Devor_Panel": {"turi": 2, "rang_a": Color(0.80, 0.78, 0.73), "rang_b": Color(0.86, 0.80, 0.68),
+		"rang_c": Color(0.74, 0.76, 0.78), "deraza_eni": 1.45, "deraza_boyi": 1.45, "oraliq": 3.0},
+	"Devor_Dokon": {"turi": 0, "rang_a": Color(0.90, 0.89, 0.86), "rang_b": Color(0.80, 0.78, 0.74),
+		"rang_c": Color(0.92, 0.86, 0.72), "deraza_eni": 1.6, "deraza_boyi": 1.6, "oraliq": 3.4, "dokon_qavat": true},
+	"Devor_Jamoat": {"turi": 0, "rang_a": Color(0.93, 0.88, 0.72), "rang_b": Color(0.86, 0.90, 0.88),
+		"rang_c": Color(0.95, 0.83, 0.70), "deraza_eni": 2.0, "deraza_boyi": 1.9, "oraliq": 3.3},
+	"Devor_Garaj": {"turi": 1, "rang_a": Color(0.62, 0.55, 0.47), "rang_b": Color(0.70, 0.66, 0.60),
+		"rang_c": Color(0.58, 0.58, 0.56), "garaj": true},
+	"Obida_Gisht": {"turi": 6, "rang_a": Color(0.86, 0.72, 0.50), "rang_b": Color(0.82, 0.68, 0.46),
+		"rang_c": Color(0.88, 0.76, 0.56), "derazalar": false},
+}
+const TOMLAR := {
+	"Tom_Shifer": {"turi": 0, "rang": Color(0.60, 0.61, 0.60)},
+	"Tom_Tekis": {"turi": 1, "rang": Color(0.36, 0.35, 0.34)},
+	"Tom_Obida": {"turi": 1, "rang": Color(0.74, 0.64, 0.48)},
 }
 
 
 static func ol(nom: String) -> Material:
 	if _kesh.has(nom):
 		return _kesh[nom]
-	var m := _yasa(nom)
+	var m: Material
+	if DEVORLAR.has(nom):
+		m = _shader(DEVOR_SHADER, DEVORLAR[nom], nom)
+	elif TOMLAR.has(nom):
+		m = _shader(TOM_SHADER, TOMLAR[nom], nom)
+	else:
+		m = _yasa(nom)
 	_kesh[nom] = m
+	return m
+
+
+static func _shader(sh: Shader, param: Dictionary, nom: String) -> ShaderMaterial:
+	var m := ShaderMaterial.new()
+	m.resource_name = nom
+	m.shader = sh
+	for k in param:
+		m.set_shader_parameter(k, param[k])
 	return m
 
 
@@ -101,7 +144,7 @@ static func qoy(ildiz: Node) -> void:
 		for i in mi.mesh.get_surface_count():
 			var eski := mi.mesh.surface_get_material(i)
 			var nom := eski.resource_name if eski else ""
-			if TAVSIF.has(nom):
+			if TAVSIF.has(nom) or DEVORLAR.has(nom) or TOMLAR.has(nom):
 				mi.set_surface_override_material(i, ol(nom))
 		if mi.name.begins_with("Devor_") or mi.name.begins_with("Obida_") or mi.name.begins_with("Tom_"):
 			mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON

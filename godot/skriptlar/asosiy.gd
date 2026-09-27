@@ -13,6 +13,10 @@ var hud: Label
 var quyosh: DirectionalLight3D
 var _sinov := false
 var _tepa := false
+var _tun := false
+var _oddiy := false                    # sinov: SSAO/SSIL/SDFGI/SSR/hajmli tumansiz
+var _kamera_joy := Vector2.INF        # sinov suratlari uchun qo'zg'almas kamera
+var _kamera_havo := false
 var _surat := ""
 var _vaqt := 0.0
 var _kocha := ""
@@ -28,6 +32,14 @@ func _ready() -> void:
 			_surat = a.substr(8)
 		elif a == "--tepa":
 			_tepa = true
+		elif a == "--tun":
+			_tun = true
+		elif a == "--oddiy":
+			_oddiy = true
+		elif a.begins_with("--kamera_yol=") or a.begins_with("--kamera_havo="):
+			var q := a.split("=")[1].split(",")
+			_kamera_joy = Vector2(float(q[0]), float(q[1]))
+			_kamera_havo = a.begins_with("--kamera_havo=")
 	_muhit()
 	_yer()
 
@@ -52,8 +64,31 @@ func _ready() -> void:
 	kamera.make_current()
 	if _tepa:
 		kamera.rejim = Kamera.Rejim.TEPADAN
+	if _kamera_joy != Vector2.INF:
+		_kamerani_qoy()
 
 	_hud()
+
+
+## Sinov suratlari: kamerani berilgan joydagi eng yaqin ko'chaga qo'yadi
+## (ko'cha sathida yoki havodan), atrofni sinxron yuklaydi.
+func _kamerani_qoy() -> void:
+	var y := yollar.eng_yaqin(Vector3(_kamera_joy.x, 0, _kamera_joy.y), 300.0)
+	if y.is_empty():
+		return
+	var p: Vector3 = y["nuqta"]
+	var d: Vector3 = y["yonalish"]
+	kamera.rejim = Kamera.Rejim.ERKIN
+	mashina.boshqaruv_yoqilgan = false
+	if _kamera_havo:
+		kamera.global_position = p + Vector3(40, 70, 90)
+		kamera.look_at(p, Vector3.UP)
+	else:
+		kamera.global_position = p + Vector3.UP * 1.8 - d * 6.0 + d.cross(Vector3.UP) * 1.5
+		kamera.look_at(p + d * 30.0 + Vector3.UP * 3.0, Vector3.UP)
+	kamera.set("_yaw", kamera.rotation.y)
+	kamera.set("_pitch", kamera.rotation.x)
+	shahar.darhol_yukla(kamera.global_position, 700.0)
 
 
 func _tugmalar() -> void:
@@ -74,8 +109,8 @@ func _tugmalar() -> void:
 ## GTA uslubidagi yorug'lik: AgX tonemap, SDFGI, hajmli tuman, yumshoq soyalar.
 func _muhit() -> void:
 	var osmon_mat := ProceduralSkyMaterial.new()
-	osmon_mat.sky_top_color = Color(0.22, 0.42, 0.72)
-	osmon_mat.sky_horizon_color = Color(0.70, 0.76, 0.82)
+	osmon_mat.sky_top_color = Color(0.16, 0.38, 0.74)
+	osmon_mat.sky_horizon_color = Color(0.62, 0.72, 0.84)
 	osmon_mat.sky_curve = 0.12
 	osmon_mat.ground_horizon_color = Color(0.66, 0.66, 0.64)
 	osmon_mat.ground_bottom_color = Color(0.35, 0.32, 0.28)
@@ -103,16 +138,24 @@ func _muhit() -> void:
 	env.glow_bloom = 0.04
 	env.fog_enabled = true
 	env.fog_light_color = Color(0.72, 0.76, 0.82)
-	env.fog_density = 0.0009
+	env.fog_density = 0.00035
 	env.fog_aerial_perspective = 0.7
 	env.fog_sky_affect = 0.25
 	env.volumetric_fog_enabled = true
-	env.volumetric_fog_density = 0.006
+	env.volumetric_fog_density = 0.0018
 	env.volumetric_fog_albedo = Color(0.95, 0.9, 0.82)
 	env.volumetric_fog_length = 160.0
+	env.ssr_enabled = true
+	env.ssr_max_steps = 48
 	env.adjustment_enabled = true
 	env.adjustment_contrast = 1.06
 	env.adjustment_saturation = 1.12
+	if _oddiy:
+		env.ssao_enabled = false
+		env.ssil_enabled = false
+		env.sdfgi_enabled = false
+		env.ssr_enabled = false
+		env.volumetric_fog_enabled = false
 	var we := WorldEnvironment.new()
 	we.environment = env
 	add_child(we)
@@ -122,12 +165,23 @@ func _muhit() -> void:
 	quyosh.rotation_degrees = Vector3(-38, -35, 0)   # kechki quyosh — uzun soyalar
 	quyosh.light_color = Color(1.0, 0.93, 0.82)
 	quyosh.light_energy = 1.6
-	quyosh.light_angular_distance = 0.6
+	quyosh.light_angular_distance = 0.25
 	quyosh.shadow_enabled = true
 	quyosh.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
 	quyosh.directional_shadow_max_distance = 450.0
-	quyosh.shadow_blur = 1.5
+	quyosh.shadow_blur = 1.0
+	quyosh.shadow_normal_bias = 1.5
 	add_child(quyosh)
+	if _tun:                                        # tungi ko'rinish sinovi (8-bosqichda kun/tun sikli)
+		RenderingServer.global_shader_parameter_set("tun", 1.0)
+		quyosh.light_energy = 0.06
+		quyosh.light_color = Color(0.6, 0.7, 1.0)
+		osmon_mat.sky_top_color = Color(0.01, 0.015, 0.04)
+		osmon_mat.sky_horizon_color = Color(0.06, 0.06, 0.09)
+		env.ambient_light_energy = 0.15
+		env.fog_light_color = Color(0.05, 0.05, 0.08)
+		env.volumetric_fog_enabled = false
+		env.glow_intensity = 1.0
 
 
 ## Relyef GLB bo'laklar ichida. Bu yerda faqat pastdagi xavfsizlik tekisligi:
@@ -216,12 +270,15 @@ func _sinov_qadam() -> void:
 		var y := yollar.eng_yaqin(mashina.global_position, 80.0)
 		_maks_chetga = maxf(_maks_chetga, y.get("masofa", 99.0))
 		_maks_qiya = maxf(_maks_qiya, rad_to_deg(mashina.global_basis.y.angle_to(Vector3.UP)))
-	if _surat != "" and _vaqt > 2.6 and not _surat_olindi:
+	var tayyor := Engine.get_process_frames() > 45 if _kamera_joy != Vector2.INF else _vaqt > 2.6
+	if _surat != "" and tayyor and not _surat_olindi:
 		_surat_olindi = true
 		await RenderingServer.frame_post_draw
 		get_viewport().get_texture().get_image().save_png(_surat)
 		print("SURAT: ", _surat)
-	if _vaqt > 11.0 and not _tugadi:
+		if _kamera_joy != Vector2.INF:
+			get_tree().quit()
+	if _vaqt > 11.0 and not _tugadi and _kamera_joy == Vector2.INF:
 		_tugadi = true
 		var yer_y := mashina.global_position.y
 		print("SINOV: bo'laklar=%d, yo'l=%.1f m, maks tezlik=%.1f km/soat, y=%.2f, maks qiyalik=%.1f°, yo'l o'qidan eng uzoq=%.1f m, ko'cha=%s" % [
