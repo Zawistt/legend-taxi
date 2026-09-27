@@ -27,10 +27,11 @@ Godot 4.3, bomba rejimi (T hujum qiladi, CT himoya qiladi).
 | 9 | Stilizatsiya: low-poly ko'rinish (tekis ranglar, tekis soya, kam qirrali shakllar, gradient osmon); eski personaj/animatsiya/qurollar o'rniga vaqtinchalik manekin | ✅ ([hisobot](docs/STAGE9.md)) |
 | 10 | Qurol tizimi (Legend Tactical FPS'dan): 3 qurol ma'lumotdan, tepki naqshi, tarqalish, ADS, o'q rejimlari, bosh/tana/qo'l/oyoq zarari, HUD, F7 mashq nishonlari | ✅ ([hisobot](docs/STAGE10.md)) |
 | 11 | Qolgan qurollar (AR-44, Spectre-9 SMG, Longbow-50 snayper, Breacher-12 drobovik), sotib olish menyusi (B), 3v3 xaritasi (Qumtepa v2 low-poly, 50 m), bosh menyu | ✅ ([hisobot](docs/STAGE11.md)) |
+| 12 | Botlar (5v5 va 3v3), vizual audit, 3v3 qorayish; CS2 qoidalari 1 ga 1: $800, g'alaba/mag'lubiyat puli, 20 ta CS2 quroli, sotib olish menyusi (bo'limlar, rasmlar), zirh/kaska, HE/flesh/tutun/molotov, bomba aylanasi va kodi, portlash to'lqini, Zeus, kill feed, TAB, MR12 | ✅ ([hisobot](docs/STAGE12.md)) |
 
 ## O'ynash
 
-Godot 4.3 → Import → `qumtepa-5v5/godot/project.godot` → F5 (o'zingiz o'ynaysiz; Shift — sekin yurish, Ctrl/C — o'tirish, sichqoncha — o'q, R — qayta o'qlash, M — xarita, F4 — shom, F9 — FPS). `bots.tscn` → F6 — 5v5 bot o'yinini kuzatish. Boshqaruv: [STAGE2.md](docs/STAGE2.md), [STAGE3.md](docs/STAGE3.md).
+Godot 4.3 → Import → `qumtepa-5v5/godot/project.godot` → F5 — bosh menyu: 5v5 yoki 3v3, botlar bilan (CS2 qoidalari). Boshqaruv: WASD, Shift — sekin yurish, Ctrl/C — o'tirish, sichqoncha — o'q, R — qayta o'qlash, B — sotib olish, 1/2/3/4/5 — asosiy / to'pponcha / pichoq-Zeus / granata / bomba, E — bomba o'rnatish/zararsizlantirish, G — tashlash, TAB — statistika, X — o'q rejimi, M — xarita, F7 — mashq nishonlari, F10 — menyu. Batafsil: [STAGE12.md](docs/STAGE12.md).
 
 ## Tuzilma
 

@@ -91,7 +91,7 @@ def main():
     zp = os.path.join(OUT, "zeus.tres")
     open(zp, "w").write(HEAD + "\n".join([
         'weapon_id = "zeus"', 'weapon_name = "Zeus x27"', "kind = 8", "slot = 3", 'category_name = "Zeus"', 'buy_category = "gear"',
-        'side = "both"', "price = 200", "kill_reward = 0", "move_speed = 0.88", "base_damage = 500.0", "headshot_multiplier = 1.0",
+        'side = "both"', "price = 200", "kill_reward = 100", "move_speed = 0.88", "base_damage = 500.0", "headshot_multiplier = 1.0",
         "legshot_multiplier = 1.0", "armor_pen = 1.0", "effective_range = 4.6", "damage_falloff_multiplier = 0.0", "max_range = 4.6",
         "fire_rate = 30.0", "fire_modes = Array[int]([0])", "magazine_size = 1", "reserve_ammo = 0", "reload_time = 30.0",
         "empty_reload_time = 30.0", "recoil_pattern_v = PackedFloat32Array()", "recoil_pattern_h = PackedFloat32Array()",

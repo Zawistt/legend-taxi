@@ -182,6 +182,9 @@ func prepare_round() -> void:
 	for b in bots:
 		b.clock = 0.0
 		b.blind_until = 0.0
+		for m in ["he_used", "entry_molly", "molly_A", "molly_B", "flashed_retake"]:
+			if b.has_meta(m):
+				b.remove_meta(m)
 		b.loadout.round_start(b.team)
 		b._update_label()
 	# T taktikasi: guruhlar botlarga tartib bilan (o'yinchi T bo'lsa — uning o'rni oxirgisi)
@@ -337,6 +340,8 @@ func _physics_process(delta: float) -> void:
 		_think_ct()
 		_sweep_angles()
 		_avoid_fire()
+		if _frame % 6 == 0:
+			_utility()
 		_combat()
 	for b in bots:
 		if b.alive:
@@ -637,6 +642,46 @@ func _think_ct() -> void:
 
 
 # ------------------------------------------------------------------ granatalar (botlar)
+## vaziyatga qarab granata: zararsizlantirilayotgan bombaga molotov (T), dushman eshitilgan/yashiringan joyga HE,
+## yaqin kelayotgan dushmanga flesh (o'zi ko'r bo'lmasligi uchun teskari tomonga qaramaydi — nishon joyiga tashlaydi)
+func _utility() -> void:
+	var defusing := gm.action == "defuse"
+	for b in side("CT"):
+		if b.alive and b.busy == "defuse":
+			defusing = true
+	for b in bots:
+		if not b.alive or b.busy != "":
+			continue
+		var nades: Array = b.loadout.grenades
+		if nades.is_empty():
+			continue
+		# 1) T: bomba zararsizlantirilyapti — molotov bomba ustiga (ko'rmasa ham, joyini biladi)
+		if b.team == "T" and defusing and gm.bomb and is_instance_valid(gm.bomb) and "molotov" in nades:
+			var bp: Vector3 = gm.bomb.global_position
+			if b.global_position.distance_to(bp) < 28.0:
+				_take_bot_nade(b, "molotov")
+				_lineup(bp, 1.1, "molotov", b)
+				continue
+		# 2) dushman shu yerda edi (eshitildi / ko'rindi), hozir ko'rinmayapti — HE o'sha joyga
+		if "he" in nades and b.target == null and b.alert_until > t and not b.has_meta("he_used"):
+			var d: float = b.global_position.distance_to(b.alert_look)
+			if d > 7.0 and d < 26.0 and rng.randf() < 0.35:
+				_take_bot_nade(b, "he")
+				b.set_meta("he_used", true)
+				_lineup(b.alert_look, 0.4 + d / 18.0, "he", b)
+				continue
+		# 3) T: site'ga kirishda molotov CT turadigan burchakka (strategiyaning maqsad site'i)
+		if b.team == "T" and b.mode == "entry" and "molotov" in nades and not b.has_meta("entry_molly"):
+			var site: String = strat[1]
+			for key in S.CT_SPOTS:
+				var sp: Array = S.CT_SPOTS[key]
+				if sp[2] == site and b.global_position.distance_to(sp[0]) < 24.0:
+					_take_bot_nade(b, "molotov")
+					b.set_meta("entry_molly", true)
+					_lineup(sp[0], 1.2, "molotov", b)
+					break
+
+
 func _take_nade(team: String, type: String) -> bool:
 	for b in side(team):
 		if b.alive and _take_bot_nade(b, type):

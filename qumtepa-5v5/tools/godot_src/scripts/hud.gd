@@ -167,7 +167,7 @@ func _process(delta: float) -> void:
 	team_lbl.text = ("Terrorchilar (T)" if player.team == "T" else "Maxsus kuchlar (CT)") + ("   •   bomba sizda" if player.has_bomb else "")
 	team_lbl.modulate = T_COLOR if player.team == "T" else CT_COLOR
 	var lo = player.loadout
-	hp_lbl.text = ("+ %d" % int(ceil(player.hp))) + ("     %s %d" % ["⛑" if lo.helmet else "▣", int(lo.armor)] if lo.armor > 0 else "") \
+	hp_lbl.text = ("+ %d" % int(ceil(player.hp))) + ("     %s %d" % ["Zirh+kaska" if lo.helmet else "Zirh", int(lo.armor)] if lo.armor > 0 else "") \
 		if player.alive else "O'LDINGIZ — jamoadoshni kuzatish (sichqoncha)"
 	hp_lbl.modulate = Color(1, 0.35, 0.3) if player.alive and player.hp <= 30 else Color.WHITE
 	money_lbl.text = "$%d" % lo.money
@@ -224,7 +224,7 @@ func _update_feed() -> void:
 		var vc := "#%s" % (T_COLOR if e.victim_team == "T" else CT_COLOR).to_html(false)
 		var mine: bool = e.get("attacker") == player or e.get("victim_node") == player
 		var line := ("[color=%s]%s[/color]  " % [kc, e.killer] if e.killer != "" else "") + "[%s]%s  [color=%s]%s[/color]" % [
-			e.weapon, "  ⌖" if e.head else "", vc, e.victim]
+			e.weapon, " (HS)" if e.head else "", vc, e.victim]
 		s += ("[bgcolor=#8a1a1a88]%s[/bgcolor]" % line if mine else line) + "\n"
 	feed_lbl.text = s
 

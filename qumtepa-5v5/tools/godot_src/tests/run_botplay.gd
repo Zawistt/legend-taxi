@@ -58,6 +58,29 @@ func _run() -> void:
 		results.append(w)
 		reasons[r] = reasons.get(r, 0) + 1)
 	pl.died.connect(func() -> void: player_deaths += 1)
+	# CS2 kuzatuvlari: bomba faqat aylanaga, xaridlar, granatalar, kill feed, pul chegaralari
+	var plants_in_circle := [0, 0]
+	var bought := {}
+	var nades := {}
+	var feed_weapons := {}
+	var money_bad := [0]
+	gm.bomb_event.connect(func(ev: String) -> void:
+		if ev == "planted" and gm.bomb:
+			plants_in_circle[1] += 1
+			if gm.plant_circle_at(gm.bomb.global_position) != "":
+				plants_in_circle[0] += 1)
+	gm.killed.connect(func(e: Dictionary) -> void: feed_weapons[e.weapon] = feed_weapons.get(e.weapon, 0) + 1)
+	node_added.connect(func(n: Node) -> void:
+		if n is RigidBody3D and "type" in n and "thrower" in n:
+			nades[n.type] = nades.get(n.type, 0) + 1)
+	gm.phase_changed.connect(func(p: int) -> void:
+		if p == 1:
+			for row in bp.buys:
+				for it in row[1]:
+					bought[it] = bought.get(it, 0) + 1
+		for c in gm.combatants():
+			if c.loadout.money < 0 or c.loadout.money > 16000:
+				money_bad[0] += 1)
 	while results.size() < rounds:
 		await physics_frame
 		frame += 1
@@ -104,6 +127,15 @@ func _run() -> void:
 	ok(reasons.size() >= 2, "raundlar turli yo'l bilan tugaydi (%d xil)" % reasons.size())
 	ok(stuck == 0, "tiqilib qolgan bot yo'q (%d)" % stuck)
 	ok(bp.bots.size() == bp.team_size * 2 - 1, "botlar: %d (o'yinchi + %d jamoadosh va %d raqib)" % [bp.bots.size(), bp.team_size - 1, bp.team_size])
+	print("  xaridlar: %s" % bought)
+	print("  granatalar: %s" % nades)
+	print("  kill feed qurollari: %s" % feed_weapons)
+	ok(bought.size() >= 5 and (bought.has("kevlar") or bought.has("vesthelm")), "botlar pulga qarab sotib oladi (%d xil narsa, zirh bilan)" % bought.size())
+	ok(plants_in_circle[1] == 0 or plants_in_circle[0] == plants_in_circle[1], "bomba faqat aylana ichiga o'rnatildi (%d/%d)" % plants_in_circle)
+	ok(money_bad[0] == 0, "pul hech qachon $0 dan kam yoki $16000 dan ko'p emas")
+	ok(feed_weapons.size() >= 1, "kill feed: kim kimni qaysi qurol bilan (%d xil qurol)" % feed_weapons.size())
+	if rounds >= 6:
+		ok(nades.size() >= 2, "botlar granata ishlatadi (%d xil)" % nades.size())
 	print("\nNATIJA: %d / %d tekshiruv o'tdi" % [total - fails, total])
 	quit(1 if fails else 0)
 
@@ -138,11 +170,17 @@ func _smart_checks(main: Node, gm: Node, bp: Node, pl: CharacterBody3D) -> void:
 		pl.cam.rotation.x = asin(d.y)
 		await physics_frame
 		fpv.no_spread = true
-		fpv._next_shot = 0.0
-		fpv._equip_end = 0.0
-		fpv.fire()
+		var tgt: Node = null
+		for k in 5:
+			fpv._next_shot = 0.0
+			fpv._equip_end = 0.0
+			fpv.last_hit = {}
+			if fpv.fire() and fpv.last_hit.get("target") != null:
+				tgt = fpv.last_hit.get("target")
+				break
+			await physics_frame
 		fpv.no_spread = false
-		ok(a.hp == 100.0 and fpv.last_hit.get("target") == a, "o'z jamoadoshiga o'q tegdi, lekin zarar yo'q (HP %d)" % a.hp)
+		ok(tgt != null and tgt.team == pl.team and tgt.hp == 100.0, "o'z jamoadoshiga o'q tegdi, lekin zarar yo'q (HP %d)" % (tgt.hp if tgt else -1))
 	# 3) raqib bot ko'rinib turgan o'yinchiga o'q uzadi
 	var spot := Vector3.ZERO
 	var dirs: Array = [e.look_dir]

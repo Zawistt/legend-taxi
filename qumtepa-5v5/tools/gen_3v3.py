@@ -178,6 +178,31 @@ def main():
         t = t.replace('main = load("res://main_3v3.tscn").instantiate()\n',
                       'main = load("res://main_3v3.tscn").instantiate()\n\tmain.get_node("Bots").enabled = false      # botlarsiz: xarita sinovi\n')
         assert 'get_node("Bots").enabled = false' in t
+        if fn == "run_tests.gd":
+            # CS2 Wingman vaqtlari (map_data ROUND) va bomba faqat aylana ichiga (game_mode.plant_spots)
+            for a, b in [
+                ('\tawait secs(4.3)\n\tok(gm.phase == GM.Phase.LIVE and not pl.frozen, "5 s dan keyin jang boshlanadi")',
+                 '\tawait secs(gm.R.freeze - 0.7)\n\tok(gm.phase == GM.Phase.LIVE and not pl.frozen, "%.0f s tayyorgarlikdan keyin jang boshlanadi" % gm.R.freeze)'),
+                ('\tput(-15, 0.1, 8)\n\tawait frames(10)\n\tok(gm.current_site() == "A", "A site zonasi aniqlandi")',
+                 '\tvar pa: Vector3 = gm.plant_spots["A"]\n\tput(pa.x + 0.4, pa.y + 0.1, pa.z)\n\tawait frames(30)\n'
+                 '\tok(gm.current_site() == "A" and gm.plant_circle_at(pl.global_position) == "A", "A site zonasi va o\'rnatish aylanasi aniqlandi")'),
+                ('\tInput.action_press("interact")\n\tawait secs(3.2)\n\tInput.action_release("interact")\n\tawait frames(2)\n\tok(gm.phase == GM.Phase.PLANTED and gm.planted_site == "A", "bomba A\'ga o\'rnatildi (3 s)")\n'
+                 '\tok(absf(gm.time_left - (35.0 - 0.03)) < 0.3, "bomba taymeri 35 s")',
+                 '\tInput.action_press("interact")\n\tawait secs(gm.R.plant_time + 0.1)\n\tInput.action_release("interact")\n\tawait frames(2)\n'
+                 '\tok(gm.phase == GM.Phase.PLANTED and gm.planted_site == "A", "bomba A\'ga o\'rnatildi (%.1f s, kod terildi)" % gm.R.plant_time)\n'
+                 '\tok(absf(gm.time_left - (gm.R.bomb_timer - 0.1)) < 0.3, "bomba taymeri %.0f s" % gm.R.bomb_timer)'),
+                ('\tawait secs(3.2)\n\tInput.action_release("interact")\n\tawait frames(2)\n\tok(gm.bomb_state == "defused" and gm.last_winner == "CT" and gm.score["CT"] == 1, "zararsizlantirildi (7 s), CT +1")',
+                 '\tawait secs(gm.R.defuse_time - 3.8)\n\tInput.action_release("interact")\n\tawait frames(2)\n'
+                 '\tok(gm.bomb_state == "defused" and gm.last_winner == "CT" and gm.score["CT"] == 1, "zararsizlantirildi (to\'plamsiz %.0f s), CT +1" % gm.R.defuse_time)'),
+                ('\tawait secs(5.3)\n\tok(gm.phase == GM.Phase.FREEZE, "5 s dan keyin yangi raund")',
+                 '\tawait secs(gm.R.round_end + 0.3)\n\tok(gm.phase == GM.Phase.FREEZE, "%.0f s dan keyin yangi raund" % gm.R.round_end)'),
+                ('\tput(16, 0.1, 7)\n\tawait frames(10)\n\tInput.action_press("interact")\n\tawait secs(3.2)',
+                 '\tvar pb: Vector3 = gm.plant_spots["B"]\n\tput(pb.x, pb.y + 0.1, pb.z)\n\tawait frames(30)\n\tInput.action_press("interact")\n\tawait secs(gm.R.plant_time + 0.1)'),
+                ('\tawait secs(35.3)\n\tok(gm.bomb_state == "exploded" and gm.last_winner == "T" and gm.score["T"] == 1, "35 s da portladi, T +1")',
+                 '\tawait secs(gm.R.bomb_timer + 0.3)\n\tok(gm.bomb_state == "exploded" and gm.last_winner == "T" and gm.score["T"] == 1, "%.0f s da portladi, T +1" % gm.R.bomb_timer)'),
+            ]:
+                assert a in t, a[:60]
+                t = t.replace(a, b)
         open(os.path.join(DST, "tests", fn), "w").write(t)
     # sahna
     t = fix_paths(open(os.path.join(SRC, "main.tscn")).read())
