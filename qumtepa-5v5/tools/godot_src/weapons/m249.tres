@@ -11,6 +11,7 @@ slot = 1
 category_name = "Pulemyot"
 buy_category = "heavy"
 side = "both"
+origin = "cs2"
 price = 5200
 kill_reward = 300
 move_speed = 0.78

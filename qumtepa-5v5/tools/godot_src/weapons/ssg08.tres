@@ -11,6 +11,7 @@ slot = 1
 category_name = "Snayper"
 buy_category = "rifle"
 side = "both"
+origin = "cs2"
 price = 1700
 kill_reward = 300
 move_speed = 0.92

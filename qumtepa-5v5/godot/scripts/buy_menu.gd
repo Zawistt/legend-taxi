@@ -6,14 +6,14 @@ extends PanelContainer
 ## Pul, tomon (T/CT qurollari), granata cheklovlari (ko'pi bilan 4, flesh 2) — loadout.gd dagi qoidalar.
 
 const Rules := preload("res://scripts/cs_rules.gd")
-const CharacterModel := preload("res://scripts/character_model.gd")
+const WeaponIcon := preload("res://scripts/weapon_icon.gd")
 const CATS := [
 	["pistol", "To'pponchalar"], ["smg", "SMG"], ["rifle", "Avtomatlar"], ["heavy", "Og'ir"], ["grenade", "Granatalar"], ["gear", "Jihozlar"]]
 const ORDER := {
-	"pistol": ["glock", "usp", "p250", "tec9", "fiveseven", "deagle", "apex_09"],
-	"smg": ["mac10", "mp9", "ump45", "p90", "spectre_smg"],
-	"rifle": ["galil", "famas", "ak47", "m4a4", "ssg08", "awp", "lar_01", "rifle_vanguard", "longbow_50"],
-	"heavy": ["nova", "xm1014", "m249", "breacher_12"],
+	"pistol": ["glock", "usp", "p2000", "elite", "p250", "tec9", "fiveseven", "cz75", "deagle", "revolver"],
+	"smg": ["mac10", "mp9", "mp7", "mp5sd", "ump45", "p90", "bizon"],
+	"rifle": ["galil", "famas", "ak47", "m4a4", "m4a1s", "sg553", "aug", "ssg08", "awp", "g3sg1", "scar20"],
+	"heavy": ["nova", "xm1014", "sawedoff", "mag7", "m249", "negev"],
 	"grenade": ["flash", "smoke", "he", "molotov", "incendiary"],
 	"gear": ["kevlar", "vesthelm", "kit", "zeus"],
 }
@@ -226,13 +226,11 @@ func _info(id: String) -> String:
 		w.magazine_size, w.reserve_ammo, w.kill_reward]
 
 
-## qurol rasmi: shakli kichik 3D sahnada yondan chiziladi (bir marta)
+## qurol rasmi (weapon_icon.gd), bir marta chiziladi
 func _icon(id: String, team: String) -> Texture2D:
 	var key := id + team
 	if _icons.has(key):
 		return _icons[key]
-	if DisplayServer.get_name() == "headless":
-		return null
 	var kind := 7
 	var w: Resource = Rules.weapon(id)
 	if w:
@@ -241,33 +239,7 @@ func _icon(id: String, team: String) -> Texture2D:
 		kind = 9
 	elif id in ["kevlar", "vesthelm"]:
 		kind = -1
-	var sv := SubViewport.new()
-	sv.size = Vector2i(220, 88)
-	sv.transparent_bg = true
-	sv.own_world_3d = true
-	sv.render_target_update_mode = SubViewport.UPDATE_ONCE
-	add_child(sv)
-	var root := Node3D.new()
-	sv.add_child(root)
-	if kind >= 0:
-		var shape: Dictionary = CharacterModel.make_weapon_shape(kind, team, w.weapon_id if w else "")
-		root.add_child(shape.node)
-		if kind == 7:
-			shape.node.scale = Vector3.ONE * 4.0
-	else:
-		var vest := CharacterModel._sbox(root, Vector3(0.1, 0.5, 0.42), Vector3(0, 0, 0.3), Color(0.3, 0.33, 0.25))
-		if id == "vesthelm":
-			CharacterModel._sbox(root, Vector3(0.3, 0.16, 0.3), Vector3(0, 0.36, 0.3), Color(0.2, 0.22, 0.2))
-		vest.rotation.y = 0.0
-	var cam := Camera3D.new()
-	cam.projection = Camera3D.PROJECTION_ORTHOGONAL
-	cam.size = 0.62 if kind in [1, 7, 8, 9] else 1.25
-	root.add_child(cam)
-	cam.position = Vector3(-2.0, 0.0, 0.3 if kind in [0, 3, 4, 5, 6] else 0.1)
-	cam.look_at(Vector3(0, 0, cam.position.z), Vector3.UP)
-	var l := DirectionalLight3D.new()
-	l.rotation_degrees = Vector3(-40, -60, 0)
-	root.add_child(l)
-	var tex := sv.get_texture()
-	_icons[key] = tex
+	var tex := WeaponIcon.make(self, kind, team, w.weapon_id if w else "", Vector2i(220, 88), id == "vesthelm")
+	if tex:
+		_icons[key] = tex
 	return tex

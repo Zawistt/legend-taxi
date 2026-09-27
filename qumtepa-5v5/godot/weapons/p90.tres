@@ -11,6 +11,7 @@ slot = 1
 category_name = "SMG"
 buy_category = "smg"
 side = "both"
+origin = "cs2"
 price = 2350
 kill_reward = 300
 move_speed = 0.92

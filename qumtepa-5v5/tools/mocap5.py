@@ -125,6 +125,13 @@ def track_from(clip, f0, f1, align="facing", keep_drift=False, loop=True, speed=
             if kk != "hips":
                 tr[kk][:, 2] -= zf
     rot = {k: np.einsum("ij,fjk->fik", Q, c.rot(v)[idx]) @ Q.T for k, v in JMAP.items()}
+    # son burilishi oyoqlar chizig'i bilan mos kelmasa (ba'zi kliplarda "Hips" aylanasi yonga buralgan, masalan 137_41),
+    # hamma burilishlar o'rtacha xato burchagiga to'g'rilanadi: son o'qining chap tomoni (+X) oyoqlar chizig'iga mos bo'lsin
+    lat = rot["hips"][:, :, 0].mean(0)
+    err = math.atan2(lat[1], lat[0])
+    if abs(err) > 0.05:
+        Rc = Rz(-err)
+        rot = {k: np.einsum("ij,fjk->fik", Rc, v) for k, v in rot.items()}
     T = (f1 - f0) * c.dt
     t = np.arange(len(idx)) * c.dt
     v = (hips[-1, :2] - hips[0, :2]) / T if len(idx) > 1 else np.zeros(2)

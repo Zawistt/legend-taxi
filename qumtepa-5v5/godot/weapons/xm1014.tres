@@ -11,6 +11,7 @@ slot = 1
 category_name = "Drobovik"
 buy_category = "heavy"
 side = "both"
+origin = "cs2"
 price = 2000
 kill_reward = 600
 move_speed = 0.86

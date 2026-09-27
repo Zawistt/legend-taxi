@@ -17,6 +17,7 @@ enum FireMode { SEMI, BURST, AUTO }
 @export var price := 2700
 @export var kill_reward := 300                    ## shu qurol bilan o'ldirgani uchun pul
 @export var move_speed := 1.0                     ## ma'lumot (CS2 dagi tezlik ko'paytuvchisi)
+@export var origin := "cs2"                        ## cs2 — o'yinda sotiladi; zaxira — eski (Legend) qurollar; pubg — PUBG Mobile (faqat inventarda)
 
 @export_group("Zarar")
 @export var base_damage := 34.0

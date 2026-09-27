@@ -38,10 +38,12 @@ const BOMB_RADIUS := 44.0
 const BOMB_CODE := "7355608"
 const ZEUS_RECHARGE := 30.0
 ## qurollar (weapons/*.tres) — eksport qilingan o'yinda papkani o'qib bo'lmaydi, ro'yxat shu yerda
-const WEAPON_IDS := ["glock", "usp", "p250", "tec9", "fiveseven", "deagle", "pistol",
-	"mac10", "mp9", "ump45", "p90", "smg",
-	"galil", "famas", "ak47", "m4a4", "ssg08", "awp", "rifle", "vanguard", "sniper",
-	"nova", "xm1014", "m249", "shotgun", "knife", "zeus"]
+const WEAPON_IDS := ["glock", "usp", "p2000", "elite", "p250", "tec9", "fiveseven", "cz75", "deagle", "revolver",
+	"mac10", "mp9", "mp7", "mp5sd", "ump45", "p90", "bizon",
+	"galil", "famas", "ak47", "m4a4", "m4a1s", "sg553", "aug", "ssg08", "awp", "g3sg1", "scar20",
+	"nova", "xm1014", "sawedoff", "mag7", "m249", "negev", "knife", "zeus",
+	"pistol", "smg", "rifle", "vanguard", "sniper", "shotgun",
+	"pubg_m416", "pubg_akm", "pubg_m762", "pubg_scarl", "pubg_groza", "pubg_awm", "pubg_kar98k", "pubg_ump45", "pubg_vector", "pubg_dp28"]
 const WEAPON_FILE := {"pistol": "pistol", "smg": "smg", "rifle": "rifle", "vanguard": "vanguard", "sniper": "sniper",
 	"shotgun": "shotgun", "knife": "knife"}
 
@@ -55,6 +57,16 @@ static func catalog() -> Dictionary:
 			var w: Resource = load("res://weapons/%s.tres" % f)
 			_cat[w.weapon_id] = w
 	return _cat
+
+
+## inventar uchun: origin bo'yicha (cs2 / zaxira / pubg), WEAPON_IDS tartibida
+static func by_origin(origin: String) -> Array:
+	var out: Array = []
+	for f in WEAPON_IDS:
+		var w: Resource = load("res://weapons/%s.tres" % f)
+		if w.origin == origin and w.kind != 2 and w.kind != 8:
+			out.append(w)
+	return out
 
 
 static func weapon(id: String) -> Resource:

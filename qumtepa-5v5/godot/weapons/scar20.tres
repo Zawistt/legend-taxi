@@ -1,0 +1,46 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+weapon_id = "scar20"
+weapon_name = "SCAR-20"
+kind = 4
+slot = 1
+category_name = "Snayper"
+buy_category = "rifle"
+side = "CT"
+origin = "cs2"
+price = 5000
+kill_reward = 300
+move_speed = 0.86
+base_damage = 80.0
+headshot_multiplier = 4.0
+arm_multiplier = 1.0
+legshot_multiplier = 0.75
+stomach_multiplier = 1.25
+armor_pen = 0.825
+range_modifier = 0.98
+max_range = 250.0
+fire_rate = 240.0
+fire_modes = Array[int]([0])
+magazine_size = 20
+reserve_ammo = 90
+reload_time = 3.1
+empty_reload_time = 3.5
+recoil_pattern_v = PackedFloat32Array(2.2)
+recoil_pattern_h = PackedFloat32Array(-0.3)
+recoil_reset_time = 0.3
+base_spread = 0.04
+spread_bloom_per_shot = 0.0180
+max_spread = 0.2400
+spread_walk_mult = 2.5
+spread_slow_mult = 1.30
+spread_crouch_mult = 0.7
+spread_air_mult = 6.2
+equip_time = 0.9
+scope = true
+ads_fov_ratio = 0.4
+ads_spread_multiplier = 0.05
+ads_sensitivity_multiplier = 0.45

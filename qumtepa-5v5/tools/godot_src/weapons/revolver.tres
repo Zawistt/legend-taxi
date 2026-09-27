@@ -1,0 +1,43 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+weapon_id = "revolver"
+weapon_name = "R8 Revolver"
+kind = 1
+slot = 2
+category_name = "To'pponcha"
+buy_category = "pistol"
+side = "both"
+origin = "cs2"
+price = 600
+kill_reward = 300
+move_speed = 0.9
+base_damage = 86.0
+headshot_multiplier = 4.0
+arm_multiplier = 1.0
+legshot_multiplier = 0.75
+stomach_multiplier = 1.25
+armor_pen = 0.932
+range_modifier = 0.94
+max_range = 250.0
+fire_rate = 120.0
+fire_modes = Array[int]([0])
+magazine_size = 8
+reserve_ammo = 8
+reload_time = 2.3
+empty_reload_time = 2.7
+recoil_pattern_v = PackedFloat32Array(3.6, 3.9, 4.1, 4.3)
+recoil_pattern_h = PackedFloat32Array(0, 0.6, -0.6, 0.8)
+recoil_reset_time = 0.3
+base_spread = 0.01
+spread_bloom_per_shot = 0.0045
+max_spread = 0.0600
+spread_walk_mult = 4.5
+spread_slow_mult = 1.57
+spread_crouch_mult = 0.7
+spread_air_mult = 11.2
+equip_time = 0.6
+ads_ready = false

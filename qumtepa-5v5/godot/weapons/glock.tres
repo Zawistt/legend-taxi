@@ -11,6 +11,7 @@ slot = 2
 category_name = "To'pponcha"
 buy_category = "pistol"
 side = "T"
+origin = "cs2"
 price = 200
 kill_reward = 300
 move_speed = 0.96

@@ -11,6 +11,7 @@ slot = 1
 category_name = "Avtomat"
 buy_category = "rifle"
 side = "T"
+origin = "cs2"
 price = 2700
 kill_reward = 300
 move_speed = 0.86

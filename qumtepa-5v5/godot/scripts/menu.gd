@@ -1,11 +1,12 @@
 extends Control
 ## Bosh menyu: xaritani tanlash. 5v5 — Qumtepa (110×110 m), 3v3 — Qumtepa v2 low-poly (50×50 m), 5v5 botlar o'yini.
-## Klaviatura: 1 / 2 / 3. O'yin ichida F10 — menyuga qaytish.
+## 4 — inventar (hamma qurollar). Klaviatura: 1 / 2 / 3 / 4. O'yin ichida F10 — menyuga qaytish.
 
 const MAPS := [
 	["Qumtepa 5v5", "110 × 110 m, 5 hudud, bomba rejimi", "res://main.tscn"],
 	["Qumtepa 3v3", "50 × 50 m, low-poly, bomba rejimi", "res://main_3v3.tscn"],
 	["5v5 botlar o'yini", "kuzatish (tomoshabin kamerasi)", "res://bots.tscn"],
+	["Inventar", "hamma qurollar: CS2, zaxira, PUBG Mobile", "res://inventory.tscn"],
 ]
 
 

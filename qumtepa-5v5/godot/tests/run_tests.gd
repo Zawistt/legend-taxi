@@ -450,17 +450,28 @@ func section_characters() -> void:
 		await frames(2)
 		var nmesh: int = chm.find_children("*", "MeshInstance3D", true, false).size()
 		var gun: Node3D = chm.model.find_child("Weapon", true, false)
-		ok(chm.PLACEHOLDER and nmesh >= 5 and nmesh <= 9 and gun != null and chm.skel.find_bone("chest") >= 0,
-			"%s: o'rinbosar manekin (qutilar %d ta mesh'ga birlashtirilgan, qurol ko'krakka bog'langan)" % [key, nmesh])
+		if chm.rig:
+			ok(nmesh >= 2 and gun != null and chm.skel.find_bone("chest") >= 0 and chm.hitboxes.size() >= 13,
+				"%s: 3-shaxs skeletli model (%d mesh, qurol \"weapon\" suyagida, %d o'q zonasi suyaklarga bog'langan)" % [key, nmesh, chm.hitboxes.size()])
+		else:
+			ok(chm.PLACEHOLDER and nmesh >= 5 and nmesh <= 9 and gun != null and chm.skel.find_bone("chest") >= 0,
+				"%s: o'rinbosar manekin (qutilar %d ta mesh'ga birlashtirilgan, qurol ko'krakka bog'langan)" % [key, nmesh])
 		chm.crouching = true
 		await secs(0.6)
 		var e_c: float = chm.eye_point().y
 		chm.crouching = false
 		chm.die()
-		await secs(0.6)
-		var lying: bool = absf(chm.model.rotation.x) > 1.4
+		await secs(0.6 if chm.rig == null else chm.anim.get_animation("death").length + 0.3)
+		var lying: bool
+		if chm.rig:
+			lying = chm.eye_point().y < 0.7                     # skeletli model: "death" klipi — yerda yotadi
+		else:
+			lying = absf(chm.model.rotation.x) > 1.4
 		chm.revive()
-		ok(e_c < 1.35 and lying and chm.model.rotation.x == 0.0, "%s: o'tirish (ko'z %.2f m), o'lim (yiqiladi) va qayta tirilish" % [key, e_c])
+		await secs(0.3)
+		var up_ok: bool = chm.eye_point().y > 1.4 if chm.rig else chm.model.rotation.x == 0.0
+		ok(e_c < 1.35 and lying and up_ok, "%s: o'tirish (ko'z %.2f m), o'lim (yiqiladi) va qayta tirilish%s" % [key, e_c,
+			" — skeletli model, %d animatsiya (yotgan %s, turgan %s)" % [chm.anim.get_animation_list().size(), lying, up_ok] if chm.rig else ""])
 		chm.queue_free()
 	# harakat turlari: oddiy (qadam eshitiladi), Shift (sekin, jim), o'tirish (sekin, jim, past), sakrash (qo'nish tovushi)
 	gm.skip_freeze()

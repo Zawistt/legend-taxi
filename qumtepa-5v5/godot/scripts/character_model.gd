@@ -54,6 +54,7 @@ var model: Node3D
 var skel: Skeleton3D
 var anim: AnimationPlayer           ## o'rinbosarda animatsiyalar yo'q (bo'sh pleyer — API uchun)
 var tree: AnimationTree = null
+var rig: Node3D = null              ## 3-shaxs skeletli model (rigged_body.gd) — bo'lsa, manekin o'rniga
 var dead := false
 var fire_count := 0
 var reload_count := 0
@@ -89,6 +90,12 @@ func load_model(t: String) -> void:
 	if model:
 		model.queue_free()
 		model = null
+	rig = null
+	# 3-shaxs: jamoaning skeletli modeli bo'lsa (T — Desert Shadow Operative) — o'sha; 1-shaxs doim alohida (manekin qo'llar)
+	var RB := load("res://scripts/rigged_body.gd")
+	if not first_person and RB.available(t):
+		_load_rigged(RB)
+		return
 	_mats = {}
 	_legs = []
 	_hand_nodes = []
@@ -144,6 +151,28 @@ func load_model(t: String) -> void:
 	_die_t = 0.0
 	model.rotation = Vector3.ZERO
 	model.position = Vector3.ZERO
+
+
+func _load_rigged(RB: Script) -> void:
+	_mats = {}
+	_legs = []
+	_hand_nodes = []
+	rig = RB.new()
+	rig.name = "Rigged"
+	model = rig
+	add_child(rig)
+	rig.setup(self, team)
+	skel = rig.skel
+	anim = rig.ap
+	tree = rig.tree
+	rig.set_weapon(weapon_kind, weapon_id)
+	_gun = rig.gun
+	hitboxes = []
+	if not own_body:
+		hitboxes = rig.build_hitboxes(LAYER_HITBOX)
+	rig.apply_layers(first_person, own_body)
+	dead = false
+	_die_t = 0.0
 
 
 func _apply_layers() -> void:
@@ -204,6 +233,10 @@ func set_weapon(kind: int, wid := "") -> void:
 		return
 	weapon_kind = kind
 	weapon_id = wid
+	if rig:
+		rig.set_weapon(kind, wid)
+		_gun = rig.gun
+		return
 	if model:
 		var was_dead := dead
 		load_model(team)                 # qutilar birlashtirilgan — qo'l va qurol butunlay qayta yig'iladi (arzon)
@@ -404,6 +437,8 @@ static func _sbox(parent: Node3D, size: Vector3, pos: Vector3, col: Color) -> Me
 
 ## qurol og'zi (dunyo fazosida) — o'q izi shu yerdan chiqadi
 func muzzle_position() -> Vector3:
+	if rig:
+		return rig.muzzle_position()
 	var m := _gun.get_node_or_null("Muzzle") as Node3D if _gun else null
 	return m.global_position if m else global_position + Vector3.UP * 1.4
 
@@ -452,7 +487,7 @@ func _all(n: Node, cls: String, out: Array = []) -> Array:
 
 
 func has_anim(_name: String) -> bool:
-	return false
+	return rig != null and rig.has_anim(_name)
 
 
 # ------------------------------------------------------------------ boshqaruv
@@ -460,12 +495,16 @@ func fire() -> void:
 	if not dead:
 		fire_count += 1
 		_kick = 1.0
+		if rig:
+			rig.fire(weapon_kind)
 
 
 func reload() -> void:
 	if not dead and not is_reloading():
 		reload_count += 1
 		_reload_left = RELOAD_TIME
+		if rig:
+			rig.reload(RELOAD_TIME)
 
 
 func is_reloading() -> bool:
@@ -483,6 +522,8 @@ func die() -> void:
 	dead = true
 	_die_t = 0.0
 	_set_hitboxes(false)
+	if rig:
+		rig.die()
 
 
 func _set_hitboxes(on: bool) -> void:
@@ -495,17 +536,26 @@ func revive() -> void:
 	dead = false
 	_set_hitboxes(true)
 	_die_t = 0.0
+	if rig:
+		rig.revive()
+		return
 	model.rotation = Vector3.ZERO
 	model.position = Vector3.ZERO
 
 
 ## ko'z nuqtasi (model fazosida): o'tirganda pastga tushadi
 func eye_point() -> Vector3:
+	if rig:
+		return rig.eye_point()
 	return EYE - Vector3(0, 0.42 * _crouch_amt, 0)
 
 
 func _process(delta: float) -> void:
 	if model == null:
+		return
+	if rig:
+		_reload_left = maxf(0.0, _reload_left - delta)
+		rig.update(delta, velocity_local, crouching, on_floor, planting, aim_pitch)
 		return
 	if dead:
 		# o'lim: orqaga yiqiladi (0.45 s)

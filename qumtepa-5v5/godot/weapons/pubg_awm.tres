@@ -1,0 +1,47 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapon_data.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+weapon_id = "pubg_awm"
+weapon_name = "AWM"
+kind = 4
+slot = 1
+category_name = "Snayper"
+buy_category = ""
+side = "both"
+origin = "pubg"
+price = 0
+kill_reward = 0
+move_speed = 0.85
+base_damage = 105.0
+headshot_multiplier = 2.5
+arm_multiplier = 1.0
+legshot_multiplier = 0.75
+stomach_multiplier = 1.25
+armor_pen = 1.0
+range_modifier = 0.995
+max_range = 250.0
+fire_rate = 32.0
+fire_modes = Array[int]([0])
+magazine_size = 5
+reserve_ammo = 20
+reload_time = 4.2
+empty_reload_time = 4.6
+recoil_pattern_v = PackedFloat32Array(5.5)
+recoil_pattern_h = PackedFloat32Array(0)
+recoil_reset_time = 0.3
+base_spread = 0.06
+spread_bloom_per_shot = 0.0270
+max_spread = 0.3600
+spread_walk_mult = 2.5
+spread_slow_mult = 1.30
+spread_crouch_mult = 0.7
+spread_air_mult = 6.2
+equip_time = 0.9
+scope = true
+ads_fov_ratio = 0.4
+ads_spread_multiplier = 0.05
+ads_sensitivity_multiplier = 0.45
+bolt_cycle_time = 1.85

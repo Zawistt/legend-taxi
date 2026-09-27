@@ -508,6 +508,17 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("1_menu")
 ''')
+open(f"{OUT}/inventory.tscn", "w").write('''[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/inventory.gd" id="1_inv"]
+
+[node name="Inventory" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_inv")
+''')
 # ------------------------------------------------------------------ tests/test_data.gd — testlar uchun xarita ma'lumotlari
 def gd_route(wps):
     return "[" + ", ".join(V3(p) for p in wps) + "]"
