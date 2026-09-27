@@ -6,15 +6,14 @@
 <title>Samarqand 2D xaritasi</title>
 <!--
   Samarqand shahrining 2D modeli.
-  Fon tayllari o'rniga shahar OpenStreetMap ma'lumotlaridan (Overpass API)
-  vektor ko'rinishda chiziladi: yo'llar, binolar, suv, bog'lar, temir yo'l.
-  Avval shaharning haqiqiy ma'muriy chegarasi olinadi, keyin katta yo'llar,
-  suv va bog'lar butun shahar uchun bir so'rovda, so'ng chegara ichidagi
-  BARCHA uylar va ko'chalar (piyoda yo'laklari, so'qmoq, zinapoyagacha)
-  kataklarga bo'linib fonda yuklanadi — avval ekrandagi joy, keyin qolgani.
+  Ma'lumot oldindan tayyorlangan (tools/samarqand_tayyorla.py) va samarqand/
+  papkasida turadi: shahar chegarasi, 87 mingdan ortiq uy (OpenStreetMap +
+  Microsoft sun'iy yo'ldosh ma'lumoti), barcha ko'chalar, suv va yerlar.
+  Hammasi o'zimizning kanvas qatlamimizda (L.GridLayer) chiziladi.
 -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="samarqand/malumot.js"></script>
 <style>
   :root{
     --fon:#0E1621; --panel:#17212B; --panel2:#1F2C38;
@@ -27,7 +26,7 @@
     font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif}
 
   #xarita{position:absolute;inset:0;background:var(--fon)}
-  .leaflet-container{background:var(--fon)}
+  .leaflet-container{background:#0A1018}
   .leaflet-control-attribution{
     background:rgba(14,22,33,.75)!important;color:var(--xira)!important;font-size:9px!important}
   .leaflet-control-attribution a{color:var(--xira)!important}
@@ -43,12 +42,13 @@
     border-radius:50%;background:var(--sariq);animation:puls 1s infinite}
   @keyframes puls{50%{opacity:.25}}
 
-  #tugmalar{position:absolute;right:10px;bottom:calc(150px + env(safe-area-inset-bottom));
+  #tugmalar{position:absolute;right:10px;bottom:calc(170px + env(safe-area-inset-bottom));
     z-index:500;display:flex;flex-direction:column;gap:8px}
   .yumaloq{width:44px;height:44px;border-radius:12px;border:1px solid var(--chegara);
     background:rgba(23,33,43,.95);color:var(--matn);font-size:18px;cursor:pointer;
-    display:flex;align-items:center;justify-content:center}
+    display:flex;align-items:center;justify-content:center;text-decoration:none}
   .yumaloq.faol{background:var(--sariq);color:#111;border-color:var(--sariq)}
+  .yumaloq.matnli{font-size:12px;font-weight:700}
 
   #pastki{position:absolute;left:0;right:0;bottom:0;z-index:500;
     padding:10px 0 calc(10px + env(safe-area-inset-bottom));
@@ -58,8 +58,9 @@
   .joy{flex:0 0 auto;background:var(--panel2);border:1px solid var(--chegara);color:var(--matn);
     border-radius:20px;padding:8px 14px;font-size:13px;cursor:pointer;white-space:nowrap}
   .joy:active{background:var(--sariq);color:#111}
-  #izoh{display:flex;flex-wrap:wrap;gap:10px;padding:8px 12px 0;font-size:11px;color:var(--xira)}
-  #izoh i{display:inline-block;width:12px;height:8px;border-radius:2px;margin-right:4px;vertical-align:middle}
+  .izoh{display:flex;flex-wrap:wrap;gap:4px 10px;padding:8px 12px 0;font-size:11px;color:var(--xira)}
+  .izoh i{display:inline-block;width:12px;height:8px;border-radius:2px;margin-right:4px;vertical-align:middle}
+  .izoh[hidden]{display:none}
 
   .belgi-yorliq{background:transparent;border:0}
   .belgi-yorliq div{transform:translate(-50%,-50%);display:flex;align-items:center;gap:5px;
@@ -68,8 +69,9 @@
   .belgi-yorliq span{width:10px;height:10px;border-radius:50%;background:var(--sariq);
     box-shadow:0 0 0 3px rgba(242,183,5,.3);flex:0 0 auto}
   .leaflet-popup-content-wrapper,.leaflet-popup-tip{background:var(--panel);color:var(--matn)}
-  .leaflet-popup-content{margin:10px 12px;font-size:13px}
+  .leaflet-popup-content{margin:10px 12px;font-size:13px;line-height:1.45}
   .leaflet-popup-content b{color:var(--sariq)}
+  .leaflet-popup-content .xira{color:var(--xira);font-size:11px}
 </style>
 </head>
 <body>
@@ -77,47 +79,41 @@
 
 <div id="sarlavha">
   <div class="quti" id="nom">Samarqand <small>2D shahar modeli</small></div>
-  <div class="quti" id="holat">Tayyorlanmoqda…</div>
+  <div class="quti yuklanmoqda" id="holat">Ma'lumot yuklanmoqda…</div>
 </div>
 
 <div id="tugmalar">
-  <button class="yumaloq" id="t-fon" title="Fon xarita (tayllar)">🗺</button>
+  <a class="yumaloq matnli" id="t-3d" href="samarqand3d.html" title="3D rejim">3D</a>
+  <button class="yumaloq" id="t-aniqlik" title="Aniqlik rejimi: uy balandligi qayerdan olingan">📐</button>
   <button class="yumaloq" id="t-men" title="Mening joylashuvim">◎</button>
   <button class="yumaloq" id="t-shahar" title="Butun shahar">⌂</button>
 </div>
 
 <div id="pastki">
   <div id="joylar"></div>
-  <div id="izoh">
+  <div class="izoh" id="izoh-oddiy">
     <span><i style="background:#F2B705"></i>Tarixiy obida</span>
-    <span><i style="background:#3A4A5C"></i>Bino</span>
+    <span><i style="background:#3E4E60"></i>Uy</span>
     <span><i style="background:#C9D3DD;height:3px"></i>Katta yo'l</span>
+    <span><i style="background:#9C8660;height:2px"></i>Piyoda yo'lak</span>
     <span><i style="background:#1F6FB2"></i>Suv</span>
     <span><i style="background:#1E4D2B"></i>Bog'</span>
-    <span><i style="background:#9C8660;height:2px"></i>Piyoda yo'lak</span>
-    <span><i style="background:transparent;border:1.5px dashed #F2B705;height:9px"></i>Shahar chegarasi</span>
+    <span><i style="border:1.5px dashed #F2B705;height:9px"></i>Shahar chegarasi</span>
+  </div>
+  <div class="izoh" id="izoh-aniqlik" hidden>
+    <span><i style="background:#2FA84F"></i>Balandlik o'lchangan</span>
+    <span><i style="background:#F2B705"></i>Qavatlar soni ma'lum</span>
+    <span><i style="background:#56606B"></i>Balandlik taxminiy</span>
+    <span><i style="border:1.5px solid #C07BFF;height:9px"></i>Sun'iy yo'ldoshdan (Microsoft)</span>
   </div>
 </div>
 
 <script>
 (function(){
 'use strict';
+const SM = window.SamarqandMalumot;
 
-// ---------------- Sozlamalar ----------------
-// Haqiqiy shahar chegarasi OSM'dan olinadi; bu to'rtburchak faqat zaxira.
-const ZAXIRA_CHEGARA = [[39.600, 66.870], [39.720, 67.060]];
 const MARKAZ = [39.6547, 66.9757];                 // Registon
-const UY_ZOOM = 14;                                 // uylar va mayda ko'chalar shu zoomdan ko'rinadi
-const KATAK = 0.012;                                // yuklash katagi, gradus (~1.3 km)
-const ISHCHI = 2;                                   // bir vaqtda nechta so'rov
-
-const OVERPASS = [
-  'https://overpass-api.de/api/interpreter',
-  'https://overpass.kumi.systems/api/interpreter',
-  'https://maps.mail.ru/osm/tools/overpass/api/interpreter'
-];
-
-// Diqqatga sazovor joylar (koordinatalar OSM/Vikipediya bo'yicha)
 const JOYLAR = [
   { nom:"Registon",               k:[39.6547, 66.9757], z:17, t:"XV–XVII asr. Ulug'bek, Sherdor va Tillakori madrasalari." },
   { nom:"Go'ri Amir",             k:[39.6484, 66.9691], z:18, t:"Amir Temur maqbarasi, XV asr boshlari." },
@@ -130,438 +126,269 @@ const JOYLAR = [
   { nom:"Aeroport",               k:[39.7005, 66.9837], z:15, t:"Samarqand xalqaro aeroporti." }
 ];
 
+// ---------------- Uslublar ----------------
+// kenglik metrda (real kenglikka yaqin), min — piksel
+const YOL = {
+  motorway:{c:'#F2B705',m:16,min:2.5}, trunk:{c:'#F2B705',m:14,min:2.2},
+  primary:{c:'#E8C766',m:12,min:2},    secondary:{c:'#C9D3DD',m:10,min:1.6},
+  tertiary:{c:'#A7B3BF',m:8,min:1.2},  unclassified:{c:'#7A8A9A',m:6,min:0.8},
+  residential:{c:'#6B7B8B',m:6,min:0.7}, living_street:{c:'#5F6E7C',m:5,min:0.6},
+  service:{c:'#4E5B68',m:4,min:0.4},   unknown:{c:'#4E5B68',m:4,min:0.4},
+  pedestrian:{c:'#8A6F3A',m:6,min:0.8},
+  footway:{c:'#9C8660',m:2,min:0.5,d:[3,3],z:14}, path:{c:'#9C8660',m:1.5,min:0.5,d:[3,3],z:14},
+  steps:{c:'#C47A3E',m:2,min:0.8,d:[1,2],z:15},    cycleway:{c:'#3E8FC4',m:2,min:0.5,d:[4,3],z:14},
+  track:{c:'#6E5A3A',m:3,min:0.5,d:[5,4],z:14},    bridleway:{c:'#6E5A3A',m:2,min:0.5,d:[3,3],z:14},
+  rail:{c:'#8C8C8C',m:3,min:1.4,temir:1}, tram:{c:'#8C6C8C',m:2,min:1,temir:1}
+};
+const YOL_TARTIB = ['track','bridleway','path','footway','steps','cycleway','service','unknown','living_street',
+  'pedestrian','residential','unclassified','tertiary','secondary','primary','trunk','motorway','tram','rail'];
+const KATTA = new Set(['motorway','trunk','primary','secondary','tertiary']);
+
+const YER_RANG = {
+  park:'#1E4D2B', grass:'#1C4428', garden:'#1E4D2B', cemetery:'#2B3A30', farmland:'#1D3524',
+  orchard:'#1F3F26', pitch:'#23553A', stadium:'#23483A', playground:'#23483A', forest:'#173F24',
+  school:'#1A2530', kindergarten:'#1A2530', college:'#1A2530', university:'#1A2530',
+  hospital:'#2A1E24', industrial:'#1C1E26', military:'#1E211C'
+};
+
+function binoRangi(b, aniqlikRejimi){
+  if (aniqlikRejimi){
+    const a = b.h ? 2 : b.f ? 1 : 0;
+    return a === 2 ? ['#2FA84F','#1F7A38'] : a === 1 ? ['#F2B705','#B8870A'] : ['#56606B','#3C444C'];
+  }
+  if (b.t) return ['#F2B705','#B8870A'];
+  const s = b.s;
+  if (s === 'apartments' || s === 'dormitory')                        return ['#40536A','#2E3C4B'];
+  if (['commercial','retail','office','industrial','warehouse','supermarket','service','hotel'].includes(s))
+                                                                      return ['#4F4A62','#34404D'];
+  if (['school','university','college','kindergarten','hospital','public','civic','education','medical','library'].includes(s))
+                                                                      return ['#3C6070','#2E4450'];
+  if (['garage','shed','roof','carport','barn','greenhouse','outbuilding','parking'].includes(s))
+                                                                      return ['#2F3A46','#252F39'];
+  return ['#3E4E60','#2A3642'];
+}
+
+const SINF_NOM = {
+  house:'Turar joy uyi', residential:'Turar joy', apartments:"Ko'p qavatli uy", detached:'Hovli uy',
+  semidetached_house:'Juft uy', terrace:'Qator uylar', dormitory:'Yotoqxona',
+  school:'Maktab', college:'Kollej', university:'Universitet', kindergarten:"Bog'cha", education:"Ta'lim",
+  hospital:'Shifoxona', medical:'Tibbiyot', mosque:'Masjid', church:'Cherkov', cathedral:'Sobor',
+  synagogue:'Sinagoga', religious:'Diniy bino', commercial:'Tijorat', retail:"Do'kon", supermarket:'Supermarket',
+  office:'Idora', hotel:'Mehmonxona', industrial:'Sanoat', warehouse:'Ombor', garage:'Garaj', roof:'Ayvon/tom',
+  civic:'Jamoat binosi', public:'Jamoat binosi', library:'Kutubxona', train_station:'Vokzal',
+  post_office:'Pochta', fire_station:"O't o'chirish", stadium:'Stadion', greenhouse:'Issiqxona'
+};
+
 // ---------------- Xarita ----------------
 const xrt = L.map('xarita', {
-  zoomControl:false, preferCanvas:true,
-  minZoom:11, maxZoom:20,
-  maxBounds:L.latLngBounds(ZAXIRA_CHEGARA).pad(0.5),
-  attributionControl:true
-}).setView(MARKAZ, 14);
+  zoomControl:false, minZoom:11, maxZoom:20, attributionControl:true
+}).setView(MARKAZ, 15);
 xrt.attributionControl.setPrefix(false);
-xrt.attributionControl.addAttribution('© <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>');
 
-const chizgich = L.canvas({ padding:0.5, tolerance:4 });
+const holatEl = document.getElementById('holat');
+function holat(m, yuk){ holatEl.textContent = m; holatEl.classList.toggle('yuklanmoqda', !!yuk); }
 
-// Pane'lar: pastdan yuqoriga — yer, suv, mayda yo'l, bino, katta yo'l, niqob, chegara
-[['yer',350],['suv',360],['yol',370],['bino',380],['yolUst',390],['niqob',395],['chegara',396]]
-  .forEach(([n,z]) => { xrt.createPane(n).style.zIndex = z; });
+// ---------------- Web Mercator ----------------
+const R2D = Math.PI / 180;
+function mx(lon, s){ return (lon + 180) / 360 * s; }
+function my(lat, s){ const r = lat * R2D; return (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * s; }
 
-const fonTayl = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  subdomains:'abcd', maxZoom:20, attribution:'© CARTO', opacity:0.55
+// ---------------- Kanvas qatlami ----------------
+let D = null;                       // yuklangan ma'lumot
+let kUy, kYol, kYer, kSuv;          // fazoviy indekslar
+let aniqlik = false;
+
+const ShaharQatlam = L.GridLayer.extend({
+  createTile(c){
+    const t = document.createElement('canvas');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const o = this.getTileSize();
+    t.width = o.x * dpr; t.height = o.y * dpr;
+    if (D) chiz(t.getContext('2d'), c, o.x, dpr);
+    return t;
+  }
 });
 
-const qatlam = {
-  yer:     L.layerGroup().addTo(xrt),
-  suv:     L.layerGroup().addTo(xrt),
-  yol:     L.layerGroup().addTo(xrt),
-  temir:   L.layerGroup().addTo(xrt),
-  bino:    L.layerGroup(),          // UY_ZOOM dan
-  mayda:   L.layerGroup(),          // UY_ZOOM dan
-  chegara: L.layerGroup().addTo(xrt),
-  belgi:   L.layerGroup().addTo(xrt)
-};
+function chiz(ctx, c, T, dpr){
+  const z = c.z, S = T * Math.pow(2, z);
+  const ox = c.x * T, oy = c.y * T;
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const X = lon => mx(lon, S) - ox, Y = lat => my(lat, S) - oy;
 
-// ---------------- Uslublar ----------------
-// w: [zoom<14, 14–15, 16–17, 18+]
-const YOL_USLUB = {
-  motorway:{c:'#F2B705',w:[3,5,8,12]},   trunk:{c:'#F2B705',w:[2.5,4.5,7,11]},
-  primary:{c:'#E8C766',w:[2,4,7,11]},    secondary:{c:'#C9D3DD',w:[1.5,3,6,10]},
-  tertiary:{c:'#A7B3BF',w:[1,2.5,5,8]},
-  residential:{c:'#6B7B8B',w:[0.4,1.5,3.5,6]}, unclassified:{c:'#6B7B8B',w:[0.4,1.5,3.5,6]},
-  living_street:{c:'#5F6E7C',w:[0.3,1.2,3,5]}, service:{c:'#4E5B68',w:[0.2,0.8,2.2,4]},
-  road:{c:'#5F6E7C',w:[0.3,1,2.5,4]},
-  pedestrian:{c:'#8A6F3A',w:[0.4,1.5,3.5,6]},
-  track:{c:'#6E5A3A',w:[0.2,0.8,1.8,3],d:'5 4'},
-  footway:{c:'#9C8660',w:[0.2,0.6,1.2,2],d:'3 3'},
-  path:{c:'#9C8660',w:[0.2,0.6,1.2,2],d:'3 3'},
-  cycleway:{c:'#3E8FC4',w:[0.2,0.6,1.4,2.2],d:'4 3'},
-  steps:{c:'#C47A3E',w:[0.2,0.8,2,3],d:'1 2'},
-  bridleway:{c:'#6E5A3A',w:[0.2,0.6,1.2,2],d:'3 3'}
-};
-function yolUslubi(tur){
-  return YOL_USLUB[tur.replace('_link','')] || YOL_USLUB.service;
-}
-function zoomIndeks(z){ return z < 14 ? 0 : z < 16 ? 1 : z < 18 ? 2 : 3; }
+  // tayl qutisi (lon/lat) + zaxira (qalin chiziq va yozuvlar uchun)
+  const zax = 40 / S * 360;
+  const lonA = ox / S * 360 - 180 - zax, lonB = (ox + T) / S * 360 - 180 + zax;
+  const latB = Math.atan(Math.sinh(Math.PI * (1 - 2 * oy / S))) / R2D + zax;
+  const latA = Math.atan(Math.sinh(Math.PI * (1 - 2 * (oy + T) / S))) / R2D - zax;
+  const mpp = 156543.034 * Math.cos(39.66 * R2D) / Math.pow(2, z);   // metr / piksel
 
-function tarixiymi(tg){
-  return !!(tg.historic || tg.amenity === 'place_of_worship' ||
-    ['mosque','mausoleum','madrasa','church','temple','cathedral','shrine'].includes(tg.building) ||
-    tg.tourism === 'attraction' || tg.heritage);
-}
-function binoUslubi(tg){
-  const b = tg.building;
-  if (tarixiymi(tg))                    return {color:'#B8870A', fillColor:'#F2B705', fillOpacity:0.85};
-  if (b === 'apartments')               return {color:'#2E3C4B', fillColor:'#40536A', fillOpacity:0.9};
-  if (['house','detached','semidetached_house','terrace','residential'].includes(b))
-                                         return {color:'#2A3642', fillColor:'#3E4E60', fillOpacity:0.85};
-  if (['commercial','retail','office','industrial','warehouse','supermarket','kiosk'].includes(b))
-                                         return {color:'#34404D', fillColor:'#4F4A62', fillOpacity:0.9};
-  if (['school','university','college','kindergarten','hospital','public','government','civic'].includes(b))
-                                         return {color:'#2E4450', fillColor:'#3C6070', fillOpacity:0.9};
-  if (['garage','garages','shed','roof','hut'].includes(b))
-                                         return {color:'#252F39', fillColor:'#2F3A46', fillOpacity:0.85};
-  return {color:'#2A3642', fillColor:'#3A4A5C', fillOpacity:0.85};
-}
+  function yol(k){
+    ctx.moveTo(X(k[0]), Y(k[1]));
+    for (let i = 2; i < k.length; i += 2) ctx.lineTo(X(k[i]), Y(k[i+1]));
+  }
+  function halqa(h){ yol(h); ctx.closePath(); }
 
-// ---------------- Geometriya ----------------
-function nuqtalar(el){ return (el.geometry || []).map(p => [p.lat, p.lon]); }
-const teng = (a,b) => a[0] === b[0] && a[1] === b[1];
-function yopiqmi(k){ return k.length > 3 && teng(k[0], k[k.length-1]); }
+  // 1. Yer
+  for (const e of kYer.izla(lonA, latA, lonB, latB)){
+    const r = YER_RANG[e.s] || YER_RANG[e.tur];
+    if (!r) continue;
+    ctx.beginPath(); e.r.forEach(halqa);
+    ctx.fillStyle = r; ctx.fill('evenodd');
+  }
+  // 2. Suv
+  ctx.fillStyle = '#17466F';
+  for (const s of kSuv.izla(lonA, latA, lonB, latB)){
+    if (s.r){ ctx.beginPath(); s.r.forEach(halqa); ctx.fill('evenodd'); }
+    else {
+      const w = {river:14, canal:6, stream:3, drain:2, ditch:1.5}[s.s] || 2;
+      ctx.beginPath(); yol(s.k);
+      ctx.strokeStyle = '#1F6FB2'; ctx.lineWidth = Math.max(w / mpp, 0.8);
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.stroke();
+    }
+  }
+  // 3. Yo'llar — sinf bo'yicha tartibda (kattasi ustida)
+  const yollar = kYol.izla(lonA, latA, lonB, latB);
+  const guruh = new Map();
+  for (const y of yollar){
+    const u = YOL[y.s] || YOL.unknown;
+    if (u.z && z < u.z) continue;
+    if (!KATTA.has(y.s) && !u.temir && z < 13 && y.s !== 'unclassified') continue;
+    let g = guruh.get(y.s); if (!g) guruh.set(y.s, g = []);
+    g.push(y);
+  }
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  // katta yo'llar uchun qora hoshiya
+  if (z >= 15){
+    for (const s of YOL_TARTIB){
+      const g = guruh.get(s); if (!g || !KATTA.has(s)) continue;
+      const u = YOL[s];
+      ctx.beginPath(); g.forEach(y => yol(y.k));
+      ctx.strokeStyle = '#05080C'; ctx.lineWidth = Math.max(u.m / mpp, u.min) + 2; ctx.setLineDash([]); ctx.stroke();
+    }
+  }
+  for (const s of YOL_TARTIB){
+    const g = guruh.get(s); if (!g) continue;
+    const u = YOL[s];
+    const w = Math.max(u.m / mpp, u.min);
+    ctx.beginPath(); g.forEach(y => yol(y.k));
+    ctx.strokeStyle = u.c; ctx.lineWidth = w;
+    ctx.setLineDash(u.d && !u.temir ? u.d.map(v => v * Math.max(1, w / 2)) : []);
+    ctx.lineCap = u.d ? 'butt' : 'round';
+    ctx.stroke();
+    if (u.temir){                                   // temir yo'l: kul rang ustida punktir
+      ctx.strokeStyle = '#0E1621'; ctx.lineWidth = w * 0.45; ctx.setLineDash([6, 6]); ctx.stroke();
+    }
+  }
+  ctx.setLineDash([]);
 
-// Relation a'zolarini halqalarga ulash (role: 'outer' yoki 'inner')
-function halqalar(el, rol){
-  const bolaklar = (el.members || [])
-    .filter(m => m.type === 'way' && m.geometry && (rol === 'inner' ? m.role === 'inner' : m.role !== 'inner'))
-    .map(m => m.geometry.map(p => [p.lat, p.lon]));
-  const natija = [];
-  while (bolaklar.length){
-    let h = bolaklar.shift();
-    let ozgardi = true;
-    while (!yopiqmi(h) && ozgardi){
-      ozgardi = false;
-      for (let i = 0; i < bolaklar.length; i++){
-        const b = bolaklar[i], bosh = h[0], oxir = h[h.length-1];
-        if      (teng(oxir, b[0]))            h = h.concat(b.slice(1));
-        else if (teng(oxir, b[b.length-1]))   h = h.concat(b.slice(0,-1).reverse());
-        else if (teng(bosh, b[b.length-1]))   h = b.slice(0,-1).concat(h);
-        else if (teng(bosh, b[0]))            h = b.slice(1).reverse().concat(h);
-        else continue;
-        bolaklar.splice(i,1); ozgardi = true; break;
+  // 4. Uylar
+  if (z >= 13){
+    const uylar = kUy.izla(lonA, latA, lonB, latB);
+    const chiziqQalin = z >= 17 ? 0.8 : 0.5;
+    // rang bo'yicha guruhlab chizish — tezroq
+    const rg = new Map();
+    for (const b of uylar){
+      const [f, s] = binoRangi(b, aniqlik);
+      const k = f + s + (aniqlik && b.m === 1 ? 'm' : '');
+      let g = rg.get(k); if (!g) rg.set(k, g = {f, s, ms: aniqlik && b.m === 1, r:[]});
+      g.r.push(b);
+    }
+    for (const g of rg.values()){
+      ctx.beginPath(); g.r.forEach(b => b.r.forEach(halqa));
+      ctx.fillStyle = g.f; ctx.fill('evenodd');
+      if (z >= 15 || g.ms){
+        ctx.strokeStyle = g.ms ? '#C07BFF' : g.s; ctx.lineWidth = g.ms ? Math.max(chiziqQalin, 1) : chiziqQalin;
+        ctx.stroke();
       }
     }
-    natija.push(h);
   }
-  return natija;
-}
-function shakl(el){
-  if (el.type !== 'relation') return [nuqtalar(el)];
-  const ichki = halqalar(el, 'inner');
-  // teshikli ko'pburchak: [tashqi, ...ichki]
-  return halqalar(el, 'outer').map(t => ichki.length ? [t, ...ichki] : t);
-}
-function ichidami(n, halqa){           // nuqta ko'pburchak ichidami (ray casting)
-  let ich = false;
-  for (let i = 0, j = halqa.length - 1; i < halqa.length; j = i++){
-    const [yi,xi] = halqa[i], [yj,xj] = halqa[j];
-    if ((yi > n[0]) !== (yj > n[0]) && n[1] < (xj - xi) * (n[0] - yi) / (yj - yi) + xi) ich = !ich;
+
+  // 5. Ko'cha nomlari
+  if (z >= 16){
+    ctx.font = (z >= 18 ? '600 12px ' : '600 11px ') + '-apple-system,Segoe UI,Roboto,sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(5,8,12,.9)'; ctx.fillStyle = '#DDE5EC';
+    for (const y of yollar){
+      if (!y.nom || YOL[y.s]?.temir) continue;
+      const k = y.k;
+      // eng uzun bo'lak o'rtasiga yozamiz
+      let eng = -1, ei = 0;
+      for (let i = 2; i < k.length; i += 2){
+        const d = Math.hypot(X(k[i]) - X(k[i-2]), Y(k[i+1]) - Y(k[i-1]));
+        if (d > eng){ eng = d; ei = i; }
+      }
+      const en = ctx.measureText(y.nom).width;
+      if (eng < en + 16) continue;
+      const x1 = X(k[ei-2]), y1 = Y(k[ei-1]), x2 = X(k[ei]), y2 = Y(k[ei+1]);
+      let bur = Math.atan2(y2 - y1, x2 - x1);
+      if (bur > Math.PI/2) bur -= Math.PI; else if (bur < -Math.PI/2) bur += Math.PI;
+      ctx.save();
+      ctx.translate((x1 + x2) / 2, (y1 + y2) / 2); ctx.rotate(bur);
+      ctx.strokeText(y.nom, 0, 0); ctx.fillText(y.nom, 0, 0);
+      ctx.restore();
+    }
   }
-  return ich;
-}
-function chegaradami(n){
-  if (!chegaraHalqa) return CHEGARA.contains(n);
-  return chegaraHalqa.some(h => ichidami(n, h));
+
+  // 6. Chegaradan tashqarini qoraytirish va chegara chizig'i
+  ctx.beginPath();
+  ctx.rect(-2, -2, T + 4, T + 4);
+  D.chegara.forEach(p => p.forEach(halqa));
+  ctx.fillStyle = 'rgba(5,8,12,.6)'; ctx.fill('evenodd');
+  ctx.beginPath(); D.chegara.forEach(p => halqa(p[0]));
+  ctx.strokeStyle = 'rgba(242,183,5,.18)'; ctx.lineWidth = 7; ctx.stroke();
+  ctx.strokeStyle = '#F2B705'; ctx.lineWidth = 1.6; ctx.setLineDash([8, 5]); ctx.stroke();
+  ctx.setLineDash([]);
 }
 
-// ---------------- Overpass ----------------
-async function overpass(sorov, boshlash){
-  let oxirgiXato;
-  for (let i = 0; i < OVERPASS.length; i++){
-    const url = OVERPASS[((boshlash || 0) + i) % OVERPASS.length];
-    try{
-      const j = await fetch(url, {
-        method:'POST',
-        body:'data=' + encodeURIComponent(sorov),
-        headers:{'Content-Type':'application/x-www-form-urlencoded'}
-      });
-      if (!j.ok) throw new Error('HTTP ' + j.status);
-      return (await j.json()).elements || [];
-    }catch(e){ oxirgiXato = e; }
-  }
-  throw oxirgiXato;
-}
-const bboxMatn = (j,g,s,sh) => `(${j},${g},${s},${sh})`;
+const qatlam = new ShaharQatlam({ tileSize:256, updateWhenZooming:false, keepBuffer:3, maxZoom:20 });
+
+// ---------------- Bosilganda ma'lumot ----------------
 function xavfsiz(s){
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-
-// ---------------- Holat ----------------
-const holatEl = document.getElementById('holat');
-let asosiyTayyor = false;
-function holat(matn, yuklanmoqda){
-  holatEl.textContent = matn;
-  holatEl.classList.toggle('yuklanmoqda', !!yuklanmoqda);
+function maydon(b){                                        // m², tashqi halqa
+  const h = b.r[0], k = Math.cos(39.66 * R2D) * 111320, q = 110540;
+  let s = 0;
+  for (let i = 0, j = h.length - 2; i < h.length; j = i, i += 2)
+    s += (h[j] * k) * (h[i+1] * q) - (h[i] * k) * (h[j+1] * q);
+  return Math.abs(s / 2);
 }
-function holatniYangila(){
-  const jami = barchaKatak.length, tayyor = yuklangan.size;
-  if (!asosiyTayyor)            holat('Shahar yuklanmoqda…', true);
-  else if (jami && tayyor < jami)
-    holat(`Uylar: ${Math.round(tayyor / jami * 100)}% (${tayyor}/${jami})`, true);
-  else if (xrt.getZoom() < UY_ZOOM) holat('Yaqinlashtiring → uylar');
-  else                          holat('Butun shahar yuklandi');
-}
-
-// ---------------- 1. Shahar chegarasi ----------------
-let CHEGARA = L.latLngBounds(ZAXIRA_CHEGARA);
-let chegaraHalqa = null;
-
-async function chegaraYukla(){
-  const [[j,g],[s,sh]] = ZAXIRA_CHEGARA;
-  const sorov = `[out:json][timeout:60];
-relation["boundary"="administrative"]["admin_level"~"^(5|6|7|8)$"]${bboxMatn(j-0.08,g-0.1,s+0.08,sh+0.1)};
-out geom;`;
-  try{
-    const els = await overpass(sorov);
-    const nomlar = tg => [tg.name, tg['name:uz'], tg['name:ru'], tg['name:en']].filter(Boolean).join(' ');
-    const mos = els
-      .filter(el => /samar|самар/i.test(nomlar(el.tags || {})) &&
-                    !/viloyat|вилоят|област|region|tuman|район|district/i.test(nomlar(el.tags || {})))
-      .map(el => ({el, h:halqalar(el, 'outer').filter(yopiqmi)}))
-      .filter(x => x.h.length && x.h.some(h => ichidami(MARKAZ, h)));
-    if (!mos.length) throw new Error('chegara topilmadi');
-    // bir nechta bo'lsa — eng kattasi (shahar), tuman ichidagi mahalla emas
-    mos.sort((a,b) => L.latLngBounds(b.h.flat()).getNorthEast().distanceTo(L.latLngBounds(b.h.flat()).getSouthWest())
-                    - L.latLngBounds(a.h.flat()).getNorthEast().distanceTo(L.latLngBounds(a.h.flat()).getSouthWest()));
-    chegaraHalqa = mos[0].h;
-    CHEGARA = L.latLngBounds(chegaraHalqa.flat());
-  }catch(e){
-    console.warn('Shahar chegarasi olinmadi, to\'rtburchak ishlatiladi', e);
-    chegaraHalqa = null;
+function nuqtaChiziqdan(px, py, k, kx){
+  let eng = Infinity;
+  for (let i = 2; i < k.length; i += 2){
+    const ax = k[i-2]*kx, ay = k[i-1], bx = k[i]*kx, by = k[i+1];
+    const dx = bx - ax, dy = by - ay;
+    const t = Math.max(0, Math.min(1, ((px - ax)*dx + (py - ay)*dy) / (dx*dx + dy*dy || 1)));
+    eng = Math.min(eng, Math.hypot(px - ax - t*dx, py - ay - t*dy));
   }
-  const halqa = chegaraHalqa || [[
-    CHEGARA.getSouthWest(), CHEGARA.getNorthWest(), CHEGARA.getNorthEast(), CHEGARA.getSouthEast()
-  ].map(p => [p.lat, p.lng])];
-
-  // chegaradan tashqarini qoraytiruvchi niqob
-  const t = CHEGARA.pad(3);
-  const dunyo = [[t.getSouth(),t.getWest()],[t.getNorth(),t.getWest()],[t.getNorth(),t.getEast()],[t.getSouth(),t.getEast()]];
-  L.polygon([dunyo, ...halqa], {renderer:chizgich, pane:'niqob', stroke:false,
-    fillColor:'#070C12', fillOpacity:0.55, interactive:false}).addTo(qatlam.chegara);
-  halqa.forEach(h => {
-    L.polygon(h, {renderer:chizgich, pane:'chegara', color:'#F2B705', weight:6, opacity:0.15, fill:false, interactive:false}).addTo(qatlam.chegara);
-    L.polygon(h, {renderer:chizgich, pane:'chegara', color:'#F2B705', weight:1.6, opacity:0.9, dashArray:'8 5', fill:false, interactive:false}).addTo(qatlam.chegara);
-  });
-  xrt.setMaxBounds(CHEGARA.pad(0.4));
-}
-
-// ---------------- 2. Asosiy qatlam (butun shahar) ----------------
-function yolChiz(el, guruh){
-  const tur = el.tags.highway;
-  const us = yolUslubi(tur);
-  const katta = guruh === qatlam.yol;
-  const chiziq = L.polyline(nuqtalar(el), {
-    renderer:chizgich, pane: katta ? 'yolUst' : 'yol',
-    color:us.c, weight:us.w[zoomIndeks(xrt.getZoom())], opacity:0.95,
-    dashArray:us.d, lineCap: us.d ? 'butt' : 'round', lineJoin:'round',
-    interactive: katta && !!el.tags.name
-  });
-  chiziq._yolTuri = tur;
-  if (katta && el.tags.name) chiziq.bindPopup('<b>' + xavfsiz(el.tags['name:uz'] || el.tags.name) + '</b>');
-  chiziq.addTo(guruh);
-  if (!katta && el.tags.name) indeksgaQosh({tur:'yol', k:chiziq.getLatLngs(), tg:el.tags});
-}
-
-async function asosiyYukla(){
-  const b = bboxMatn(CHEGARA.getSouth(), CHEGARA.getWest(), CHEGARA.getNorth(), CHEGARA.getEast());
-  const sorov = `[out:json][timeout:120];
-(
-  way["highway"~"^(motorway|trunk|primary|secondary|tertiary)(_link)?$"]${b};
-  way["waterway"~"^(river|canal|stream|ditch|drain)$"]${b};
-  way["natural"="water"]${b};
-  relation["natural"="water"]${b};
-  way["landuse"~"^(reservoir|basin)$"]${b};
-  way["leisure"~"^(park|garden|stadium|pitch|playground)$"]${b};
-  relation["leisure"="park"]${b};
-  way["landuse"~"^(grass|forest|recreation_ground|cemetery|orchard|vineyard|farmland|allotments)$"]${b};
-  way["natural"~"^(wood|scrub)$"]${b};
-  way["amenity"="grave_yard"]${b};
-  way["railway"~"^(rail|tram)$"]${b};
-);
-out geom qt;`;
-  try{
-    const els = await overpass(sorov);
-    for (const el of els){
-      const tg = el.tags || {};
-      if (tg.highway){ yolChiz(el, qatlam.yol); continue; }
-      if (tg.railway){
-        const k = nuqtalar(el);
-        L.polyline(k, {renderer:chizgich, pane:'yol', color:'#8C8C8C', weight:2.5, interactive:false}).addTo(qatlam.temir);
-        L.polyline(k, {renderer:chizgich, pane:'yol', color:'#0E1621', weight:1.2, dashArray:'6 6', interactive:false}).addTo(qatlam.temir);
-        continue;
-      }
-      if (tg.waterway){
-        const w = {river:5, canal:3, stream:1.5}[tg.waterway] || 1;
-        L.polyline(nuqtalar(el), {renderer:chizgich, pane:'suv', color:'#1F6FB2',
-          weight:w, opacity:0.9, interactive:false}).addTo(qatlam.suv);
-        continue;
-      }
-      const suvmi = tg.natural === 'water' || tg.landuse === 'reservoir' || tg.landuse === 'basin';
-      const qabr = tg.landuse === 'cemetery' || tg.amenity === 'grave_yard';
-      const dala = ['farmland','orchard','vineyard','allotments'].includes(tg.landuse);
-      for (const k of shakl(el)){
-        if ((Array.isArray(k[0][0]) ? k[0] : k).length < 3) continue;
-        L.polygon(k, suvmi
-          ? {renderer:chizgich, pane:'suv', color:'#1F6FB2', weight:1, fillColor:'#17466F', fillOpacity:0.9, interactive:false}
-          : {renderer:chizgich, pane:'yer', stroke:false, interactive:false, fillOpacity:0.75,
-             fillColor: qabr ? '#2B3A30' : dala ? '#1D3524' : '#1E4D2B'}
-        ).addTo(suvmi ? qatlam.suv : qatlam.yer);
-      }
-    }
-  }catch(e){
-    console.warn('Asosiy qatlam yuklanmadi', e);
-    fonYoq(true);
-  }
-  asosiyTayyor = true;
-  holatniYangila();
-}
-
-// ---------------- 3. Uylar va barcha ko'chalar — butun shahar, kataklab ----------------
-// Katak ichidagi binolar bosilganda topish uchun oddiy fazoviy indeks
-const indeks = new Map();                 // kalit -> [{tur, k, tg, ch}]
-function katakKaliti(lat, lng){ return Math.floor(lat/KATAK) + ':' + Math.floor(lng/KATAK); }
-function indeksgaQosh(ob){
-  const tashqi = Array.isArray(ob.k[0][0]) ? ob.k[0] : ob.k;    // teshikli bo'lsa tashqi halqa
-  const c = L.latLngBounds(tashqi).getCenter();
-  const kalit = katakKaliti(c.lat, c.lng);
-  if (!indeks.has(kalit)) indeks.set(kalit, []);
-  indeks.get(kalit).push(ob);
-}
-
-let barchaKatak = [];
-const kutilmoqda = new Set();
-const yuklangan = new Set();
-const urinish = new Map();
-
-function katakChegarasi(kalit){
-  const [y,x] = kalit.split(':').map(Number);
-  return L.latLngBounds([y*KATAK, x*KATAK], [(y+1)*KATAK, (x+1)*KATAK]);
-}
-function katakShahardami(kalit){
-  const b = katakChegarasi(kalit);
-  if (!b.intersects(CHEGARA)) return false;
-  if (!chegaraHalqa) return true;
-  const nuq = [b.getCenter(), b.getNorthWest(), b.getNorthEast(), b.getSouthWest(), b.getSouthEast()];
-  if (nuq.some(p => chegaradami([p.lat, p.lng]))) return true;
-  return chegaraHalqa.some(h => h.some(n => b.contains(n)));   // chegara chizig'i katakdan o'tadi
-}
-function katakRejasi(){
-  const ro = [];
-  for (let y = Math.floor(CHEGARA.getSouth()/KATAK); y <= Math.floor(CHEGARA.getNorth()/KATAK); y++)
-    for (let x = Math.floor(CHEGARA.getWest()/KATAK); x <= Math.floor(CHEGARA.getEast()/KATAK); x++){
-      const k = y + ':' + x;
-      if (katakShahardami(k)) ro.push(k);
-    }
-  barchaKatak = ro;
-  ro.forEach(k => kutilmoqda.add(k));
-}
-function masofa(kalit, m){
-  const c = katakChegarasi(kalit).getCenter();
-  return Math.hypot(c.lat - m.lat, c.lng - m.lng);
-}
-// Avval ekrandagi kataklar, keyin markazga eng yaqini
-function keyingiKatak(){
-  if (!kutilmoqda.size) return null;
-  const m = xrt.getCenter(), ekran = xrt.getBounds();
-  let eng = null, engBall = Infinity;
-  for (const k of kutilmoqda){
-    const ball = masofa(k, m) + (katakChegarasi(k).intersects(ekran) ? 0 : 100);
-    if (ball < engBall){ eng = k; engBall = ball; }
-  }
-  kutilmoqda.delete(eng);
   return eng;
 }
-
-async function katakYukla(kalit, server){
-  const b0 = katakChegarasi(kalit);
-  const b = bboxMatn(b0.getSouth().toFixed(4), b0.getWest().toFixed(4), b0.getNorth().toFixed(4), b0.getEast().toFixed(4));
-  // way markazi shu katakda bo'lganlari chiziladi — qo'shni kataklar bilan takrorlanmasin
-  const sorov = `[out:json][timeout:90];
-(
-  way["building"]${b};
-  relation["building"]${b};
-  way["highway"~"^(residential|unclassified|living_street|service|road|pedestrian|track|footway|path|cycleway|steps|bridleway)$"]${b};
-);
-out geom qt;`;
-  const els = await overpass(sorov, server);
-  for (const el of els){
-    const tg = el.tags || {};
-    const hamma = el.type === 'relation'
-      ? (el.members || []).flatMap(m => m.geometry || [])
-      : (el.geometry || []);
-    if (!hamma.length) continue;
-    const bosh = hamma[0];
-    if (katakKaliti(bosh.lat, bosh.lon) !== kalit) continue;   // boshqa katakka tegishli
-    if (tg.highway){ yolChiz(el, qatlam.mayda); continue; }
-    for (const k of shakl(el)){
-      if ((Array.isArray(k[0][0]) ? k[0] : k).length < 3) continue;
-      L.polygon(k, Object.assign({renderer:chizgich, pane:'bino', weight:0.5, interactive:false}, binoUslubi(tg)))
-        .addTo(qatlam.bino);
-      indeksgaQosh({tur:'bino', k, tg});
-    }
-  }
-}
-
-async function ishchi(raqam){
-  for (;;){
-    const kalit = keyingiKatak();
-    if (!kalit) break;
-    try{
-      await katakYukla(kalit, raqam);
-      yuklangan.add(kalit);
-    }catch(e){
-      const n = (urinish.get(kalit) || 0) + 1;
-      urinish.set(kalit, n);
-      console.warn('Katak yuklanmadi', kalit, n, e);
-      if (n < 4){
-        await new Promise(r => setTimeout(r, 3000 * n));
-        kutilmoqda.add(kalit);
-      }else{
-        yuklangan.add(kalit);           // tashlab ketamiz, foiz 100 ga yetsin
-      }
-    }
-    holatniYangila();
-  }
-  holatniYangila();
-}
-
-function uylarniKorsat(){
-  const yaqin = xrt.getZoom() >= UY_ZOOM;
-  [qatlam.mayda, qatlam.bino].forEach(q => yaqin ? q.addTo(xrt) : xrt.removeLayer(q));
-  holatniYangila();
-}
-function yolQalinligi(){
-  const i = zoomIndeks(xrt.getZoom());
-  [qatlam.yol, qatlam.mayda].forEach(g => g.eachLayer(l => {
-    if (l._yolTuri) l.setStyle({weight: yolUslubi(l._yolTuri).w[i]});
-  }));
-}
-
-// Bosilgan joydagi uy yoki ko'chani topish
-function nuqtaChiziqdan(p, a, b){
-  const dx = b.lng - a.lng, dy = b.lat - a.lat;
-  const t = Math.max(0, Math.min(1, ((p.lng - a.lng)*dx + (p.lat - a.lat)*dy) / (dx*dx + dy*dy || 1)));
-  return Math.hypot(p.lng - (a.lng + t*dx), p.lat - (a.lat + t*dy));
-}
 xrt.on('click', e => {
-  if (xrt.getZoom() < 16) return;
-  const p = e.latlng;
-  const [y,x] = katakKaliti(p.lat, p.lng).split(':').map(Number);
-  let topildi = null, engYol = null, engM = 4 * 360 / (256 * Math.pow(2, xrt.getZoom()));  // ~4px
-  for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++){
-    for (const ob of indeks.get((y+dy) + ':' + (x+dx)) || []){
-      if (ob.tur === 'bino'){
-        const tashqi = Array.isArray(ob.k[0][0]) ? ob.k[0] : ob.k;
-        if (!topildi && ichidami([p.lat, p.lng], tashqi)) topildi = ob;
-      }else{
-        for (let i = 1; i < ob.k.length; i++){
-          const m = nuqtaChiziqdan(p, ob.k[i-1], ob.k[i]);
-          if (m < engM){ engM = m; engYol = ob; }
-        }
-      }
-    }
-  }
+  if (!D || xrt.getZoom() < 15) return;
+  const lon = e.latlng.lng, lat = e.latlng.lat, d = 0.0002;
+  const uy = kUy.izla(lon - d, lat - d, lon + d, lat + d)
+    .find(b => SM.ichidami(lon, lat, b.r[0]) && !b.r.slice(1).some(h => SM.ichidami(lon, lat, h)));
   let html = '';
-  if (topildi){
-    const tg = topildi.tg;
-    const nom = tg['name:uz'] || tg.name;
-    const manzil = [tg['addr:street'], tg['addr:housenumber']].filter(Boolean).join(', ');
-    const qavat = tg['building:levels'];
-    html = '<b>' + xavfsiz(nom || (tarixiymi(tg) ? 'Tarixiy bino' : 'Bino')) + '</b>' +
-      (manzil ? '<br>' + xavfsiz(manzil) : '') +
-      (qavat ? '<br>' + xavfsiz(qavat) + ' qavat' : '');
-  }else if (engYol){
-    html = '<b>' + xavfsiz(engYol.tg['name:uz'] || engYol.tg.name) + '</b>';
+  if (uy){
+    const m2 = maydon(uy), bal = SM.balandlik(uy, m2);
+    const qavat = uy.f || Math.max(1, Math.round((bal.m - 0.8) / SM.QAVAT_M));
+    html = '<b>' + xavfsiz(uy.nom || SINF_NOM[uy.s] || 'Bino') + '</b>' +
+      (uy.nom && SINF_NOM[uy.s] ? '<br>' + SINF_NOM[uy.s] : '') +
+      '<br>Maydoni: ' + Math.round(m2) + ' m²' +
+      '<br>Balandligi: ' + bal.m.toFixed(1) + ' m, ' + qavat + ' qavat' +
+      '<br><span class="xira">' + ['o\'lchangan', 'qavatlar sonidan', 'taxminiy — aniqlashtirish kerak'][2 - bal.aniq] +
+      ' · manba: ' + (uy.m === 0 ? 'OpenStreetMap' : uy.m === 1 ? 'Microsoft (sun\'iy yo\'ldosh)' : 'boshqa') + '</span>';
+  } else {
+    const kx = Math.cos(lat * R2D), chegara = 12 * 360 / (256 * Math.pow(2, xrt.getZoom()));
+    let eng = null, engM = chegara;
+    for (const y of kYol.izla(lon - chegara, lat - chegara, lon + chegara, lat + chegara)){
+      if (!y.nom) continue;
+      const m = nuqtaChiziqdan(lon * kx, lat, y.k, kx);
+      if (m < engM){ engM = m; eng = y; }
+    }
+    if (eng) html = '<b>' + xavfsiz(eng.nom) + '</b>';
   }
-  if (html) L.popup().setLatLng(p).setContent(html).openOn(xrt);
+  if (html) L.popup().setLatLng(e.latlng).setContent(html).openOn(xrt);
 });
 
 // ---------------- Belgilar ----------------
@@ -569,8 +396,7 @@ const joylarEl = document.getElementById('joylar');
 JOYLAR.forEach(j => {
   L.marker(j.k, {
     icon: L.divIcon({className:'belgi-yorliq', html:'<div><span></span>' + xavfsiz(j.nom) + '</div>', iconSize:[0,0]})
-  }).bindPopup('<b>' + xavfsiz(j.nom) + '</b><br>' + xavfsiz(j.t)).addTo(qatlam.belgi);
-
+  }).bindPopup('<b>' + xavfsiz(j.nom) + '</b><br>' + xavfsiz(j.t)).addTo(xrt);
   const t = document.createElement('button');
   t.className = 'joy'; t.textContent = j.nom;
   t.onclick = () => xrt.flyTo(j.k, j.z, {duration:1.2});
@@ -578,14 +404,16 @@ JOYLAR.forEach(j => {
 });
 
 // ---------------- Tugmalar ----------------
-const fonTugma = document.getElementById('t-fon');
-function fonYoq(yoq){
-  if (yoq){ fonTayl.addTo(xrt); fonTugma.classList.add('faol'); }
-  else    { xrt.removeLayer(fonTayl); fonTugma.classList.remove('faol'); }
-}
-fonTugma.onclick = () => fonYoq(!xrt.hasLayer(fonTayl));
-
-document.getElementById('t-shahar').onclick = () => xrt.flyToBounds(CHEGARA, {duration:1});
+const aniqlikTugma = document.getElementById('t-aniqlik');
+aniqlikTugma.onclick = () => {
+  aniqlik = !aniqlik;
+  aniqlikTugma.classList.toggle('faol', aniqlik);
+  document.getElementById('izoh-oddiy').hidden = aniqlik;
+  document.getElementById('izoh-aniqlik').hidden = !aniqlik;
+  qatlam.redraw();
+};
+let CHEGARA = null;
+document.getElementById('t-shahar').onclick = () => CHEGARA && xrt.flyToBounds(CHEGARA, {duration:1});
 
 let menBelgi = null;
 document.getElementById('t-men').onclick = () => {
@@ -595,26 +423,34 @@ document.getElementById('t-men').onclick = () => {
     const k = [p.coords.latitude, p.coords.longitude];
     if (menBelgi) menBelgi.setLatLng(k);
     else menBelgi = L.circleMarker(k, {radius:8, color:'#fff', weight:3, fillColor:'#2FA84F', fillOpacity:1}).addTo(xrt);
-    if (CHEGARA.pad(0.4).contains(k)){ xrt.flyTo(k, 17); holatniYangila(); }
+    if (CHEGARA && CHEGARA.pad(0.3).contains(k)){ xrt.flyTo(k, 17); holatTayyor(); }
     else holat('Siz Samarqanddan tashqaridasiz');
   }, () => holat('Joylashuv aniqlanmadi'), {enableHighAccuracy:true, timeout:10000});
 };
 
-// Telegram WebApp ichida ochilsa — to'liq ekran
 try{ window.Telegram && Telegram.WebApp && Telegram.WebApp.expand(); }catch(e){}
 
-xrt.on('zoomend', () => { yolQalinligi(); uylarniKorsat(); });
+function holatTayyor(){
+  const s = D.statistika;
+  holat(s.jami.toLocaleString('ru-RU') + ' uy · ' + D.yollar.length.toLocaleString('ru-RU') + ' yo\'l bo\'lagi');
+}
 
-// ---------------- Ishga tushirish ----------------
-(async function(){
-  holatniYangila();
-  uylarniKorsat();
-  await chegaraYukla();
-  katakRejasi();
-  holatniYangila();
-  asosiyYukla();
-  for (let i = 0; i < ISHCHI; i++) ishchi(i);
-})();
+// ---------------- Yuklash ----------------
+SM.yukla('samarqand/').then(d => {
+  D = d;
+  kUy = new SM.Katak(0.004);  d.uylar.forEach(b => kUy.qosh(b));
+  kYol = new SM.Katak(0.004); d.yollar.forEach(y => kYol.qosh(y));
+  kYer = new SM.Katak(0.01);  d.yer.forEach(y => kYer.qosh(y));
+  kSuv = new SM.Katak(0.01);  d.suvP.forEach(s => kSuv.qosh(s)); d.suvCh.forEach(s => kSuv.qosh(s));
+  CHEGARA = L.latLngBounds(d.chegaraQuti);
+  xrt.setMaxBounds(CHEGARA.pad(0.4));
+  xrt.attributionControl.addAttribution(xavfsiz(d.manba));
+  qatlam.addTo(xrt);
+  holatTayyor();
+}).catch(e => {
+  console.error(e);
+  holat('Ma\'lumot yuklanmadi: ' + e.message);
+});
 })();
 </script>
 </body>
