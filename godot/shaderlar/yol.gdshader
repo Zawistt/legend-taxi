@@ -1,6 +1,7 @@
 // Yo'l yuzalari. UV — dunyo koordinatasi (X, Z) metrda.
 //   turi 0 — asfalt (katta yo'l), 1 — mahalla yo'li (eskirgan asfalt, chang),
-//   2 — trotuar plitkasi, 3 — yo'l chizig'i bo'yog'i
+//   2 — trotuar plitkasi, 3 — yo'l chizig'i bo'yog'i,
+//   4 — ariq (UV: lenta bo'ylab, ko'ndalang 0..0.7 m), 5 — maysa, 6 — tuproq (relyef)
 shader_type spatial;
 render_mode cull_back;
 
@@ -63,6 +64,30 @@ void fragment() {
 		alb = rang * (0.88 + 0.18 * xesh(id)) * (0.9 + 0.2 * fbm(p * 0.3));
 		alb = mix(alb, alb * 0.55, chok);
 		rough = 0.9;
+	} else if (turi == 4) {
+		// ariq: beton chetlar, o'rtada suv
+		float v = p.y;
+		float chet = 1.0 - smoothstep(0.1, 0.13, min(v, 0.7 - v));
+		vec3 beton = rang * (0.85 + 0.2 * fbm(p * 2.0));
+		vec3 suv = vec3(0.07, 0.12, 0.12) * (0.9 + 0.2 * shovqin(vec2(p.x * 3.0 - TIME * 0.8, v * 10.0)));
+		alb = mix(suv, beton, chet);
+		rough = mix(0.04, 0.85, chet);
+		SPECULAR = mix(0.9, 0.5, chet);
+	} else if (turi == 5) {
+		// maysa: yashil va quruq sarg'ish dog'lar, mayda donadorlik
+		float katta_dog = fbm(p * 0.05);
+		float quruq = smoothstep(0.45, 0.75, fbm(p * 0.12 + 5.0));
+		vec3 yashil = rang * (0.8 + 0.4 * katta_dog);
+		alb = mix(yashil, vec3(0.52, 0.48, 0.28), quruq * 0.6);
+		alb *= 0.9 + 0.2 * mix(shovqin(p * 9.0), 0.5, uzoq);
+		rough = 0.95;
+	} else if (turi == 6) {
+		// tuproq: chang, mayda toshlar, quruq o't dog'lari
+		float katta_dog = fbm(p * 0.02);
+		alb = rang * (0.82 + 0.3 * katta_dog) * (0.92 + 0.16 * mix(shovqin(p * 6.0), 0.5, uzoq));
+		float ot = smoothstep(0.55, 0.8, fbm(p * 0.08 + 17.0));
+		alb = mix(alb, vec3(0.46, 0.46, 0.28), ot * 0.45);
+		rough = 1.0;
 	} else {
 		// bo'yoq: oq, eskirgan (asfalt ko'rinib turadi)
 		float eskirgan = smoothstep(0.35, 0.65, fbm(p * 1.5));

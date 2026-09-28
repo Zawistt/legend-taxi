@@ -893,12 +893,14 @@
   {
    "fayl": "bolak_-32_-1.glb",
    "x": -12800,
-   "z": -400
+   "z": -400,
+   "obyektlar": "bolak_-32_-1.obyektlar.json"
   },
   {
    "fayl": "bolak_-32_0.glb",
    "x": -12800,
-   "z": 0
+   "z": 0,
+   "obyektlar": "bolak_-32_0.obyektlar.json"
   },
   {
    "fayl": "bolak_-32_1.glb",
@@ -996,7 +998,8 @@
   {
    "fayl": "bolak_-31_-5.glb",
    "x": -12400,
-   "z": -2000
+   "z": -2000,
+   "obyektlar": "bolak_-31_-5.obyektlar.json"
   },
   {
    "fayl": "bolak_-31_-4.glb",
@@ -1096,12 +1099,14 @@
   {
    "fayl": "bolak_-30_-10.glb",
    "x": -12000,
-   "z": -4000
+   "z": -4000,
+   "obyektlar": "bolak_-30_-10.obyektlar.json"
   },
   {
    "fayl": "bolak_-30_-9.glb",
    "x": -12000,
-   "z": -3600
+   "z": -3600,
+   "obyektlar": "bolak_-30_-9.obyektlar.json"
   },
   {
    "fayl": "bolak_-30_-8.glb",
@@ -1373,7 +1378,8 @@
   {
    "fayl": "bolak_-28_-7.glb",
    "x": -11200,
-   "z": -2800
+   "z": -2800,
+   "obyektlar": "bolak_-28_-7.obyektlar.json"
   },
   {
    "fayl": "bolak_-28_-6.glb",
@@ -1425,12 +1431,14 @@
   {
    "fayl": "bolak_-28_2.glb",
    "x": -11200,
-   "z": 800
+   "z": 800,
+   "obyektlar": "bolak_-28_2.obyektlar.json"
   },
   {
    "fayl": "bolak_-28_3.glb",
    "x": -11200,
-   "z": 1200
+   "z": 1200,
+   "obyektlar": "bolak_-28_3.obyektlar.json"
   },
   {
    "fayl": "bolak_-28_4.glb",
@@ -1530,7 +1538,8 @@
   {
    "fayl": "bolak_-27_-1.glb",
    "x": -10800,
-   "z": -400
+   "z": -400,
+   "obyektlar": "bolak_-27_-1.obyektlar.json"
   },
   {
    "fayl": "bolak_-27_0.glb",
@@ -1546,27 +1555,32 @@
   {
    "fayl": "bolak_-27_2.glb",
    "x": -10800,
-   "z": 800
+   "z": 800,
+   "obyektlar": "bolak_-27_2.obyektlar.json"
   },
   {
    "fayl": "bolak_-27_3.glb",
    "x": -10800,
-   "z": 1200
+   "z": 1200,
+   "obyektlar": "bolak_-27_3.obyektlar.json"
   },
   {
    "fayl": "bolak_-27_4.glb",
    "x": -10800,
-   "z": 1600
+   "z": 1600,
+   "obyektlar": "bolak_-27_4.obyektlar.json"
   },
   {
    "fayl": "bolak_-27_5.glb",
    "x": -10800,
-   "z": 2000
+   "z": 2000,
+   "obyektlar": "bolak_-27_5.obyektlar.json"
   },
   {
    "fayl": "bolak_-27_6.glb",
    "x": -10800,
-   "z": 2400
+   "z": 2400,
+   "obyektlar": "bolak_-27_6.obyektlar.json"
   },
   {
    "fayl": "bolak_-27_7.glb",
@@ -1674,22 +1688,26 @@
   {
    "fayl": "bolak_-26_3.glb",
    "x": -10400,
-   "z": 1200
+   "z": 1200,
+   "obyektlar": "bolak_-26_3.obyektlar.json"
   },
   {
    "fayl": "bolak_-26_4.glb",
    "x": -10400,
-   "z": 1600
+   "z": 1600,
+   "obyektlar": "bolak_-26_4.obyektlar.json"
   },
   {
    "fayl": "bolak_-26_5.glb",
    "x": -10400,
-   "z": 2000
+   "z": 2000,
+   "obyektlar": "bolak_-26_5.obyektlar.json"
   },
   {
    "fayl": "bolak_-26_6.glb",
    "x": -10400,
-   "z": 2400
+   "z": 2400,
+   "obyektlar": "bolak_-26_6.obyektlar.json"
   },
   {
    "fayl": "bolak_-26_7.glb",
@@ -1768,7 +1786,8 @@
   {
    "fayl": "bolak_-25_-2.glb",
    "x": -10000,
-   "z": -800
+   "z": -800,
+   "obyektlar": "bolak_-25_-2.obyektlar.json"
   },
   {
    "fayl": "bolak_-25_-1.glb",
@@ -1867,7 +1886,8 @@
   {
    "fayl": "bolak_-24_-6.glb",
    "x": -9600,
-   "z": -2400
+   "z": -2400,
+   "obyektlar": "bolak_-24_-6.obyektlar.json"
   },
   {
    "fayl": "bolak_-24_-5.glb",
@@ -1895,7 +1915,8 @@
   {
    "fayl": "bolak_-24_-1.glb",
    "x": -9600,
-   "z": -400
+   "z": -400,
+   "obyektlar": "bolak_-24_-1.obyektlar.json"
   },
   {
    "fayl": "bolak_-24_0.glb",
@@ -1922,7 +1943,8 @@
   {
    "fayl": "bolak_-24_4.glb",
    "x": -9600,
-   "z": 1600
+   "z": 1600,
+   "obyektlar": "bolak_-24_4.obyektlar.json"
   },
   {
    "fayl": "bolak_-24_5.glb",
@@ -2004,12 +2026,14 @@
   {
    "fayl": "bolak_-23_-3.glb",
    "x": -9200,
-   "z": -1200
+   "z": -1200,
+   "obyektlar": "bolak_-23_-3.obyektlar.json"
   },
   {
    "fayl": "bolak_-23_-2.glb",
    "x": -9200,
-   "z": -800
+   "z": -800,
+   "obyektlar": "bolak_-23_-2.obyektlar.json"
   },
   {
    "fayl": "bolak_-23_-1.glb",
@@ -2047,7 +2071,8 @@
   {
    "fayl": "bolak_-23_5.glb",
    "x": -9200,
-   "z": 2000
+   "z": 2000,
+   "obyektlar": "bolak_-23_5.obyektlar.json"
   },
   {
    "fayl": "bolak_-23_6.glb",
@@ -2129,7 +2154,8 @@
   {
    "fayl": "bolak_-22_-3.glb",
    "x": -8800,
-   "z": -1200
+   "z": -1200,
+   "obyektlar": "bolak_-22_-3.obyektlar.json"
   },
   {
    "fayl": "bolak_-22_-2.glb",
@@ -2154,7 +2180,8 @@
   {
    "fayl": "bolak_-22_2.glb",
    "x": -8800,
-   "z": 800
+   "z": 800,
+   "obyektlar": "bolak_-22_2.obyektlar.json"
   },
   {
    "fayl": "bolak_-22_3.glb",
@@ -2222,7 +2249,8 @@
   {
    "fayl": "bolak_-21_-12.glb",
    "x": -8400,
-   "z": -4800
+   "z": -4800,
+   "obyektlar": "bolak_-21_-12.obyektlar.json"
   },
   {
    "fayl": "bolak_-21_-11.glb",
@@ -2245,12 +2273,14 @@
   {
    "fayl": "bolak_-21_-8.glb",
    "x": -8400,
-   "z": -3200
+   "z": -3200,
+   "obyektlar": "bolak_-21_-8.obyektlar.json"
   },
   {
    "fayl": "bolak_-21_-7.glb",
    "x": -8400,
-   "z": -2800
+   "z": -2800,
+   "obyektlar": "bolak_-21_-7.obyektlar.json"
   },
   {
    "fayl": "bolak_-21_-6.glb",
@@ -2271,7 +2301,8 @@
   {
    "fayl": "bolak_-21_-3.glb",
    "x": -8400,
-   "z": -1200
+   "z": -1200,
+   "obyektlar": "bolak_-21_-3.obyektlar.json"
   },
   {
    "fayl": "bolak_-21_-2.glb",
@@ -2407,7 +2438,8 @@
   {
    "fayl": "bolak_-20_-6.glb",
    "x": -8000,
-   "z": -2400
+   "z": -2400,
+   "obyektlar": "bolak_-20_-6.obyektlar.json"
   },
   {
    "fayl": "bolak_-20_-5.glb",
@@ -2566,7 +2598,8 @@
   {
    "fayl": "bolak_-19_-6.glb",
    "x": -7600,
-   "z": -2400
+   "z": -2400,
+   "obyektlar": "bolak_-19_-6.obyektlar.json"
   },
   {
    "fayl": "bolak_-19_-5.glb",
@@ -2766,7 +2799,8 @@
   {
    "fayl": "bolak_-18_2.glb",
    "x": -7200,
-   "z": 800
+   "z": 800,
+   "obyektlar": "bolak_-18_2.obyektlar.json"
   },
   {
    "fayl": "bolak_-18_3.glb",
@@ -2813,7 +2847,8 @@
   {
    "fayl": "bolak_-18_10.glb",
    "x": -7200,
-   "z": 4000
+   "z": 4000,
+   "obyektlar": "bolak_-18_10.obyektlar.json"
   },
   {
    "fayl": "bolak_-18_11.glb",
@@ -2856,7 +2891,8 @@
   {
    "fayl": "bolak_-17_-11.glb",
    "x": -6800,
-   "z": -4400
+   "z": -4400,
+   "obyektlar": "bolak_-17_-11.obyektlar.json"
   },
   {
    "fayl": "bolak_-17_-10.glb",
@@ -2896,7 +2932,8 @@
   {
    "fayl": "bolak_-17_-4.glb",
    "x": -6800,
-   "z": -1600
+   "z": -1600,
+   "obyektlar": "bolak_-17_-4.obyektlar.json"
   },
   {
    "fayl": "bolak_-17_-3.glb",
@@ -2931,12 +2968,14 @@
   {
    "fayl": "bolak_-17_3.glb",
    "x": -6800,
-   "z": 1200
+   "z": 1200,
+   "obyektlar": "bolak_-17_3.obyektlar.json"
   },
   {
    "fayl": "bolak_-17_4.glb",
    "x": -6800,
-   "z": 1600
+   "z": 1600,
+   "obyektlar": "bolak_-17_4.obyektlar.json"
   },
   {
    "fayl": "bolak_-17_5.glb",
@@ -2965,12 +3004,14 @@
   {
    "fayl": "bolak_-17_9.glb",
    "x": -6800,
-   "z": 3600
+   "z": 3600,
+   "obyektlar": "bolak_-17_9.obyektlar.json"
   },
   {
    "fayl": "bolak_-17_10.glb",
    "x": -6800,
-   "z": 4000
+   "z": 4000,
+   "obyektlar": "bolak_-17_10.obyektlar.json"
   },
   {
    "fayl": "bolak_-17_11.glb",
@@ -3113,7 +3154,8 @@
   {
    "fayl": "bolak_-16_6.glb",
    "x": -6400,
-   "z": 2400
+   "z": 2400,
+   "obyektlar": "bolak_-16_6.obyektlar.json"
   },
   {
    "fayl": "bolak_-16_7.glb",
@@ -3128,12 +3170,14 @@
   {
    "fayl": "bolak_-16_9.glb",
    "x": -6400,
-   "z": 3600
+   "z": 3600,
+   "obyektlar": "bolak_-16_9.obyektlar.json"
   },
   {
    "fayl": "bolak_-16_10.glb",
    "x": -6400,
-   "z": 4000
+   "z": 4000,
+   "obyektlar": "bolak_-16_10.obyektlar.json"
   },
   {
    "fayl": "bolak_-16_11.glb",
@@ -3313,7 +3357,8 @@
   {
    "fayl": "bolak_-15_7.glb",
    "x": -6000,
-   "z": 2800
+   "z": 2800,
+   "obyektlar": "bolak_-15_7.obyektlar.json"
   },
   {
    "fayl": "bolak_-15_8.glb",
@@ -3388,7 +3433,8 @@
   {
    "fayl": "bolak_-14_-13.glb",
    "x": -5600,
-   "z": -5200
+   "z": -5200,
+   "obyektlar": "bolak_-14_-13.obyektlar.json"
   },
   {
    "fayl": "bolak_-14_-12.glb",
@@ -3564,12 +3610,14 @@
   {
    "fayl": "bolak_-13_-17.glb",
    "x": -5200,
-   "z": -6800
+   "z": -6800,
+   "obyektlar": "bolak_-13_-17.obyektlar.json"
   },
   {
    "fayl": "bolak_-13_-16.glb",
    "x": -5200,
-   "z": -6400
+   "z": -6400,
+   "obyektlar": "bolak_-13_-16.obyektlar.json"
   },
   {
    "fayl": "bolak_-13_-15.glb",
@@ -3584,7 +3632,8 @@
   {
    "fayl": "bolak_-13_-13.glb",
    "x": -5200,
-   "z": -5200
+   "z": -5200,
+   "obyektlar": "bolak_-13_-13.obyektlar.json"
   },
   {
    "fayl": "bolak_-13_-12.glb",
@@ -3709,7 +3758,8 @@
   {
    "fayl": "bolak_-13_8.glb",
    "x": -5200,
-   "z": 3200
+   "z": 3200,
+   "obyektlar": "bolak_-13_8.obyektlar.json"
   },
   {
    "fayl": "bolak_-13_9.glb",
@@ -3739,7 +3789,8 @@
   {
    "fayl": "bolak_-12_-21.glb",
    "x": -4800,
-   "z": -8400
+   "z": -8400,
+   "obyektlar": "bolak_-12_-21.obyektlar.json"
   },
   {
    "fayl": "bolak_-12_-20.glb",
@@ -3768,7 +3819,8 @@
   {
    "fayl": "bolak_-12_-16.glb",
    "x": -4800,
-   "z": -6400
+   "z": -6400,
+   "obyektlar": "bolak_-12_-16.obyektlar.json"
   },
   {
    "fayl": "bolak_-12_-15.glb",
@@ -3935,7 +3987,8 @@
   {
    "fayl": "bolak_-11_-21.glb",
    "x": -4400,
-   "z": -8400
+   "z": -8400,
+   "obyektlar": "bolak_-11_-21.obyektlar.json"
   },
   {
    "fayl": "bolak_-11_-20.glb",
@@ -4345,7 +4398,8 @@
   {
    "fayl": "bolak_-9_-20.glb",
    "x": -3600,
-   "z": -8000
+   "z": -8000,
+   "obyektlar": "bolak_-9_-20.obyektlar.json"
   },
   {
    "fayl": "bolak_-9_-19.glb",
@@ -4522,7 +4576,8 @@
   {
    "fayl": "bolak_-9_10.glb",
    "x": -3600,
-   "z": 4000
+   "z": 4000,
+   "obyektlar": "bolak_-9_10.obyektlar.json"
   },
   {
    "fayl": "bolak_-9_11.glb",
@@ -4574,7 +4629,8 @@
   {
    "fayl": "bolak_-8_-16.glb",
    "x": -3200,
-   "z": -6400
+   "z": -6400,
+   "obyektlar": "bolak_-8_-16.obyektlar.json"
   },
   {
    "fayl": "bolak_-8_-15.glb",
@@ -4585,7 +4641,8 @@
   {
    "fayl": "bolak_-8_-14.glb",
    "x": -3200,
-   "z": -5600
+   "z": -5600,
+   "obyektlar": "bolak_-8_-14.obyektlar.json"
   },
   {
    "fayl": "bolak_-8_-13.glb",
@@ -4595,7 +4652,8 @@
   {
    "fayl": "bolak_-8_-12.glb",
    "x": -3200,
-   "z": -4800
+   "z": -4800,
+   "obyektlar": "bolak_-8_-12.obyektlar.json"
   },
   {
    "fayl": "bolak_-8_-11.glb",
@@ -4939,7 +4997,8 @@
   {
    "fayl": "bolak_-7_11.glb",
    "x": -2800,
-   "z": 4400
+   "z": 4400,
+   "obyektlar": "bolak_-7_11.obyektlar.json"
   },
   {
    "fayl": "bolak_-7_12.glb",
@@ -5135,7 +5194,8 @@
   {
    "fayl": "bolak_-6_10.glb",
    "x": -2400,
-   "z": 4000
+   "z": 4000,
+   "obyektlar": "bolak_-6_10.obyektlar.json"
   },
   {
    "fayl": "bolak_-6_11.glb",
@@ -5170,17 +5230,20 @@
   {
    "fayl": "bolak_-5_-18.glb",
    "x": -2000,
-   "z": -7200
+   "z": -7200,
+   "obyektlar": "bolak_-5_-18.obyektlar.json"
   },
   {
    "fayl": "bolak_-5_-17.glb",
    "x": -2000,
-   "z": -6800
+   "z": -6800,
+   "obyektlar": "bolak_-5_-17.obyektlar.json"
   },
   {
    "fayl": "bolak_-5_-16.glb",
    "x": -2000,
-   "z": -6400
+   "z": -6400,
+   "obyektlar": "bolak_-5_-16.obyektlar.json"
   },
   {
    "fayl": "bolak_-5_-15.glb",
@@ -5371,7 +5434,8 @@
   {
    "fayl": "bolak_-4_-17.glb",
    "x": -1600,
-   "z": -6800
+   "z": -6800,
+   "obyektlar": "bolak_-4_-17.obyektlar.json"
   },
   {
    "fayl": "bolak_-4_-16.glb",
@@ -5562,7 +5626,8 @@
   {
    "fayl": "bolak_-3_-17.glb",
    "x": -1200,
-   "z": -6800
+   "z": -6800,
+   "obyektlar": "bolak_-3_-17.obyektlar.json"
   },
   {
    "fayl": "bolak_-3_-16.glb",
@@ -5759,7 +5824,8 @@
   {
    "fayl": "bolak_-2_-15.glb",
    "x": -800,
-   "z": -6000
+   "z": -6000,
+   "obyektlar": "bolak_-2_-15.obyektlar.json"
   },
   {
    "fayl": "bolak_-2_-14.glb",
@@ -5907,7 +5973,8 @@
   {
    "fayl": "bolak_-2_10.glb",
    "x": -800,
-   "z": 4000
+   "z": 4000,
+   "obyektlar": "bolak_-2_10.obyektlar.json"
   },
   {
    "fayl": "bolak_-2_11.glb",
@@ -5954,7 +6021,8 @@
   {
    "fayl": "bolak_-1_-14.glb",
    "x": -400,
-   "z": -5600
+   "z": -5600,
+   "obyektlar": "bolak_-1_-14.obyektlar.json"
   },
   {
    "fayl": "bolak_-1_-13.glb",
@@ -6097,7 +6165,8 @@
   {
    "fayl": "bolak_-1_10.glb",
    "x": -400,
-   "z": 4000
+   "z": 4000,
+   "obyektlar": "bolak_-1_10.obyektlar.json"
   },
   {
    "fayl": "bolak_-1_11.glb",
@@ -6138,7 +6207,8 @@
   {
    "fayl": "bolak_0_-15.glb",
    "x": 0,
-   "z": -6000
+   "z": -6000,
+   "obyektlar": "bolak_0_-15.obyektlar.json"
   },
   {
    "fayl": "bolak_0_-14.glb",
@@ -6148,7 +6218,8 @@
   {
    "fayl": "bolak_0_-13.glb",
    "x": 0,
-   "z": -5200
+   "z": -5200,
+   "obyektlar": "bolak_0_-13.obyektlar.json"
   },
   {
    "fayl": "bolak_0_-12.glb",
@@ -6291,7 +6362,8 @@
   {
    "fayl": "bolak_0_11.glb",
    "x": 0,
-   "z": 4400
+   "z": 4400,
+   "obyektlar": "bolak_0_11.obyektlar.json"
   },
   {
    "fayl": "bolak_0_12.glb",
@@ -6333,7 +6405,8 @@
   {
    "fayl": "bolak_1_-14.glb",
    "x": 400,
-   "z": -5600
+   "z": -5600,
+   "obyektlar": "bolak_1_-14.obyektlar.json"
   },
   {
    "fayl": "bolak_1_-13.glb",
@@ -6518,7 +6591,8 @@
   {
    "fayl": "bolak_2_-14.glb",
    "x": 800,
-   "z": -5600
+   "z": -5600,
+   "obyektlar": "bolak_2_-14.obyektlar.json"
   },
   {
    "fayl": "bolak_2_-13.glb",
@@ -6569,7 +6643,8 @@
   {
    "fayl": "bolak_2_-5.glb",
    "x": 800,
-   "z": -2000
+   "z": -2000,
+   "obyektlar": "bolak_2_-5.obyektlar.json"
   },
   {
    "fayl": "bolak_2_-4.glb",
@@ -7370,7 +7445,8 @@
   {
    "fayl": "bolak_6_5.glb",
    "x": 2400,
-   "z": 2000
+   "z": 2000,
+   "obyektlar": "bolak_6_5.obyektlar.json"
   },
   {
    "fayl": "bolak_6_6.glb",
@@ -7664,7 +7740,8 @@
   {
    "fayl": "bolak_8_-3.glb",
    "x": 3200,
-   "z": -1200
+   "z": -1200,
+   "obyektlar": "bolak_8_-3.obyektlar.json"
   },
   {
    "fayl": "bolak_8_-2.glb",
@@ -7851,12 +7928,14 @@
   {
    "fayl": "bolak_9_1.glb",
    "x": 3600,
-   "z": 400
+   "z": 400,
+   "obyektlar": "bolak_9_1.obyektlar.json"
   },
   {
    "fayl": "bolak_9_2.glb",
    "x": 3600,
-   "z": 800
+   "z": 800,
+   "obyektlar": "bolak_9_2.obyektlar.json"
   },
   {
    "fayl": "bolak_9_3.glb",
@@ -7926,7 +8005,8 @@
   {
    "fayl": "bolak_10_-13.glb",
    "x": 4000,
-   "z": -5200
+   "z": -5200,
+   "obyektlar": "bolak_10_-13.obyektlar.json"
   },
   {
    "fayl": "bolak_10_-12.glb",
@@ -7975,7 +8055,8 @@
   {
    "fayl": "bolak_10_-4.glb",
    "x": 4000,
-   "z": -1600
+   "z": -1600,
+   "obyektlar": "bolak_10_-4.obyektlar.json"
   },
   {
    "fayl": "bolak_10_-3.glb",
@@ -7990,7 +8071,8 @@
   {
    "fayl": "bolak_10_-1.glb",
    "x": 4000,
-   "z": -400
+   "z": -400,
+   "obyektlar": "bolak_10_-1.obyektlar.json"
   },
   {
    "fayl": "bolak_10_0.glb",
@@ -8075,7 +8157,8 @@
   {
    "fayl": "bolak_11_-13.glb",
    "x": 4400,
-   "z": -5200
+   "z": -5200,
+   "obyektlar": "bolak_11_-13.obyektlar.json"
   },
   {
    "fayl": "bolak_11_-12.glb",
@@ -8091,7 +8174,8 @@
   {
    "fayl": "bolak_11_-10.glb",
    "x": 4400,
-   "z": -4000
+   "z": -4000,
+   "obyektlar": "bolak_11_-10.obyektlar.json"
   },
   {
    "fayl": "bolak_11_-9.glb",
@@ -8106,7 +8190,8 @@
   {
    "fayl": "bolak_11_-7.glb",
    "x": 4400,
-   "z": -2800
+   "z": -2800,
+   "obyektlar": "bolak_11_-7.obyektlar.json"
   },
   {
    "fayl": "bolak_11_-6.glb",
@@ -8229,17 +8314,20 @@
   {
    "fayl": "bolak_12_-9.glb",
    "x": 4800,
-   "z": -3600
+   "z": -3600,
+   "obyektlar": "bolak_12_-9.obyektlar.json"
   },
   {
    "fayl": "bolak_12_-8.glb",
    "x": 4800,
-   "z": -3200
+   "z": -3200,
+   "obyektlar": "bolak_12_-8.obyektlar.json"
   },
   {
    "fayl": "bolak_12_-7.glb",
    "x": 4800,
-   "z": -2800
+   "z": -2800,
+   "obyektlar": "bolak_12_-7.obyektlar.json"
   },
   {
    "fayl": "bolak_12_-6.glb",
@@ -8256,7 +8344,8 @@
   {
    "fayl": "bolak_12_-4.glb",
    "x": 4800,
-   "z": -1600
+   "z": -1600,
+   "obyektlar": "bolak_12_-4.obyektlar.json"
   },
   {
    "fayl": "bolak_12_-3.glb",
@@ -8341,7 +8430,8 @@
   {
    "fayl": "bolak_13_-10.glb",
    "x": 5200,
-   "z": -4000
+   "z": -4000,
+   "obyektlar": "bolak_13_-10.obyektlar.json"
   },
   {
    "fayl": "bolak_13_-9.glb",
@@ -8352,7 +8442,8 @@
   {
    "fayl": "bolak_13_-8.glb",
    "x": 5200,
-   "z": -3200
+   "z": -3200,
+   "obyektlar": "bolak_13_-8.obyektlar.json"
   },
   {
    "fayl": "bolak_13_-7.glb",
@@ -8369,7 +8460,8 @@
   {
    "fayl": "bolak_13_-5.glb",
    "x": 5200,
-   "z": -2000
+   "z": -2000,
+   "obyektlar": "bolak_13_-5.obyektlar.json"
   },
   {
    "fayl": "bolak_13_-4.glb",
@@ -8439,7 +8531,8 @@
   {
    "fayl": "bolak_14_-13.glb",
    "x": 5600,
-   "z": -5200
+   "z": -5200,
+   "obyektlar": "bolak_14_-13.obyektlar.json"
   },
   {
    "fayl": "bolak_14_-12.glb",
@@ -8449,7 +8542,8 @@
   {
    "fayl": "bolak_14_-11.glb",
    "x": 5600,
-   "z": -4400
+   "z": -4400,
+   "obyektlar": "bolak_14_-11.obyektlar.json"
   },
   {
    "fayl": "bolak_14_-10.glb",
@@ -8459,12 +8553,14 @@
   {
    "fayl": "bolak_14_-9.glb",
    "x": 5600,
-   "z": -3600
+   "z": -3600,
+   "obyektlar": "bolak_14_-9.obyektlar.json"
   },
   {
    "fayl": "bolak_14_-8.glb",
    "x": 5600,
-   "z": -3200
+   "z": -3200,
+   "obyektlar": "bolak_14_-8.obyektlar.json"
   },
   {
    "fayl": "bolak_14_-7.glb",
@@ -8546,12 +8642,14 @@
   {
    "fayl": "bolak_15_-13.glb",
    "x": 6000,
-   "z": -5200
+   "z": -5200,
+   "obyektlar": "bolak_15_-13.obyektlar.json"
   },
   {
    "fayl": "bolak_15_-12.glb",
    "x": 6000,
-   "z": -4800
+   "z": -4800,
+   "obyektlar": "bolak_15_-12.obyektlar.json"
   },
   {
    "fayl": "bolak_15_-11.glb",
@@ -8658,12 +8756,14 @@
   {
    "fayl": "bolak_16_-12.glb",
    "x": 6400,
-   "z": -4800
+   "z": -4800,
+   "obyektlar": "bolak_16_-12.obyektlar.json"
   },
   {
    "fayl": "bolak_16_-11.glb",
    "x": 6400,
-   "z": -4400
+   "z": -4400,
+   "obyektlar": "bolak_16_-11.obyektlar.json"
   },
   {
    "fayl": "bolak_16_-10.glb",
@@ -8686,12 +8786,14 @@
   {
    "fayl": "bolak_16_-7.glb",
    "x": 6400,
-   "z": -2800
+   "z": -2800,
+   "obyektlar": "bolak_16_-7.obyektlar.json"
   },
   {
    "fayl": "bolak_16_-6.glb",
    "x": 6400,
-   "z": -2400
+   "z": -2400,
+   "obyektlar": "bolak_16_-6.obyektlar.json"
   },
   {
    "fayl": "bolak_16_-5.glb",
@@ -8771,12 +8873,14 @@
   {
    "fayl": "bolak_17_-8.glb",
    "x": 6800,
-   "z": -3200
+   "z": -3200,
+   "obyektlar": "bolak_17_-8.obyektlar.json"
   },
   {
    "fayl": "bolak_17_-7.glb",
    "x": 6800,
-   "z": -2800
+   "z": -2800,
+   "obyektlar": "bolak_17_-7.obyektlar.json"
   },
   {
    "fayl": "bolak_17_-6.glb",
@@ -8855,12 +8959,14 @@
   {
    "fayl": "bolak_18_-8.glb",
    "x": 7200,
-   "z": -3200
+   "z": -3200,
+   "obyektlar": "bolak_18_-8.obyektlar.json"
   },
   {
    "fayl": "bolak_18_-7.glb",
    "x": 7200,
-   "z": -2800
+   "z": -2800,
+   "obyektlar": "bolak_18_-7.obyektlar.json"
   },
   {
    "fayl": "bolak_18_-6.glb",

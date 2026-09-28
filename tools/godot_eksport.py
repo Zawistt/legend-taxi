@@ -21,7 +21,7 @@ Nima qilinadi:
     pip install numpy scipy shapely mapbox-earcut rasterio requests
     python3 tools/godot_eksport.py
 """
-import json, math, os, sys, time
+import json, math, os, sys, time, zlib
 import numpy as np
 import shapely
 import shapely.ops
@@ -54,6 +54,7 @@ MAT = {
     "Balkon":       ((0.80, 0.79, 0.76), 0.85),
     "Trotuar":      ((0.62, 0.60, 0.56), 0.9),
     "Yol_Chiziq":   ((0.92, 0.92, 0.88), 0.7),
+    "Ariq":         ((0.45, 0.47, 0.46), 0.3),
     "Yol_Asfalt":   ((0.22, 0.23, 0.24), 0.9), "Yol_Mahalla":  ((0.30, 0.30, 0.30), 0.95),
     "Yol_Piyoda":   ((0.66, 0.60, 0.50), 0.9), "Yol_Tuproq":   ((0.55, 0.47, 0.36), 1.0),
     "Temir_Yol":    ((0.32, 0.28, 0.25), 0.95), "Yol_Chegara": ((1.0, 0.0, 1.0), 1.0),
@@ -713,6 +714,150 @@ def kocha_jihozlari(R, haydash, kenglik, katta, mayda, yol_yuza, bpoly, olib, bi
              round(L + 0.2, 2), round(h, 2), round(float(rng.random()), 3), darvoza])
         nd += 1
     vaqt(t0, f"hovli devorlari: {nd}")
+
+    tabiat(R, haydash, kenglik, ofset, katta, mayda, yol_yuza, bino_birlash, bpoly, tirik, uylar, zona,
+           yig, kalit, obyektlar, t0)
+
+
+# ---------------- 5-bosqich: tabiat ----------------
+CHINOR, TERAK, MEVA, ARCHA = 0, 1, 2, 3
+
+
+def tabiat(R, haydash, kenglik, ofset, katta, mayda, yol_yuza, bino_birlash, bpoly, tirik, uylar, zona,
+           yig, kalit, obyektlar, t0):
+    """Daraxtlar (MultiMesh) va ariqlar. Real OSM daraxtlari + Samarqand ko'chalari
+    tuzilishiga mos joylashtirish: katta ko'chada trotuar bo'yida chinor/terak va ariq,
+    mahalla ko'chasida devor oldida, hovlilar ichida mevali daraxtlar, bog'larda zich."""
+    rng = np.random.default_rng(2026)
+    bino_daraxt = STRtree(bpoly[tirik])
+    nomzod = []                                     # (x, z, tur, olcham, yerdan_balandlik)
+
+    def qator(line, qadam, tur_fn, olcham_fn, yoff, sakrash=0.0):
+        L = line.length
+        t = rng.uniform(0, qadam)
+        while t < L:
+            if rng.random() >= sakrash:
+                q = np.asarray(line.interpolate(t).coords)[0]
+                nomzod.append((q[0], q[1], tur_fn(), olcham_fn(), yoff))
+            t += qadam * rng.uniform(0.85, 1.15)
+
+    # 1) katta ko'chalar: trotuar chetida daraxt qatori, undan narida ariq
+    ariq_chiziq = []
+    for r, (sinf, nom, p) in enumerate(haydash):
+        if sinf not in KATTA_SINF or len(p) < 2:
+            continue
+        w = float(np.min(kenglik[ofset[r]:ofset[r + 1]]))
+        line = shapely.LineString(p)
+        if line.length < 20:
+            continue
+        # ko'cha bo'yicha tur: ko'pchiligi chinor, ba'zi ko'chalar terak
+        asosiy = TERAK if (zlib.crc32(str(nom or r).encode()) % 5 == 0) else CHINOR
+        for tomon in (1, -1):
+            try:
+                g = shapely.difference(line.offset_curve(tomon * (w / 2 + 2.3), quad_segs=2), zona)
+                a = shapely.difference(line.offset_curve(tomon * (w / 2 + 3.35), quad_segs=2), zona)
+            except Exception:
+                continue
+            for ch in chiziqlar(g):
+                qator(ch, 9.0, lambda: asosiy if rng.random() < 0.85 else MEVA,
+                      lambda: rng.uniform(0.85, 1.2), YOL_Y + 0.15)
+            ariq_chiziq += chiziqlar(a)
+    # 2) mahalla ko'chalari: yo'l cheti va hovli devori orasida, siyrak
+    for r, (sinf, nom, p) in enumerate(haydash):
+        if sinf in KATTA_SINF or sinf == "service" or len(p) < 2:
+            continue
+        w = float(np.min(kenglik[ofset[r]:ofset[r + 1]]))
+        line = shapely.LineString(p)
+        for tomon in (1, -1):
+            try:
+                g = line.offset_curve(tomon * (w / 2 + 0.55), quad_segs=2)
+            except Exception:
+                continue
+            for ch in chiziqlar(g):
+                qator(ch, 13.0, lambda: rng.choice([MEVA, MEVA, TERAK, CHINOR]),
+                      lambda: rng.uniform(0.75, 1.1), 0.0, sakrash=0.45)
+    n_kocha = len(nomzod)
+    # 3) hovlilar ichida mevali daraxtlar (uy atrofida 3..12 m)
+    for u in uylar:
+        k = rng.poisson(1.3)
+        if not k:
+            continue
+        c = u.centroid
+        r0 = math.sqrt(u.area) / 2
+        for _ in range(k):
+            a = rng.uniform(0, 2 * math.pi)
+            d = r0 + rng.uniform(3, 10)
+            nomzod.append((c.x + math.cos(a) * d, c.y + math.sin(a) * d,
+                           MEVA if rng.random() < 0.85 else TERAK, rng.uniform(0.7, 1.15), 0.0))
+    n_hovli = len(nomzod) - n_kocha
+    # 4) bog'lar, parklar, qabristonlar (fon.json) va real OSM daraxtlari/o'rmonlari
+    fon = json.load(open(os.path.join(MAL, "fon.json"), encoding="utf-8"))
+    bog = []
+    for tur, s_, *hh in fon["yer"]:
+        if s_ in ("park", "garden", "forest", "orchard", "cemetery"):
+            halqalar = [ochish(x, fon["o"], fon["q"]) for x in hh]
+            bog.append((s_, shapely.make_valid(shapely.Polygon(halqalar[0], halqalar[1:]))))
+    lp = os.path.join(KESH, "land.parquet")
+    if os.path.exists(lp):
+        import pyarrow.parquet as pq
+        for r_ in pq.read_table(lp).to_pylist():
+            g = shapely.from_wkb(r_["geometry"])
+            g = shapely.transform(g, lambda xy: np.stack([(xy[:, 0] - O_LON) * KX, -(xy[:, 1] - O_LAT) * KY], 1))
+            if r_["subtype"] == "tree" and g.geom_type == "Point":
+                nomzod.append((g.x, g.y, CHINOR, rng.uniform(0.9, 1.3), 0.0))
+            elif r_["subtype"] == "tree":
+                for ch in chiziqlar(g):
+                    qator(ch, 6.0, lambda: TERAK, lambda: rng.uniform(0.9, 1.2), 0.0)
+            elif r_["subtype"] == "forest":
+                bog.append(("forest", shapely.make_valid(g)))
+    for s_, g in bog:
+        zich = {"forest": 45.0, "orchard": 40.0, "park": 70.0, "garden": 60.0, "cemetery": 110.0}[s_]
+        for pg in poligonlar(g):
+            n = int(pg.area / zich)
+            if n <= 0:
+                continue
+            x0, z0, x1, z1 = pg.bounds
+            xs = rng.uniform(x0, x1, n * 3); zs = rng.uniform(z0, z1, n * 3)
+            ich = shapely.contains_xy(pg, xs, zs)
+            for x, z in list(zip(xs[ich], zs[ich]))[:n]:
+                tur = ARCHA if (s_ == "cemetery" or rng.random() < 0.12) else (MEVA if s_ == "orchard" else
+                                                                            rng.choice([CHINOR, CHINOR, TERAK, MEVA]))
+                nomzod.append((x, z, tur, rng.uniform(0.8, 1.2), 0.0))
+    vaqt(t0, f"daraxt nomzodlari: ko'cha {n_kocha}, hovli {n_hovli}, jami {len(nomzod)}")
+
+    # filtr: yo'lda emas, binoga 1.5 m dan yaqin emas, bir-biriga 2.5 m dan yaqin emas
+    X = np.array([n[0] for n in nomzod]); Z = np.array([n[1] for n in nomzod])
+    yaxshi = ~shapely.contains_xy(yol_yuza, X, Z)
+    _, mas = bino_daraxt.query_nearest(shapely.points(np.stack([X, Z], 1)), return_distance=True, all_matches=False)
+    yaxshi &= mas > 1.5
+    band = set()
+    sanoq = [0, 0, 0, 0]
+    for i in np.nonzero(yaxshi)[0]:
+        x, z, tur, olcham, yoff = nomzod[i]
+        kk = (round(x / 2.5), round(z / 2.5))
+        if kk in band:
+            continue
+        band.add(kk)
+        k = kalit(x, z)
+        y = float(R.h(x, z)) + yoff
+        obyektlar.setdefault(k, {}).setdefault("daraxt", []).append(
+            [round(float(x - k[0] * BOLAK), 2), round(y, 2), round(float(z - k[1] * BOLAK), 2),
+             round(float(rng.uniform(0, 6.283)), 2), int(tur), round(float(olcham), 2)])
+        sanoq[int(tur)] += 1
+    vaqt(t0, f"daraxtlar: chinor {sanoq[0]}, terak {sanoq[1]}, mevali {sanoq[2]}, archa {sanoq[3]}")
+
+    # ariqlar: binolar va yo'llardan tozalangan chiziqlar
+    ariq = shapely.union_all(ariq_chiziq) if ariq_chiziq else None
+    if ariq is not None:
+        ariq = shapely.difference(ariq, bino_birlash.buffer(0.6))
+        ariq = shapely.difference(ariq, yol_yuza.buffer(0.5))
+        n_a = 0
+        for ch in chiziqlar(ariq):
+            if ch.length < 3:
+                continue
+            bolak_boyicha_lenta(yig, kalit, R, np.asarray(ch.coords), 0.7, YOL_Y + 0.02, "Ariq")
+            n_a += ch.length
+        vaqt(t0, f"ariqlar: {n_a / 1000:.0f} km")
 
 
 # ---------------- asosiy ----------------

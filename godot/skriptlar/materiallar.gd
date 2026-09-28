@@ -61,6 +61,9 @@ const YOLLAR := {
 	"Yol_Mahalla": {"turi": 1, "rang": Color(0.3, 0.3, 0.3)},
 	"Trotuar": {"turi": 2, "rang": Color(0.66, 0.63, 0.58)},
 	"Yol_Chiziq": {"turi": 3, "rang": Color(0.93, 0.93, 0.9)},
+	"Ariq": {"turi": 4, "rang": Color(0.55, 0.56, 0.54)},
+	"Yer_Maysa": {"turi": 5, "rang": Color(0.30, 0.44, 0.18)},
+	"Yer_Tuproq": {"turi": 6, "rang": Color(0.60, 0.53, 0.42)},
 }
 const TOMLAR := {
 	"Tom_Shifer": {"turi": 0, "rang": Color(0.60, 0.61, 0.60)},

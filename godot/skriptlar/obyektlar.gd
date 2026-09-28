@@ -92,6 +92,9 @@ static func mesh(tur: String) -> Mesh:
 ## Bo'lak tuguniga MultiMeshInstance3D'larni qo'shadi.
 static func qosh(tugun: Node3D, malumot: Dictionary) -> void:
 	for tur in malumot:
+		if tur == "daraxt":
+			Daraxtlar.qosh(tugun, malumot[tur])
+			continue
 		var guruhlar := {}                     # mesh nomi -> [Transform3D]
 		var qoshimcha := {}                    # mesh nomi -> [Color] (INSTANCE_CUSTOM)
 		for r in malumot[tur]:
