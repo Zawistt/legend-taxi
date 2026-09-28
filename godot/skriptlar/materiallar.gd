@@ -126,14 +126,10 @@ static func _yasa(nom: String) -> Material:
 	m.uv1_scale = Vector3(1.0 / olcham, 1.0 / olcham, 1.0)
 	var kuch: float = tv[3]
 	if kuch > 0.0:
-		m.normal_enabled = true
-		m.normal_texture = _shovqin(0.02, true, nom.hash())
-		m.normal_scale = kuch
+		# normal xaritasi yo'q: GLB'da tangent saqlanmaydi (hajm uchun)
 		# rangdagi bir tekis bo'lmagan dog'lar
-		m.detail_enabled = true
-		m.detail_blend_mode = BaseMaterial3D.BLEND_MODE_MUL
-		m.detail_albedo = _shovqin(0.008, false, nom.hash() + 7)
-		m.detail_uv_layer = BaseMaterial3D.DETAIL_UV_1
+		# (detail xaritasi tangent talab qiladi — shuning uchun albedo teksturasi)
+		m.albedo_texture = _shovqin(0.008, false, nom.hash() + 7)
 	if nom == "Suv":
 		m.metallic = 0.0
 		m.roughness = 0.04
