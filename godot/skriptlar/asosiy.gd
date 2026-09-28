@@ -52,6 +52,10 @@ func _ready() -> void:
 	_yer()
 
 	shahar = Shahar.new()
+	if OS.has_feature("web"):
+		shahar.korish_radiusi = 650.0
+		shahar.ochirish_radiusi = 900.0
+		shahar.bir_vaqtda = 3
 	add_child(shahar)
 
 	yollar = Yollar.new()
@@ -76,6 +80,8 @@ func _ready() -> void:
 		_kamerani_qoy()
 
 	_hud()
+	if DisplayServer.is_touchscreen_available():
+		_sensor_tugmalar()
 
 
 ## Sinov suratlari: kamerani berilgan joydagi eng yaqin ko'chaga qo'yadi
@@ -204,6 +210,44 @@ func _yer() -> void:
 	tana.add_child(shakl)
 	tana.position.y = -200.0
 	add_child(tana)
+
+
+## Telefon/planshet uchun ekrandagi tugmalar (rul, gaz, tormoz, kamera).
+func _sensor_tugmalar() -> void:
+	var q := CanvasLayer.new()
+	add_child(q)
+	var o := get_viewport().get_visible_rect().size
+	var r := minf(o.x, o.y) * 0.09
+	var tugmalar := [
+		["chap", "◀", Vector2(r * 1.4, o.y - r * 1.6)],
+		["ong", "▶", Vector2(r * 3.9, o.y - r * 1.6)],
+		["tormoz", "▼", Vector2(o.x - r * 3.9, o.y - r * 1.6)],
+		["gaz", "▲", Vector2(o.x - r * 1.4, o.y - r * 1.6)],
+		["kamera", "🎥", Vector2(o.x - r * 1.4, o.y - r * 4.1)],
+		["qaytish", "R", Vector2(o.x - r * 3.9, o.y - r * 4.1)],
+	]
+	var img := Image.create(128, 128, false, Image.FORMAT_RGBA8)
+	for y in 128:
+		for x in 128:
+			var d := Vector2(x - 63.5, y - 63.5).length()
+			var a := clampf(63.0 - d, 0.0, 1.0)
+			var chet := 1.0 if d > 57.0 else 0.0
+			img.set_pixel(x, y, Color(1, 1, 1, 0.9 * a) if chet > 0.5 else Color(0.06, 0.09, 0.13, 0.5 * a))
+	var tex := ImageTexture.create_from_image(img)
+	for t in tugmalar:
+		var b := TouchScreenButton.new()
+		b.texture_normal = tex
+		b.action = t[0]
+		b.scale = Vector2.ONE * (r * 2.0 / 128.0)
+		b.position = t[2] - Vector2.ONE * r
+		var l := Label.new()
+		l.text = t[1]
+		l.add_theme_font_size_override("font_size", 56)
+		l.size = Vector2(128, 128)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		b.add_child(l)
+		q.add_child(b)
 
 
 func _hud() -> void:
