@@ -1,0 +1,26 @@
+{
+  "size_m": 2000.0,
+  "cells": 512,
+  "grid": 513,
+  "cell_m": 3.90625,
+  "chunks_per_side": 4,
+  "cells_per_chunk": 128,
+  "max_height_m": 160.0,
+  "base_a": [
+    -640.0,
+    -640.0
+  ],
+  "base_b": [
+    640.0,
+    640.0
+  ],
+  "base_height_m": 22.0,
+  "stats": {
+    "min_h": 0.0,
+    "max_h": 101.36499510831788,
+    "max_slope_playable_deg": 19.155767767273037,
+    "p95_slope_playable_deg": 11.5527527994056,
+    "buildable_pct_playable": 10.80528205597515,
+    "high_ground_pct": 27.65004495023175
+  }
+}
