@@ -51,10 +51,10 @@ toggle_zones={
 
 [navigation]
 
-3d/default_cell_size=1.0
-3d/default_cell_height=0.5
-3d/default_edge_connection_margin=3.0
-3d/default_link_connection_radius=4.0
+3d/default_cell_size=0.25
+3d/default_cell_height=0.25
+3d/default_edge_connection_margin=0.75
+3d/default_link_connection_radius=1.0
 3d/merge_rasterizer_cell_scale=0.001
 
 [rendering]

@@ -5,18 +5,18 @@ extends Node3D
 ## Optional: assign `terrain` (TerrainManager) to clamp to the map and follow height.
 
 @export var terrain: TerrainManager
-@export var pan_speed := 260.0            # m/s at max zoom-out scales with zoom
+@export var pan_speed := 55.0             # m/s at default zoom; scales with zoom
 @export var edge_pan := true
 @export var edge_margin := 12.0
 @export var rotate_speed := 1.6
-@export var zoom_min := 40.0
-@export var zoom_max := 900.0
+@export var zoom_min := 12.0              # workers/buildings fill the screen
+@export var zoom_max := 330.0             # whole ~360 m battlefield in view
 @export var zoom_step := 0.12
 @export var pitch_deg := -52.0
-@export var map_limit := 1000.0
+@export var map_limit := 195.0
 
-var _zoom := 420.0
-var _target_zoom := 420.0
+var _zoom := 110.0
+var _target_zoom := 110.0
 var _yaw := 0.0
 var _cam: Camera3D
 
@@ -24,8 +24,8 @@ var _cam: Camera3D
 func _ready() -> void:
 	_cam = Camera3D.new()
 	_cam.fov = 40.0
-	_cam.near = 2.0
-	_cam.far = 6000.0
+	_cam.near = 0.3
+	_cam.far = 1500.0
 	add_child(_cam)
 	_apply()
 
@@ -58,7 +58,7 @@ func _process(delta: float) -> void:
 	_zoom = lerpf(_zoom, _target_zoom, 1.0 - exp(-10.0 * delta))
 
 	if dir != Vector2.ZERO:
-		var speed := pan_speed * (_zoom / 420.0) * delta
+		var speed := pan_speed * (_zoom / 110.0) * delta
 		var move := Vector3(dir.x, 0.0, dir.y).normalized().rotated(Vector3.UP, _yaw)
 		position += move * speed
 	position.x = clampf(position.x, -map_limit, map_limit)

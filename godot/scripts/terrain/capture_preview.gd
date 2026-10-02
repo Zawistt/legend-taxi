@@ -26,12 +26,12 @@ func _init() -> void:
 	var terrain: TerrainManager = main.get_node("Terrain")
 	var cam: Camera3D = rig.get_child(0)
 	cam.current = true
-	cam.far = 9000.0
+	cam.far = 3000.0
 	cam.fov = 40.0
 	var shots := {
-		"godot_rts_overview": [Vector3(-1650, 1250, -1750), Vector3(40, 0, 20), false],
-		"godot_rts_zones": [Vector3(-1650, 1250, -1750), Vector3(40, 0, 20), true],
-		"godot_rts_base_view": [Vector3(-880, 330, -980), Vector3(-560, 15, -560), false],
+		"godot_rts_overview": [Vector3(-350, 265, -375), Vector3(8, 0, 4), false],
+		"godot_rts_zones": [Vector3(-350, 265, -375), Vector3(8, 0, 4), true],
+		"godot_rts_base_view": [Vector3(-190, 55, -215), Vector3(-120, 5, -120), false],
 	}
 	for key in shots:
 		var s: Array = shots[key]

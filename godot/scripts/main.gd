@@ -41,11 +41,11 @@ func _setup_environment() -> void:
 	# Cheap depth fog (works on every renderer / mobile) with aerial perspective.
 	env.fog_enabled = true
 	env.fog_light_color = Color(0.72, 0.80, 0.88)
-	env.fog_density = 0.00011
+	env.fog_density = 0.0005
 	env.fog_aerial_perspective = 0.35
 	env.fog_sky_affect = 0.0
-	env.fog_height = 40.0
-	env.fog_height_density = 0.0006
+	env.fog_height = 8.0
+	env.fog_height_density = 0.003
 	env.ssao_enabled = false
 	env.glow_enabled = false
 	var we := WorldEnvironment.new()
@@ -59,9 +59,9 @@ func _setup_environment() -> void:
 	sun.light_energy = 2.0
 	sun.shadow_enabled = true
 	sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS
-	sun.directional_shadow_max_distance = 1400.0
+	sun.directional_shadow_max_distance = 300.0
 	sun.directional_shadow_split_1 = 0.08
 	sun.directional_shadow_split_2 = 0.22
 	sun.directional_shadow_split_3 = 0.5
-	sun.shadow_normal_bias = 2.0
+	sun.shadow_normal_bias = 0.4
 	add_child(sun)

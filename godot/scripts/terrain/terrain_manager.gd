@@ -16,21 +16,22 @@ const TERRAIN_LAYER := 1 << 0
 @export var chunks_per_side := 4
 @export_group("LOD")
 ## Distance (m) at which LOD0 -> LOD1 and LOD1 -> LOD2. Measured to chunk centre.
-@export var lod1_distance := 750.0
-@export var lod2_distance := 1450.0
-@export var lod_fade_margin := 80.0
-@export var skirt_depth := 6.0
+@export var lod1_distance := 170.0
+@export var lod2_distance := 330.0
+@export var lod_fade_margin := 20.0
+@export var skirt_depth := 1.5
 @export_group("Collision")
-## Collision samples every N cells (2 => 7.8 m grid). Keep coarse; units follow navmesh.
-@export var collision_step := 2
+## Collision samples every N cells (4 => 3.3 m grid). Keep coarse; units follow navmesh.
+@export var collision_step := 4
 @export_group("Navigation")
-@export var nav_cell_size := 1.0
-@export var nav_cell_height := 0.5
-@export var nav_agent_radius := 2.0
-@export var nav_agent_height := 2.0
-@export var nav_agent_max_climb := 1.0
+# Sized for WorldScale: worker ~1.2 m tall / 0.4 m radius, 0.5 m nav radius for tight formations.
+@export var nav_cell_size := 0.25
+@export var nav_cell_height := 0.25
+@export var nav_agent_radius := 0.5
+@export var nav_agent_height := 1.5
+@export var nav_agent_max_climb := 0.5
 @export var nav_agent_max_slope := 35.0
-@export var nav_chunk_margin := 4.0
+@export var nav_chunk_margin := 1.5
 @export var terrain_material: ShaderMaterial
 
 var data: TerrainData
@@ -65,6 +66,7 @@ func _default_material() -> ShaderMaterial:
 	mat.shader = load("res://shaders/terrain.gdshader")
 	mat.set_shader_parameter("zone_map", load(TerrainData.ZONEMAP_PATH))
 	mat.set_shader_parameter("map_size", data.size_m)
+	mat.set_shader_parameter("world_scale", data.meta["world_scale_from_design"])
 	return mat
 
 
@@ -220,8 +222,8 @@ func _make_navmesh(chunk_aabb: AABB) -> NavigationMesh:
 	nm.agent_height = nav_agent_height
 	nm.agent_max_climb = nav_agent_max_climb
 	nm.agent_max_slope = nav_agent_max_slope
-	nm.region_min_size = 8.0
-	nm.region_merge_size = 20.0
+	nm.region_min_size = 2.0
+	nm.region_merge_size = 8.0
 	nm.border_size = nav_chunk_margin
 	nm.filter_baking_aabb = chunk_aabb.grow(nav_chunk_margin)
 	return nm

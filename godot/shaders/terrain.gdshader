@@ -5,7 +5,10 @@ shader_type spatial;
 // the 1 zone control map (only read when show_zones is on).
 
 uniform sampler2D zone_map : filter_linear, repeat_disable;
-uniform float map_size = 2000.0;
+uniform float map_size = 428.57;
+// Design-space metres per real metre; keeps texture/noise detail identical to the
+// original layout after the world was shrunk.
+uniform float world_scale = 4.667;
 uniform bool show_zones = false;
 
 uniform vec3 grass_light : source_color = vec3(0.30, 0.45, 0.16);
@@ -16,7 +19,7 @@ uniform vec3 rock_col : source_color = vec3(0.50, 0.47, 0.43);
 
 uniform float dirt_slope_start = 9.0;
 uniform float rock_slope_start = 17.0;
-uniform float rock_height_start = 85.0;
+uniform float rock_height_start = 21.0;   // metres (world units)
 
 varying vec3 v_world;
 varying vec3 v_world_normal;
@@ -45,18 +48,18 @@ void vertex() {
 }
 
 void fragment() {
-	vec2 wp = v_world.xz;
+	vec2 wp = v_world.xz * world_scale;
 	float slope = degrees(acos(clamp(v_world_normal.y, 0.0, 1.0)));
 
 	float n_large = fbm(wp * 0.006);
 	float n_mid = fbm(wp * 0.03 + 17.0);
 	float n_fine = fbm(wp * 0.35);
 
-	vec3 col = mix(grass_dark, grass_light, clamp(n_large * 0.9 + v_world.y / 140.0, 0.0, 1.0));
+	vec3 col = mix(grass_dark, grass_light, clamp(n_large * 0.9 + v_world.y * world_scale * 1.2 / 140.0, 0.0, 1.0));
 	col = mix(col, grass_dry, smoothstep(0.55, 0.85, n_mid) * 0.8);
 	float dirt = clamp((slope - dirt_slope_start) / 8.0 * 0.9 + smoothstep(0.78, 0.95, n_mid) * 0.7, 0.0, 1.0);
 	col = mix(col, dirt_col, dirt);
-	float rock = clamp((slope - rock_slope_start) / 8.0 + (v_world.y - rock_height_start) / 30.0, 0.0, 1.0);
+	float rock = clamp((slope - rock_slope_start) / 8.0 + (v_world.y - rock_height_start) / 7.5, 0.0, 1.0);
 	col = mix(col, rock_col, rock);
 	col *= 0.92 + 0.16 * n_fine; // subtle micro variation
 

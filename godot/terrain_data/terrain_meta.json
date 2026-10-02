@@ -1,26 +1,152 @@
 {
-  "size_m": 2000.0,
+  "size_m": 428.57,
+  "playable_half_m": 179.99939999999998,
   "cells": 512,
   "grid": 513,
-  "cell_m": 3.90625,
+  "cell_m": 0.83705078125,
   "chunks_per_side": 4,
   "cells_per_chunk": 128,
-  "max_height_m": 160.0,
+  "max_height_m": 26.065197572143077,
+  "world_scale_from_design": 4.6666822222740745,
+  "vertical_scale": 0.257142,
   "base_a": [
-    -640.0,
-    -640.0
+    -137.14239999999998,
+    -137.14239999999998
   ],
   "base_b": [
-    640.0,
-    640.0
+    137.14239999999998,
+    137.14239999999998
   ],
-  "base_height_m": 22.0,
+  "base_height_m": 5.657124,
+  "resource_sites": [
+    {
+      "kind": "near",
+      "owner": 0,
+      "pos": [
+        -107.14,
+        -167.41
+      ],
+      "height": 6.11
+    },
+    {
+      "kind": "near",
+      "owner": 1,
+      "pos": [
+        117.19,
+        156.53
+      ],
+      "height": 5.66
+    },
+    {
+      "kind": "near",
+      "owner": 0,
+      "pos": [
+        -156.53,
+        -117.19
+      ],
+      "height": 5.66
+    },
+    {
+      "kind": "near",
+      "owner": 1,
+      "pos": [
+        156.53,
+        117.19
+      ],
+      "height": 5.66
+    },
+    {
+      "kind": "near",
+      "owner": 0,
+      "pos": [
+        -98.77,
+        -99.61
+      ],
+      "height": 6.28
+    },
+    {
+      "kind": "near",
+      "owner": 1,
+      "pos": [
+        111.33,
+        97.1
+      ],
+      "height": 6.49
+    },
+    {
+      "kind": "exp",
+      "owner": 0,
+      "pos": [
+        -137.28,
+        -53.57
+      ],
+      "height": 7.39
+    },
+    {
+      "kind": "exp",
+      "owner": 1,
+      "pos": [
+        137.28,
+        53.57
+      ],
+      "height": 7.39
+    },
+    {
+      "kind": "exp",
+      "owner": 0,
+      "pos": [
+        -53.57,
+        -137.28
+      ],
+      "height": 7.39
+    },
+    {
+      "kind": "exp",
+      "owner": 1,
+      "pos": [
+        53.57,
+        137.28
+      ],
+      "height": 7.39
+    },
+    {
+      "kind": "center",
+      "owner": -1,
+      "pos": [
+        2.51,
+        4.19
+      ],
+      "height": 5.58
+    },
+    {
+      "kind": "center",
+      "owner": -1,
+      "pos": [
+        -73.66,
+        56.08
+      ],
+      "height": 16.52
+    },
+    {
+      "kind": "center",
+      "owner": -1,
+      "pos": [
+        75.33,
+        -56.92
+      ],
+      "height": 16.87
+    }
+  ],
   "stats": {
+    "map_size_m": 428.57,
+    "playable_size_m": 359.99879999999996,
     "min_h": 0.0,
-    "max_h": 101.36499510831788,
-    "max_slope_playable_deg": 19.155767767273037,
-    "p95_slope_playable_deg": 11.5527527994056,
-    "buildable_pct_playable": 10.80528205597515,
-    "high_ground_pct": 27.65004495023175
+    "max_h": 26.065197572143077,
+    "max_slope_playable_deg": 22.628607294870548,
+    "p95_slope_playable_deg": 13.782166933506945,
+    "buildable_pct_playable": 10.807435360490093,
+    "buildable_m2_total": 14066.32991261444,
+    "high_ground_pct": 27.772244981454662,
+    "base_to_base_straight_m": 387.8972841127919
   }
 }
