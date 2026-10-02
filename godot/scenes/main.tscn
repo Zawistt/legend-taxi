@@ -1,14 +1,17 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/terrain/terrain_manager.gd" id="2_terrain"]
 [ext_resource type="Script" path="res://scripts/camera/rts_camera.gd" id="3_cam"]
+[ext_resource type="PackedScene" path="res://scenes/resources/resource_layout.tscn" id="4_res"]
 
 [node name="Main" type="Node3D"]
 script = ExtResource("1_main")
 
 [node name="Terrain" type="Node3D" parent="."]
 script = ExtResource("2_terrain")
+
+[node name="Resources" parent="." instance=ExtResource("4_res")]
 
 [node name="RtsCamera" type="Node3D" parent="."]
 script = ExtResource("3_cam")

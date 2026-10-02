@@ -29,12 +29,23 @@ func _init() -> void:
 	cam.far = 3000.0
 	cam.fov = 40.0
 	# [camera position, look target, show_zones, show_paths]
+	var db := ResourceDatabase.load_default()
 	var shots := {
 		"godot_rts_overview": [Vector3(-350, 265, -375), Vector3(8, 0, 4), false, false],
 		"godot_rts_lanes": [Vector3(-350, 265, -375), Vector3(8, 0, 4), false, true],
 		"godot_rts_zones": [Vector3(-350, 265, -375), Vector3(8, 0, 4), true, false],
 		"godot_rts_base_view": [Vector3(-190, 55, -215), Vector3(-120, 5, -120), false, false],
 	}
+	# resource close-ups: camera between the resource and its drop-off base, 40 m high
+	for key in ["gold_safe_a_p1", "wood_safe_p1", "stone_safe_p1", "wood_side_p1", "gold_center_a", "gold_center_b"]:
+		var l: Dictionary = db.by_id[key]
+		var c: Vector3 = l["position"]
+		var base: Vector3 = terrain.data.base_position(0 if l["dropoff_base"] == "BASE_A" else 1)
+		var dir := Vector3(base.x - c.x, 0.0, base.z - c.z).normalized()
+		shots["godot_res_" + key] = [c + dir * 30.0 + Vector3(0, 24, 0), c + Vector3(0, 1.5, 0), false, false]
+	var cc: Vector3 = (db.by_id["gold_center_a"]["position"] + db.by_id["crystal_center_a"]["position"]) * 0.5
+	shots["godot_res_center_ne"] = [cc + Vector3(-34, 30, 36), cc, false, false]
+	shots["godot_res_medium_p1"] = [Vector3(-60, 95, -75), Vector3(-120, 5, -145), false, false]
 	for key in shots:
 		var s: Array = shots[key]
 		rig.global_transform = Transform3D.IDENTITY

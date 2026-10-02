@@ -14,6 +14,7 @@ uniform bool show_zones = false;
 // --- movement structure (roads / lanes / blocked terrain) ---
 uniform sampler2D road_map : filter_linear, repeat_disable;   // R alpha, G wear, B lane id * 32
 uniform sampler2D block_map : filter_linear, repeat_disable;  // R forest, G rock, A choke highlight
+uniform sampler2D resource_map : filter_linear, repeat_disable;  // R clearing, G type (64 gold, 128 wood, 192 stone, 255 crystal), B slot ring
 uniform bool show_paths = false;                              // debug: colour roads by lane, show chokes
 uniform vec3 road_col : source_color = vec3(0.40, 0.31, 0.20);
 uniform vec3 road_light : source_color = vec3(0.50, 0.41, 0.29);
@@ -33,10 +34,10 @@ uniform float rock_height_start = 21.0;   // metres (world units)
 varying vec3 v_world;
 varying vec3 v_world_normal;
 
-float hash21(vec2 p) {
-	p = fract(p * vec2(123.34, 456.21));
-	p += dot(p, p + 45.32);
-	return fract(p.x * p.y);
+float hash21(vec2 p) {                     // Hoskins hash: no visible lattice / moire at close range
+	vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+	p3 += dot(p3, p3.yzx + 33.33);
+	return fract((p3.x + p3.y) * p3.z);
 }
 
 float vnoise(vec2 p) {
@@ -70,7 +71,7 @@ void fragment() {
 	col = mix(col, dirt_col, dirt);
 	float rock = clamp((slope - rock_slope_start) / 8.0 + (v_world.y - rock_height_start) / 7.5, 0.0, 1.0);
 	col = mix(col, rock_col, rock);
-	col *= 0.92 + 0.16 * n_fine; // subtle micro variation
+	col *= 0.95 + 0.10 * n_fine; // subtle micro variation
 
 	// ---- blocked terrain: dense vegetation / rock formations (purely visual, nav is carved by polygons)
 	vec2 uv = v_world.xz / map_size + 0.5;
@@ -91,6 +92,20 @@ void fragment() {
 	vec3 rcol2 = mix(road_col, road_light, rd.g) * (0.88 + 0.22 * fbm(wp * 1.3));
 	rcol2 = mix(rcol2, rcol2 * 0.72, rim * 0.8);                // darker worn verge
 	col = mix(col, rcol2, road * (1.0 - 0.0 * rough_extra));
+
+	// ---- resource work areas: trampled ground under every deposit / grove (no geometry)
+	vec4 rs = texture(resource_map, uv);
+	float rclear = smoothstep(0.15, 0.85, rs.r) * (1.0 - road * 0.6);
+	if (rclear > 0.001) {
+		float code = rs.g * 255.0;
+		vec3 rg = vec3(0.50, 0.44, 0.30);                              // gold: pale ochre dust
+		if (code > 100.0 && code < 160.0) rg = vec3(0.19, 0.17, 0.09);   // wood: leaf litter
+		else if (code >= 160.0 && code < 230.0) rg = vec3(0.46, 0.45, 0.43); // stone: grey gravel
+		else if (code >= 230.0) rg = vec3(0.20, 0.15, 0.30);              // crystal: dark violet earth
+		rg *= 0.85 + 0.3 * fbm(wp * 1.1);
+		col = mix(col, rg, rclear * 0.78);
+		col = mix(col, col * 0.78, rs.b * rclear * 0.6);               // worn ring where workers gather
+	}
 
 	if (show_paths) {
 		int lane = int(rd.b * 255.0 / 32.0 + 0.5);

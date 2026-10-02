@@ -36,7 +36,7 @@ func _setup_environment() -> void:
 	env.sky = sky
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
 	env.ambient_light_color = Color(0.55, 0.64, 0.80)
-	env.ambient_light_energy = 0.30
+	env.ambient_light_energy = 0.40
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
 	env.tonemap_exposure = 0.85
 	# Cheap depth fog (works on every renderer / mobile) with aerial perspective.
@@ -64,5 +64,7 @@ func _setup_environment() -> void:
 	sun.directional_shadow_split_1 = 0.08
 	sun.directional_shadow_split_2 = 0.22
 	sun.directional_shadow_split_3 = 0.5
-	sun.shadow_normal_bias = 0.4
+	sun.shadow_normal_bias = 1.2
+	sun.shadow_bias = 0.25
+	sun.directional_shadow_blend_splits = true
 	add_child(sun)

@@ -1,0 +1,61 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/resources/resource_node.tscn" id="1"]
+[ext_resource type="ArrayMesh" path="res://resources/meshes/crystal_cluster_a.res" id="2"]
+[ext_resource type="ArrayMesh" path="res://resources/meshes/crystal_cluster_a_lod.res" id="3"]
+
+[sub_resource type="CylinderShape3D" id="Shape_body"]
+height = 6.0
+radius = 3.0
+
+[sub_resource type="SphereShape3D" id="Shape_area"]
+radius = 9.0
+
+[node name="CrystalCluster" instance=ExtResource("1")]
+metadata/resource_type = "crystal"
+metadata/resource_amount = 2500
+metadata/gather_rate = 0.8
+metadata/gather_range = 2.4
+metadata/respawn_time = -1
+metadata/max_workers = 4
+metadata/carry_capacity = 5
+metadata/regen_rule = "none"
+metadata/regen_rate = 0.0
+metadata/regen_delay = 0
+
+[node name="CollisionShape3D" parent="." index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 3.000, 0.000)
+shape = SubResource("Shape_body")
+
+[node name="CollisionShape3D" parent="WorkerInteractionArea" index="0"]
+shape = SubResource("Shape_area")
+
+[node name="Mesh" parent="." index="1"]
+mesh = ExtResource("2")
+
+[node name="MeshLOD" parent="." index="2"]
+mesh = ExtResource("3")
+
+[node name="GatheringPoint" parent="." index="3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 0.000, 6.200)
+
+[node name="Approach" parent="NavigationAccess" index="0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 0.000, 11.050)
+
+[node name="Slot_0" type="Marker3D" parent="NavigationAccess"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 0.000, 6.200)
+
+[node name="Slot_1" type="Marker3D" parent="NavigationAccess"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.200, 0.000, 0.000)
+
+[node name="Slot_2" type="Marker3D" parent="NavigationAccess"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.000, 0.000, -6.200)
+
+[node name="Slot_3" type="Marker3D" parent="NavigationAccess"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.200, 0.000, -0.000)
+
+[node name="Glow" parent="ResourceVisual" index="0"]
+visible = true
+modulate = Color(0.7, 0.45, 1, 0.5)
+pixel_size = 0.06
+

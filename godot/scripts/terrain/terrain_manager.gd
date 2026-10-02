@@ -74,6 +74,7 @@ func _default_material() -> ShaderMaterial:
 	mat.set_shader_parameter("zone_map", load(TerrainData.ZONEMAP_PATH))
 	mat.set_shader_parameter("road_map", load(TerrainData.ROADMAP_PATH))
 	mat.set_shader_parameter("block_map", load(TerrainData.BLOCKMAP_PATH))
+	mat.set_shader_parameter("resource_map", load(TerrainData.RESOURCEMAP_PATH))
 	mat.set_shader_parameter("map_size", data.size_m)
 	mat.set_shader_parameter("world_scale", data.meta["world_scale_from_design"])
 	return mat
@@ -222,10 +223,12 @@ func _add_collision(chunk: Node3D, origin_col: int, origin_row: int) -> void:
 
 const NAV_DIR := "res://terrain_data/nav/"
 const BLOCKERS_PATH := "res://terrain_data/blockers.json"
+const RESOURCES_PATH := "res://terrain_data/resources.json"
 const OBSTRUCTION_BOTTOM := -3.0
 const OBSTRUCTION_HEIGHT := 80.0
 
 var _blockers: Array = []          # [{kind, polygon:[[x,z]...]}]  convex forest / rock zones
+var _resource_footprints: Array = []   # [[x,z]...] polygons: solid deposits / groves (workers use the slots around them)
 var _network: PathNetwork
 
 
@@ -242,6 +245,10 @@ func _load_blockers() -> void:
 	var f := FileAccess.open(BLOCKERS_PATH, FileAccess.READ)
 	if f != null:
 		_blockers = JSON.parse_string(f.get_as_text())["blockers"]
+	var rf := FileAccess.open(RESOURCES_PATH, FileAccess.READ)
+	if rf != null:
+		for loc in JSON.parse_string(rf.get_as_text())["locations"]:
+			_resource_footprints.append(loc["nav_footprint"])
 
 
 func _make_navmesh(chunk_aabb: AABB) -> NavigationMesh:
@@ -284,6 +291,19 @@ func _add_blockers(source: NavigationMeshSourceGeometryData3D, area: AABB) -> in
 		source.add_projected_obstruction(verts, OBSTRUCTION_BOTTOM, OBSTRUCTION_HEIGHT, true)
 		count += 1
 	return count
+
+
+## Solid resource footprints (deposit rocks, groves) are carved out; the slot ring around them stays walkable.
+func _add_resource_footprints(source: NavigationMeshSourceGeometryData3D, area: AABB) -> void:
+	for poly in _resource_footprints:
+		var verts := PackedVector3Array()
+		var inside := false
+		for p in poly:
+			verts.append(Vector3(p[0], 0.0, p[1]))
+			if area.has_point(Vector3(p[0], area.position.y + 1.0, p[1])):
+				inside = true
+		if inside:
+			source.add_projected_obstruction(verts, OBSTRUCTION_BOTTOM, OBSTRUCTION_HEIGHT, true)
 
 
 ## Four carved strips outside the playable square so nothing on the mountain rim is navigable.
@@ -349,6 +369,7 @@ func bake_navigation(save := false) -> void:
 		var source := NavigationMeshSourceGeometryData3D.new()
 		NavigationServer3D.parse_source_geometry_data(nm, source, self)
 		_add_blockers(source, aabb.grow(nav_chunk_margin + 2.0))
+		_add_resource_footprints(source, aabb.grow(nav_chunk_margin + 2.0))
 		_add_boundary(source, aabb)
 		NavigationServer3D.bake_from_source_geometry_data(nm, source)
 		if save:

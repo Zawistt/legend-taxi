@@ -10,6 +10,7 @@ const ZONEMAP_PATH := "res://terrain_data/zonemap.png"
 const META_PATH := "res://terrain_data/terrain_meta.json"
 const ROADMAP_PATH := "res://terrain_data/roadmap.png"
 const BLOCKMAP_PATH := "res://terrain_data/blockmap.png"
+const RESOURCEMAP_PATH := "res://terrain_data/resourcemap.png"
 
 ## Lane ids stored in the roadmap blue channel (value * 32).
 enum Lane { NONE = 0, CENTER = 1, LEFT = 2, RIGHT = 3, LINK = 4, RAMP = 5, WORK = 6 }

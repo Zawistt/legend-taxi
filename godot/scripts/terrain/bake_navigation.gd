@@ -19,6 +19,21 @@ func _init() -> void:
 	quit(0 if ok else 1)
 
 
+func _in_resource_footprint(q: Vector3, terrain: TerrainManager) -> bool:
+	for loc in _db().locations:
+		var c: Vector3 = loc["position"]
+		if Vector2(q.x - c.x, q.z - c.z).length() < float(loc["footprint_radius"]) + 1.2:
+			return true
+	return false
+
+
+var _db_cache: ResourceDatabase
+func _db() -> ResourceDatabase:
+	if _db_cache == null:
+		_db_cache = ResourceDatabase.load_default()
+	return _db_cache
+
+
 func _report(terrain: TerrainManager) -> void:
 	var polys := 0
 	var verts := 0
@@ -144,6 +159,8 @@ func _validate(terrain: TerrainManager) -> bool:
 			var rr := sqrt(rng.randf()) * r
 			var q := Vector3(c.x + cos(ang) * rr, 0.0, c.z + sin(ang) * rr)
 			q.y = terrain.data.height_at(q.x, q.z)
+			if _in_resource_footprint(q, terrain):
+				continue                         # solid deposits / groves are intentionally carved
 			if NavigationServer3D.map_get_closest_point(map, q).distance_to(q) > 0.75:
 				bad += 1
 		print(k, " samples off navmesh: ", bad, " / 300")
@@ -164,6 +181,63 @@ func _validate(terrain: TerrainManager) -> bool:
 	print("rim samples navigable: ", rim_bad, " / 200")
 	if rim_bad > 0:
 		ok = false
+
+	# 7. resource system: slots reachable, solid footprints carved, fair walking distances
+	var db := ResourceDatabase.load_default()
+	var res_bad := 0
+	var walk_len := {}                        # id -> navmesh path length base -> gathering point
+	var min_slot_gap := 1e9
+	for loc in db.locations:
+		var slots: Array = loc["slots"]
+		for s_ in slots:
+			if NavigationServer3D.map_get_closest_point(map, s_).distance_to(s_) > 0.75:
+				res_bad += 1
+				print("  slot off navmesh: ", loc["id"], " ", s_)
+		var c: Vector3 = loc["position"]
+		if NavigationServer3D.map_get_closest_point(map, c).distance_to(c) < float(loc["footprint_radius"]) * 0.5:
+			res_bad += 1
+			print("  footprint centre still navigable: ", loc["id"])
+		for i in slots.size():
+			for j in range(i + 1, slots.size()):
+				min_slot_gap = minf(min_slot_gap, (slots[i] as Vector3).distance_to(slots[j]))
+		var base: Vector3 = terrain.data.base_position(0 if loc["dropoff_base"] == "BASE_A" else 1)
+		var p := NavigationServer3D.map_get_path(map, base, loc["gathering_point"], true)
+		if p.is_empty():
+			res_bad += 1
+			print("  no path base -> ", loc["id"])
+			continue
+		var l := 0.0
+		for i in range(1, p.size()):
+			l += p[i].distance_to(p[i - 1])
+		walk_len[loc["id"]] = l
+	print("resource problems: ", res_bad, " | min gap between worker slots: ", snappedf(min_slot_gap, 0.1), " m")
+	if res_bad > 0 or min_slot_gap < 1.9:
+		ok = false
+	var worst_ratio := 1.0
+	var rows: Array[String] = []
+	for loc in db.locations:
+		if loc["owner"] != 0:
+			continue
+		var twin_id: String = String(loc["id"]).replace("_p1", "_p2")
+		var len1: float = walk_len.get(loc["id"], 0.0)
+		var len2: float = walk_len.get(twin_id, 0.0)
+		var r := maxf(len1, len2) / maxf(minf(len1, len2), 0.01)
+		worst_ratio = maxf(worst_ratio, r)
+		rows.append("%s P1 %.1f m | P2 %.1f m" % [loc["group"], len1, len2])
+	print("walking distance base -> resource (navmesh):")
+	for row in rows:
+		print("  ", row)
+	print("worst P1/P2 walking distance ratio: ", snappedf(worst_ratio, 0.001))
+	if worst_ratio > 1.12:
+		ok = false
+	# neutral resources: both players' combined distance must match
+	var sum_a := 0.0
+	var sum_b := 0.0
+	for loc in db.locations:
+		if loc["owner"] == -1:
+			sum_a += (loc["position"] as Vector3).distance_to(terrain.data.base_position(0))
+			sum_b += (loc["position"] as Vector3).distance_to(terrain.data.base_position(1))
+	print("neutral resources: summed distance to base A ", snappedf(sum_a, 0.1), " m, to base B ", snappedf(sum_b, 0.1), " m")
 
 	print("NAVIGATION CHECKS ", "PASSED" if ok else "FAILED")
 	return ok

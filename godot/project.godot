@@ -52,6 +52,7 @@ toggle_zones={
 3d_physics/layer_1="terrain"
 3d_physics/layer_2="units"
 3d_physics/layer_3="buildings"
+3d_physics/layer_4="resources"
 
 [navigation]
 
