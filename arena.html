@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Legend Kombat Arena</title>
+<style>
+  html,body{margin:0;height:100%;background:#000;overflow:hidden;touch-action:none;font-family:sans-serif}
+  canvas{display:block;width:100%;height:100%}
+  .btn{position:fixed;bottom:18px;width:84px;height:84px;border-radius:50%;border:2px solid #fff6;
+       background:#0006;color:#fff;font-size:34px;display:flex;align-items:center;justify-content:center;
+       user-select:none;-webkit-user-select:none}
+  #l{left:18px}#r{left:118px}#j{right:18px}
+  #h{position:fixed;top:10px;left:50%;transform:translateX(-50%);color:#fffc;font-size:13px;text-shadow:0 1px 3px #000}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<div id="h">A/D yoki ←/→ — yurish · Space — sakrash</div>
+<div class="btn" id="l">◀</div><div class="btn" id="r">▶</div><div class="btn" id="j">▲</div>
+<script>
+(function(){
+  var cv = document.getElementById('c'), g = cv.getContext('2d');
+  var img = new Image(); img.src = 'arena.webp';
+  var W, H, dpr;
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = cv.width = innerWidth * dpr; H = cv.height = innerHeight * dpr;
+  }
+  addEventListener('resize', resize); resize();
+
+  // Dunyo: rasm balandlikka moslanadi, kengligi to'liq panorama.
+  // Ekran panoramadan tor bo'lsa, kamera qismini ko'rsatadi va qahramon ortidan siljiydi.
+  var FLOOR = 0.80;                 // maydon polining balandlikdagi ulushi
+  var p = { x: 0, v: 0, y: 0, vy: 0, dir: 1, t: 0 };
+  var cam = 0, worldW = 1;
+  var keys = {};
+  addEventListener('keydown', function(e){ keys[e.code] = true; if (e.code === 'Space') e.preventDefault(); });
+  addEventListener('keyup',   function(e){ keys[e.code] = false; });
+  function hold(id, code){
+    var el = document.getElementById(id);
+    ['pointerdown','pointerenter'].forEach(function(n){ el.addEventListener(n, function(e){ if (e.buttons || n === 'pointerdown') keys[code] = true; }); });
+    ['pointerup','pointerleave','pointercancel'].forEach(function(n){ el.addEventListener(n, function(){ keys[code] = false; }); });
+  }
+  hold('l','ArrowLeft'); hold('r','ArrowRight'); hold('j','Space');
+
+  var last = performance.now();
+  function frame(now){
+    var dt = Math.min((now - last) / 1000, 0.05); last = now;
+    if (img.complete && img.naturalWidth){
+      var scale = H / img.naturalHeight;
+      worldW = img.naturalWidth * scale;
+      var unit = H / 100;                          // masshtab birligi
+      if (!p.init){ p.x = worldW / 2; p.init = true; cam = p.x - W / 2; }
+
+      var ax = (keys.ArrowRight || keys.KeyD ? 1 : 0) - (keys.ArrowLeft || keys.KeyA ? 1 : 0);
+      var speed = 38 * unit;
+      p.v += (ax * speed - p.v) * Math.min(1, dt * 12);
+      if (ax) p.dir = ax;
+      p.x += p.v * dt;
+      p.x = Math.max(6 * unit, Math.min(worldW - 6 * unit, p.x));
+      if ((keys.Space || keys.ArrowUp || keys.KeyW) && p.y === 0) p.vy = 70 * unit;
+      p.vy -= 190 * unit * dt; p.y += p.vy * dt;
+      if (p.y < 0){ p.y = 0; p.vy = 0; }
+      p.t += dt * Math.abs(p.v) / unit * 0.35;
+
+      // Kamera: o'lik zona (ekranning o'rta 30%) — qahramon chetga yetganda siljiydi
+      var dz = W * 0.15, target = cam;
+      if (p.x - cam > W / 2 + dz) target = p.x - W / 2 - dz;
+      if (p.x - cam < W / 2 - dz) target = p.x - W / 2 + dz;
+      cam += (target - cam) * Math.min(1, dt * 8);
+      cam = worldW <= W ? (worldW - W) / 2 : Math.max(0, Math.min(worldW - W, cam));
+
+      g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+      g.drawImage(img, -cam, 0, worldW, H);
+
+      // Qahramon
+      var fx = p.x - cam, fy = H * FLOOR - p.y, s = unit;
+      var sw = Math.sin(p.t * 6) * Math.min(1, Math.abs(p.v) / speed) * 5 * s;
+      g.fillStyle = '#0007'; g.beginPath();
+      g.ellipse(fx, H * FLOOR + 1.5 * s, 6 * s * (1 - p.y / (40 * unit) * .5), 1.6 * s, 0, 0, 7); g.fill();
+      g.save(); g.translate(fx, fy); g.scale(p.dir, 1);
+      g.lineCap = 'round'; g.lineWidth = 3 * s;
+      g.strokeStyle = '#1b1b24';
+      g.beginPath(); g.moveTo(-1 * s, -12 * s); g.lineTo(-1 * s + sw, 0); g.moveTo(1 * s, -12 * s); g.lineTo(1 * s - sw, 0); g.stroke();
+      g.fillStyle = '#b3202a'; g.fillRect(-4 * s, -27 * s, 8 * s, 16 * s);
+      g.fillStyle = '#d9a441'; g.fillRect(-4 * s, -14 * s, 8 * s, 2 * s);
+      g.strokeStyle = '#d8b08c';
+      g.beginPath(); g.moveTo(3 * s, -24 * s); g.lineTo(7 * s + sw * .5, -17 * s); g.stroke();
+      g.fillStyle = '#d8b08c'; g.beginPath(); g.arc(0, -31 * s, 3.6 * s, 0, 7); g.fill();
+      g.fillStyle = '#111'; g.fillRect(-3.8 * s, -35 * s, 7.6 * s, 2.4 * s);
+      g.restore();
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
