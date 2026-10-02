@@ -30,7 +30,8 @@ const TERRAIN_LAYER := 1 << 0
 @export var nav_agent_radius := 0.5
 @export var nav_agent_height := 1.5
 @export var nav_agent_max_climb := 0.5
-@export var nav_agent_max_slope := 35.0
+## Must match NAV_MAX_SLOPE in tools/generate_paths.py (the road network is validated against it).
+@export var nav_agent_max_slope := 18.0
 @export var nav_chunk_margin := 1.5
 @export var terrain_material: ShaderMaterial
 
@@ -55,16 +56,24 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("toggle_zones"):
 		set_show_zones(not terrain_material.get_shader_parameter("show_zones"))
+	elif event.is_action_pressed("toggle_paths"):
+		set_show_paths(not terrain_material.get_shader_parameter("show_paths"))
 
 
 func set_show_zones(on: bool) -> void:
 	terrain_material.set_shader_parameter("show_zones", on)
 
 
+func set_show_paths(on: bool) -> void:
+	terrain_material.set_shader_parameter("show_paths", on)
+
+
 func _default_material() -> ShaderMaterial:
 	var mat := ShaderMaterial.new()
 	mat.shader = load("res://shaders/terrain.gdshader")
 	mat.set_shader_parameter("zone_map", load(TerrainData.ZONEMAP_PATH))
+	mat.set_shader_parameter("road_map", load(TerrainData.ROADMAP_PATH))
+	mat.set_shader_parameter("block_map", load(TerrainData.BLOCKMAP_PATH))
 	mat.set_shader_parameter("map_size", data.size_m)
 	mat.set_shader_parameter("world_scale", data.meta["world_scale_from_design"])
 	return mat
@@ -211,6 +220,30 @@ func _add_collision(chunk: Node3D, origin_col: int, origin_row: int) -> void:
 
 # ------------------------------------------------------------ navigation ----
 
+const NAV_DIR := "res://terrain_data/nav/"
+const BLOCKERS_PATH := "res://terrain_data/blockers.json"
+const OBSTRUCTION_BOTTOM := -3.0
+const OBSTRUCTION_HEIGHT := 80.0
+
+var _blockers: Array = []          # [{kind, polygon:[[x,z]...]}]  convex forest / rock zones
+var _network: PathNetwork
+
+
+## Strategic road graph (lanes, nodes, ramps) - for AI / camera hints / debug.
+func get_path_network() -> PathNetwork:
+	if _network == null:
+		_network = PathNetwork.load_default()
+	return _network
+
+
+func _load_blockers() -> void:
+	if not _blockers.is_empty():
+		return
+	var f := FileAccess.open(BLOCKERS_PATH, FileAccess.READ)
+	if f != null:
+		_blockers = JSON.parse_string(f.get_as_text())["blockers"]
+
+
 func _make_navmesh(chunk_aabb: AABB) -> NavigationMesh:
 	var nm := NavigationMesh.new()
 	nm.geometry_parsed_geometry_type = NavigationMesh.PARSED_GEOMETRY_STATIC_COLLIDERS
@@ -229,25 +262,107 @@ func _make_navmesh(chunk_aabb: AABB) -> NavigationMesh:
 	return nm
 
 
-## Bakes one navmesh tile per chunk (call once at load, or from the editor tool
-## script res://scripts/terrain/bake_navigation.gd to store the result on disk).
-func bake_navigation() -> void:
+## Adds the forest / rock zones as carving obstructions (no meshes, no colliders).
+func _add_blockers(source: NavigationMeshSourceGeometryData3D, area: AABB) -> int:
+	var count := 0
+	for b in _blockers:
+		var poly: Array = b["polygon"]
+		var verts := PackedVector3Array()
+		var inside := false
+		for p in poly:
+			verts.append(Vector3(p[0], 0.0, p[1]))
+			if area.has_point(Vector3(p[0], area.position.y + 1.0, p[1])):
+				inside = true
+		if not inside:
+			# polygon may still cross the tile without a vertex inside it
+			var minx := 1e9; var maxx := -1e9; var minz := 1e9; var maxz := -1e9
+			for p in poly:
+				minx = minf(minx, p[0]); maxx = maxf(maxx, p[0])
+				minz = minf(minz, p[1]); maxz = maxf(maxz, p[1])
+			if maxx < area.position.x or minx > area.end.x or maxz < area.position.z or minz > area.end.z:
+				continue
+		source.add_projected_obstruction(verts, OBSTRUCTION_BOTTOM, OBSTRUCTION_HEIGHT, true)
+		count += 1
+	return count
+
+
+## Four carved strips outside the playable square so nothing on the mountain rim is navigable.
+func _add_boundary(source: NavigationMeshSourceGeometryData3D, area: AABB) -> void:
+	var inner: float = data.meta["playable_half_m"] + 2.0
+	var outer := data.size_m * 0.5 + 20.0
+	var strips := [
+		[Vector2(-outer, -outer), Vector2(outer, -outer), Vector2(outer, -inner), Vector2(-outer, -inner)],
+		[Vector2(-outer, inner), Vector2(outer, inner), Vector2(outer, outer), Vector2(-outer, outer)],
+		[Vector2(-outer, -inner), Vector2(-inner, -inner), Vector2(-inner, inner), Vector2(-outer, inner)],
+		[Vector2(inner, -inner), Vector2(outer, -inner), Vector2(outer, inner), Vector2(inner, inner)],
+	]
+	for st in strips:
+		var verts := PackedVector3Array()
+		for p in st:
+			verts.append(Vector3(p.x, 0.0, p.y))
+		source.add_projected_obstruction(verts, OBSTRUCTION_BOTTOM, OBSTRUCTION_HEIGHT, true)
+
+
+func _chunk_aabb(chunk: Node3D) -> AABB:
+	var chunk_m := _cells_per_chunk * data.cell_m
+	var maxh: float = data.meta["max_height_m"]
+	return AABB(Vector3(chunk.position.x - chunk_m * 0.5, -5.0, chunk.position.z - chunk_m * 0.5),
+			Vector3(chunk_m, maxh + 10.0, chunk_m))
+
+
+## Loads the pre-baked navmesh tiles stored by bake_navigation.gd (instant, mobile friendly).
+## Returns false when no baked data exists.
+func load_baked_navigation() -> bool:
 	for r in nav_regions:
 		r.queue_free()
 	nav_regions.clear()
-	var chunk_m := _cells_per_chunk * data.cell_m
-	var maxh: float = data.meta["max_height_m"]
 	for chunk in chunks:
-		var aabb := AABB(Vector3(chunk.position.x - chunk_m * 0.5, -5.0, chunk.position.z - chunk_m * 0.5),
-				Vector3(chunk_m, maxh + 10.0, chunk_m))
+		var path := NAV_DIR + "nav_%s.res" % chunk.name.trim_prefix("Chunk_")
+		if not ResourceLoader.exists(path):
+			for r in nav_regions:
+				r.queue_free()
+			nav_regions.clear()
+			return false
+		var region := NavigationRegion3D.new()
+		region.name = "Nav_" + chunk.name
+		region.navigation_mesh = load(path)
+		add_child(region)
+		nav_regions.append(region)
+	navigation_baked.emit()
+	return true
+
+
+## Bakes one navmesh tile per chunk. Terrain colliders give the walkable surface (slope limit
+## = cliffs), blockers.json carves forests / rock formations. Pass save=true to store the
+## tiles in res://terrain_data/nav/ (editor / tool scripts only).
+func bake_navigation(save := false) -> void:
+	_load_blockers()
+	for r in nav_regions:
+		r.queue_free()
+	nav_regions.clear()
+	if save:
+		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(NAV_DIR))
+	for chunk in chunks:
+		var aabb := _chunk_aabb(chunk)
 		var nm := _make_navmesh(aabb)
 		# Parse from this node so every chunk's terrain collider is a source.
 		var source := NavigationMeshSourceGeometryData3D.new()
 		NavigationServer3D.parse_source_geometry_data(nm, source, self)
+		_add_blockers(source, aabb.grow(nav_chunk_margin + 2.0))
+		_add_boundary(source, aabb)
 		NavigationServer3D.bake_from_source_geometry_data(nm, source)
+		if save:
+			ResourceSaver.save(nm, NAV_DIR + "nav_%s.res" % chunk.name.trim_prefix("Chunk_"),
+					ResourceSaver.FLAG_COMPRESS)
 		var region := NavigationRegion3D.new()
 		region.name = "Nav_" + chunk.name
 		region.navigation_mesh = nm
 		add_child(region)
 		nav_regions.append(region)
 	navigation_baked.emit()
+
+
+## Loads baked tiles when available, otherwise bakes at runtime.
+func setup_navigation() -> void:
+	if not load_baked_navigation():
+		bake_navigation()

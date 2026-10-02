@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dvw37vbesx6td"
-path="res://.godot/imported/heightmap16.png-45ffa7b7635d2f10183f7ccf0651fcc6.ctex"
+uid="uid://bt32uxdrv0nl5"
+path="res://.godot/imported/blockmap.png-bb8f8b48cd4cb1fcd08e72b34431516d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://terrain_data/heightmap16.png"
-dest_files=["res://.godot/imported/heightmap16.png-45ffa7b7635d2f10183f7ccf0651fcc6.ctex"]
+source_file="res://terrain_data/blockmap.png"
+dest_files=["res://.godot/imported/blockmap.png-bb8f8b48cd4cb1fcd08e72b34431516d.ctex"]
 
 [params]
 

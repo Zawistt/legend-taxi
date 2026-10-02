@@ -1,8 +1,8 @@
-# Legend RTS – Terrain Foundation (Godot 4.4+)
+# Legend RTS – Terrain, Roads & Navigation (Godot 4.4+)
 
-Base terrain only: **no props, buildings, units, resources, trees, rocks or rivers.**
+Terrain + movement structure only: **no props, buildings, units, workers, resources or UI.** Roads, forests and rock zones are *data + shader paint*, not meshes.
 
-![RTS overview](../docs/preview/02_rts_overview_zones.png)
+![Lanes](../docs/preview/03_topdown_lanes_chokes_50m_grid.png)
 
 | | |
 |---|---|
@@ -17,9 +17,30 @@ Base terrain only: **no props, buildings, units, resources, trees, rocks or rive
 | Resource sites | 13 positions in `terrain_meta.json → resource_sites` (3+3 beside each base, 2+2 forward pads, 3 centre/flank). Positions only - nothing is spawned. Shown as white rings in the zone view |
 | Capacity | ≈ 14 000 m² flat buildable total (~7 000 m² per player); a 180-soldier block at 1.1 m spacing needs ≈ 16 × 13 m |
 
+## Movement structure (v3)
+Player-1 view: base A is north-west, base B south-east. *Left* = north-east route, *right* = south-west route.
+
+| Route | Width | Length A→B | Character |
+|---|---|---|---|
+| **Centre lane** (yellow) | 22 m (≥ 29 m free) | 370 m | widest, most direct, passes through the open central arena (r = 50 m, 100 % free) |
+| **Left lane** (blue) | 15 m (≥ 20 m free) | 488 m | sheltered valley, forests on both flanks - flanking route; 2 chokes (≥ 20 m wide) |
+| **Right lane** (red) | 12 m (≥ 17 m free) | 494 m | narrow, winding rocky uplands - ambush / surprise route; 3 chokes (≥ 17 m wide) |
+| Links (white) | 9 m | | 4 connectors lane → arena entrances (N, E, S, W) = extra attack routes |
+| Ramps (orange) | 9 m, ≤ 14° | | every summit (4) reached from two different roads, rock ring with natural gaps |
+| Worker paths (purple) | 5 m | | base exits → resource sites / forward pads |
+
+- 52 road edges / 41 nodes in `terrain_data/paths.json`; the road graph has **no critical bridge** - every junction, summit and base exit has ≥ 2 edge-disjoint routes.
+- Each base has 3 exits (centre / left / right) on a 40 m radius open apron (no blockers); the Main Base footprint in the middle stays free.
+- Roads follow the existing terrain (A* on slope cost, smoothed); **terrain heights were not modified**. Road gradient ≤ 10.5° (ramps ≤ 14°), nav limit 18°.
+- 186 natural blockers (72 forest, 114 rock; ≈ 14 % of the playable area) are *convex polygons carved out of the navmesh* (`blockers.json`) and painted by the shader - no meshes. Gaps every few clumps keep alternatives open; no wall is longer than a few clumps.
+- Navigation: 16 `NavigationRegion3D` tiles; slope ≤ 18° walkable, forests/rocks/rim carved out. Baked tiles are stored in `terrain_data/nav/` (124 KB) and loaded at start (~1.3 s for the whole map incl. terrain); if missing they are baked at runtime.
+- `TerrainData` queries: `is_on_road`, `lane_at`, `is_blocked`, `is_walkable`, `is_buildable` (flat, not a road, not blocked). `PathNetwork` (`terrain.get_path_network()`): nodes, edges, lane curves, chokes, strategic `route()`.
+
+Regenerate: `python3 tools/generate_terrain.py && python3 tools/generate_paths.py` (needs numpy scipy pillow scikit-image networkx); validate in Godot with `scripts/terrain/bake_navigation.gd` (see below). `tools/debug_paths.py out.png` draws the network.
+
 ## Run
 Open `godot/` in Godot 4.4+, press F5. WASD/edge pan, Q/E or MMB rotate, wheel zoom, **Z** toggles the zone overlay
-(blue = buildable, yellow = high ground, purple = valley, white rings = resource sites).
+(blue = buildable, yellow = high ground, purple = valley), **P** toggles the lane debug view (roads coloured by lane, chokes magenta).
 
 ## Layout
 - `terrain_data/` – baked data: `heightmap.bin`, `heightmap16.png`, `zonemap.png` (R buildable, G high ground, B valley, A playable), `terrain_meta.json`
@@ -38,11 +59,11 @@ Open `godot/` in Godot 4.4+, press F5. WASD/edge pan, Q/E or MMB rotate, wheel z
 ## Navigation
 `terrain.bake_navigation()` bakes one `NavigationMesh` tile per chunk (cell 0.25 m, agent radius 0.5 m, height 1.5 m, max slope 35°).
 Project settings already match (`navigation/3d/default_cell_size=0.25`, `default_cell_height=0.25`).
-Validate headless (also reports a path between the two bases):
+Bake + validate headless (stores tiles, checks every road edge, lanes, carved blockers, open arena/aprons, rim):
 
     godot --headless --path godot --script res://scripts/terrain/bake_navigation.gd
 
-Verified on Godot 4.4.1: 16 regions, ~8 s bake, path base A → base B = 422 m across chunk borders.
+Verified on Godot 4.4.1 (`NAVIGATION CHECKS PASSED`): 16 regions, 5 k polygons, 87.9 % of the playable area navigable, all 948 road samples on the navmesh, 0/186 blocker centres navigable, 0/200 rim samples navigable, base A → base B = 438 m (centre lane).
 `scripts/terrain/capture_preview.gd` renders engine screenshots (needs a GL context, e.g. `xvfb-run`).
 
 ## Camera
@@ -50,4 +71,4 @@ Zoom 12 m (workers/buildings fill the screen) … 330 m (whole battlefield), def
 Pan speed scales with zoom; edge pan + WASD; Q/E/MMB rotate.
 
 ## Preview images
-`docs/preview/` were rendered with three.js from the same heightmap/zonemap (stand-in render, not the Godot shader). `05_scale_reference_PROXIES_ONLY.png` shows grey proxy boxes/capsules (worker, soldiers, buildings, main base) purely to illustrate proportions; they are **not** part of the project.
+`docs/preview/` were rendered with three.js from the same heightmap/road/block maps (stand-in render, not the Godot shader; the Godot shader was verified separately with `capture_preview.gd`). `05_scale_reference_PROXIES_ONLY.png` (from the previous step) shows grey proxy boxes/capsules (worker, soldiers, buildings, main base) purely to illustrate proportions; they are **not** part of the project.

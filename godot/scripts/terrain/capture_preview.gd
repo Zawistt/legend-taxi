@@ -28,10 +28,12 @@ func _init() -> void:
 	cam.current = true
 	cam.far = 3000.0
 	cam.fov = 40.0
+	# [camera position, look target, show_zones, show_paths]
 	var shots := {
-		"godot_rts_overview": [Vector3(-350, 265, -375), Vector3(8, 0, 4), false],
-		"godot_rts_zones": [Vector3(-350, 265, -375), Vector3(8, 0, 4), true],
-		"godot_rts_base_view": [Vector3(-190, 55, -215), Vector3(-120, 5, -120), false],
+		"godot_rts_overview": [Vector3(-350, 265, -375), Vector3(8, 0, 4), false, false],
+		"godot_rts_lanes": [Vector3(-350, 265, -375), Vector3(8, 0, 4), false, true],
+		"godot_rts_zones": [Vector3(-350, 265, -375), Vector3(8, 0, 4), true, false],
+		"godot_rts_base_view": [Vector3(-190, 55, -215), Vector3(-120, 5, -120), false, false],
 	}
 	for key in shots:
 		var s: Array = shots[key]
@@ -39,6 +41,7 @@ func _init() -> void:
 		cam.global_position = s[0]
 		cam.look_at(s[1], Vector3.UP)
 		terrain.set_show_zones(s[2])
+		terrain.set_show_paths(s[3])
 		for i in 6:
 			await process_frame
 		var img := root.get_texture().get_image()

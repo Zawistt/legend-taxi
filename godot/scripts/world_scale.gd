@@ -28,6 +28,14 @@ const DEFENSE_TOWER_HEIGHT := 7.0
 const NAV_AGENT_RADIUS := 0.5
 const NAV_AGENT_HEIGHT := 1.5
 const MIN_CORRIDOR_WIDTH := 12.0    # narrowest allowed attack route (~10 soldiers abreast)
+
+# Road network widths (tools/generate_paths.py CLS table)
+const ROAD_TRUNK_WIDTH := 22.0      # centre lane + base trunks
+const ROAD_LEFT_LANE_WIDTH := 15.0
+const ROAD_RIGHT_LANE_WIDTH := 12.0
+const ROAD_LINK_WIDTH := 9.0        # lane <-> arena connectors, high-ground ramps
+const ROAD_WORK_WIDTH := 5.0        # worker / resource paths
+const NAV_MAX_SLOPE_DEG := 18.0
 const UNIT_SPEED_WORKER := 3.5      # m/s -> base-to-base (~390 m) in about 1 min
 const UNIT_SPEED_SOLDIER := 5.0
 

@@ -7,7 +7,8 @@ extends Node3D
 
 ## Start the camera above faction A's base so the RTS view is immediately usable.
 @export var start_over_faction := 0
-@export var bake_navigation_on_start := false
+## Loads the pre-baked navmesh tiles (or bakes at startup if none are stored).
+@export var setup_navigation_on_start := true
 
 
 func _ready() -> void:
@@ -16,8 +17,8 @@ func _ready() -> void:
 	if terrain.data == null:
 		await terrain.terrain_ready
 	rts_camera.position = terrain.data.base_position(start_over_faction)
-	if bake_navigation_on_start:
-		terrain.bake_navigation()
+	if setup_navigation_on_start:
+		terrain.setup_navigation()
 
 
 func _setup_environment() -> void:
